@@ -5,13 +5,20 @@ import Link from "next/link";
 import { useState, type SVGProps } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
+import { instance } from "@/common/api";
 
 const signInSchema = z.object({
   email: z.string().email("Email không hợp lệ"),
   password: z.string().min(6, "Mật khẩu ít nhất 6 ký tự")
 });
+
+type SignInFormData = {
+  email: string;
+  password: string;
+};
+
 export default function HalfSidedGlassMorphismAuthentication() {
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   const {
@@ -22,39 +29,24 @@ export default function HalfSidedGlassMorphismAuthentication() {
     resolver: zodResolver(signInSchema)
   });
 
-  type SignInFormData = {
-    email: string;
-    password: string;
-  };
-
-  const onSubmit = async (data: SignInFormData) => {
-    setLoading(true);
-    setMessage("");
-
-    try {
-      const response = await fetch("http://localhost:20250/api/auths/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-      });
-
-      const result = await response.json();
+  const {mutate: signIn, isPending} = useMutation({
+    mutationFn: async (data: SignInFormData) => {
+      const response = await instance.post("/auths/signin", data);
+      return response.data;
+    },
+    onSuccess: (result) => {
       setMessage(result.message);
-      console.log("Server response:", result);
 
-      if (response.ok) {
-        if (result.token) {
-          localStorage.setItem("accessToken", result.token);
-        }
+      if (result.token) {
+        localStorage.setItem("accessToken", result.token);
       }
-    } catch (error) {
-      console.log("Error signing up:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    onError: (error) => {
+      console.error("Error signing in:", error);
+      setMessage(error?.message || "Có lỗi xảy ra khi đăng nhập.");
+    },
+  });
+
   return (
     <section className="relative flex h-[100vh] items-center justify-center bg-[url('https://images.unsplash.com/photo-1580610447943-1bfbef5efe07?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-cover px-2 py-6 md:px-12 lg:justify-end lg:p-0 ">
       <div className="relative z-10 flex flex-1 flex-col rounded-3xl border-white/50 border-t bg-white/60 px-4 py-10 backdrop-blur-2xl sm:justify-center md:flex-none md:px-20 lg:rounded-r-none lg:border-t-0 lg:border-l lg:py-24">
@@ -79,13 +71,14 @@ export default function HalfSidedGlassMorphismAuthentication() {
             </button>
             <div className="relative py-3">
               <div className="relative flex justify-center">
-                <span className="before:-translate-y-1/2 after:-translate-y-1/2 px-2 text-neutral-500 text-sm before:absolute before:top-1/2 before:left-0 before:h-px before:w-4/12 after:absolute after:top-1/2 after:right-0 after:h-px after:w-4/12 sm:after:bg-neutral-300 sm:before:bg-neutral-300">
+                <span
+                  className="before:-translate-y-1/2 after:-translate-y-1/2 px-2 text-neutral-500 text-sm before:absolute before:top-1/2 before:left-0 before:h-px before:w-4/12 after:absolute after:top-1/2 after:right-0 after:h-px after:w-4/12 sm:after:bg-neutral-300 sm:before:bg-neutral-300">
                   Hoặc
                 </span>
               </div>
             </div>
           </div>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit((data: SignInFormData) => signIn(data))}>
             <div className="space-y-3">
               <div>
                 <label
@@ -131,9 +124,9 @@ export default function HalfSidedGlassMorphismAuthentication() {
                 <button
                   className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-neutral-900 px-5 py-3 font-medium text-white duration-200 hover:bg-neutral-700 focus:ring-2 focus:ring-black focus:ring-offset-2"
                   type="submit"
-                  disabled={loading}
+                  disabled={isPending}
                 >
-                  {loading ? "Đang xử lý..." : "Đăng nhập"}
+                  {isPending ? "Đang xử lý..." : "Đăng nhập"}
                 </button>
               </div>
             </div>
