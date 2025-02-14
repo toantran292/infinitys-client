@@ -29,7 +29,7 @@ export default function HalfSidedGlassMorphismAuthentication() {
     resolver: zodResolver(signInSchema)
   });
 
-  const {mutate: signIn, isPending} = useMutation({
+  const { mutate: signIn, isPending } = useMutation({
     mutationFn: async (data: SignInFormData) => {
       const response = await instance.post("/auths/signin", data);
       return response.data;
@@ -44,7 +44,7 @@ export default function HalfSidedGlassMorphismAuthentication() {
     onError: (error) => {
       console.error("Error signing in:", error);
       setMessage(error?.message || "Có lỗi xảy ra khi đăng nhập.");
-    },
+    }
   });
 
   return (
@@ -71,8 +71,7 @@ export default function HalfSidedGlassMorphismAuthentication() {
             </button>
             <div className="relative py-3">
               <div className="relative flex justify-center">
-                <span
-                  className="before:-translate-y-1/2 after:-translate-y-1/2 px-2 text-neutral-500 text-sm before:absolute before:top-1/2 before:left-0 before:h-px before:w-4/12 after:absolute after:top-1/2 after:right-0 after:h-px after:w-4/12 sm:after:bg-neutral-300 sm:before:bg-neutral-300">
+                <span className="before:-translate-y-1/2 after:-translate-y-1/2 px-2 text-neutral-500 text-sm before:absolute before:top-1/2 before:left-0 before:h-px before:w-4/12 after:absolute after:top-1/2 after:right-0 after:h-px after:w-4/12 sm:after:bg-neutral-300 sm:before:bg-neutral-300">
                   Hoặc
                 </span>
               </div>

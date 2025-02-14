@@ -33,7 +33,7 @@ export default function HalfSidedGlassMorphismSignUp() {
     resolver: zodResolver(signUpSchema)
   });
 
-  const {mutate: signUp, isPending} = useMutation({
+  const { mutate: signUp, isPending } = useMutation({
     mutationFn: async (data: SignUpFormData) => {
       const response = await instance.post("/auths/signup", data);
       return response.data;
@@ -48,7 +48,7 @@ export default function HalfSidedGlassMorphismSignUp() {
     onError: (error) => {
       console.error("Error signing up:", error);
       setMessage(error?.message || "Có lỗi xảy ra khi đăng ký.");
-    },
+    }
   });
 
   return (
