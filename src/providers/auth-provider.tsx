@@ -67,37 +67,45 @@ const AuthContext = createContext<Context>({
 });
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [auth, setAuth] = useState<Auth>(() => {
-    const savedToken = localStorage.getItem("accessToken") || "";
-    if (savedToken) {
-      try {
-        const decoded = jwtDecode<Decoded>(savedToken);
-        const user: User = {
-          id: decoded.sub as string,
-          email: decoded.email as string
-        };
-        return {
-          message: "",
-          token: savedToken,
-          user
-        };
-      } catch {
-        return defaultAuth;
+  const [auth, setAuth] = useState<Auth>(defaultAuth);
+
+  //Local storage chỉ chạy trên client
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedToken = localStorage.getItem("accessToken");
+      if (savedToken) {
+        try {
+          const decoded = jwtDecode<Decoded>(savedToken);
+          setAuth({
+            message: "",
+            token: savedToken,
+            user: {
+              id: decoded.sub,
+              email: decoded.email
+            }
+          });
+        } catch {
+          setAuth(defaultAuth);
+        }
       }
     }
-    return defaultAuth;
-  });
+  }, []);
+
   useEffect(() => {
-    if (auth.token) {
-      localStorage.setItem("accessToken", auth.token);
-    } else {
-      localStorage.removeItem("accessToken");
+    if (typeof window !== "undefined") {
+      if (auth.token) {
+        localStorage.setItem("accessToken", auth.token);
+      } else {
+        localStorage.removeItem("accessToken");
+      }
     }
   }, [auth.token]);
 
   const signOut = () => {
     setAuth(defaultAuth);
-    localStorage.removeItem("accessToken");
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("accessToken");
+    }
   };
 
   const { mutate: signIn, isPending: isSigningIn } = useMutation({
@@ -117,7 +125,10 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
               email: decoded.email
             }
           });
-          localStorage.setItem("accessToken", result.token);
+
+          if (typeof window !== "undefined") {
+            localStorage.setItem("accessToken", result.token);
+          }
         } catch (error) {
           console.error("Token decode error:", error);
         }
@@ -145,7 +156,10 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
               email: decoded.email
             }
           });
-          localStorage.setItem("accessToken", result.token);
+
+          if (typeof window !== "undefined") {
+            localStorage.setItem("accessToken", result.token);
+          }
         } catch (error) {
           console.error("Token decode error:", error);
         }
