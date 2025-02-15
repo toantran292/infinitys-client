@@ -2,11 +2,9 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
-import { instance } from "@/common/api";
+import { useAuth } from "@/providers/auth-provider";
 
 const signUpSchema = z.object({
   lastName: z.string().min(1, "Họ là bắt buộc"),
@@ -23,7 +21,7 @@ type SignUpFormData = {
 };
 
 export default function HalfSidedGlassMorphismSignUp() {
-  const [message, setMessage] = useState("");
+  const { auth, signUp, isSigningIn } = useAuth();
 
   const {
     register,
@@ -31,24 +29,6 @@ export default function HalfSidedGlassMorphismSignUp() {
     formState: { errors }
   } = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema)
-  });
-
-  const { mutate: signUp, isPending } = useMutation({
-    mutationFn: async (data: SignUpFormData) => {
-      const response = await instance.post("/auths/signup", data);
-      return response.data;
-    },
-    onSuccess: (result) => {
-      setMessage(result.message);
-
-      if (result.token) {
-        localStorage.setItem("accessToken", result.token);
-      }
-    },
-    onError: (error) => {
-      console.error("Error signing up:", error);
-      setMessage(error?.message || "Có lỗi xảy ra khi đăng ký.");
-    }
   });
 
   return (
@@ -141,17 +121,17 @@ export default function HalfSidedGlassMorphismSignUp() {
                 <button
                   className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-neutral-900 px-5 py-3 font-medium text-white duration-200 hover:bg-neutral-700 focus:ring-2 focus:ring-black focus:ring-offset-2"
                   type="submit"
-                  disabled={isPending}
+                  disabled={isSigningIn}
                 >
-                  {isPending ? "Đang xử lý..." : "Đăng ký"}
+                  {isSigningIn ? "Đang xử lý..." : "Đăng ký"}
                 </button>
               </div>
             </div>
-            {message && (
+            {auth.message && (
               <p
-                className={`mt-3 text-sm ${message.includes("thành công") ? "text-green-600" : "text-red-600"}`}
+                className={`mt-3 text-sm ${auth.message.includes("thành công") ? "text-green-600" : "text-red-600"}`}
               >
-                {message}
+                {auth.message}
               </p>
             )}
             <div className="mt-6">

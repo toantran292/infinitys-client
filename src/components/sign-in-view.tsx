@@ -2,11 +2,10 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useState, type SVGProps } from "react";
+import { type SVGProps } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
-import { instance } from "@/common/api";
+import { useAuth } from "@/providers/auth-provider";
 
 const signInSchema = z.object({
   email: z.string().email("Email không hợp lệ"),
@@ -19,7 +18,7 @@ type SignInFormData = {
 };
 
 export default function HalfSidedGlassMorphismAuthentication() {
-  const [message, setMessage] = useState("");
+  const { signIn, isSigningIn, auth } = useAuth();
 
   const {
     register,
@@ -27,24 +26,6 @@ export default function HalfSidedGlassMorphismAuthentication() {
     formState: { errors }
   } = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema)
-  });
-
-  const { mutate: signIn, isPending } = useMutation({
-    mutationFn: async (data: SignInFormData) => {
-      const response = await instance.post("/auths/signin", data);
-      return response.data;
-    },
-    onSuccess: (result) => {
-      setMessage(result.message);
-
-      if (result.token) {
-        localStorage.setItem("accessToken", result.token);
-      }
-    },
-    onError: (error) => {
-      console.error("Error signing in:", error);
-      setMessage(error?.message || "Có lỗi xảy ra khi đăng nhập.");
-    }
   });
 
   return (
@@ -123,17 +104,17 @@ export default function HalfSidedGlassMorphismAuthentication() {
                 <button
                   className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-neutral-900 px-5 py-3 font-medium text-white duration-200 hover:bg-neutral-700 focus:ring-2 focus:ring-black focus:ring-offset-2"
                   type="submit"
-                  disabled={isPending}
+                  disabled={isSigningIn}
                 >
-                  {isPending ? "Đang xử lý..." : "Đăng nhập"}
+                  {isSigningIn ? "Đang xử lý..." : "Đăng nhập"}
                 </button>
               </div>
             </div>
-            {message && (
+            {auth.message && (
               <p
-                className={`mt-3 text-sm ${message.includes("thành công") ? "text-green-600" : "text-red-600"}`}
+                className={`mt-3 text-sm ${auth.message.includes("thành công") ? "text-green-600" : "text-red-600"}`}
               >
-                {message}
+                {auth.message}
               </p>
             )}
             <div className="mt-6">
