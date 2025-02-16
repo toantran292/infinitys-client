@@ -5,6 +5,5 @@ export const API_BASE = config.apiBaseUrl;
 
 export const instance = axios.create({
   baseURL: API_BASE,
-  timeout: 60000,
-  withCredentials: true
+  timeout: 60000
 });
