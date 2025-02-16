@@ -106,6 +106,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("accessToken");
     }
+    window.location.href = "/";
   };
 
   const { mutate: signIn, isPending: isSigningIn } = useMutation({
@@ -129,6 +130,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
           if (typeof window !== "undefined") {
             localStorage.setItem("accessToken", result.token);
           }
+          window.location.href = "/home";
         } catch (error) {
           console.error("Token decode error:", error);
         }
@@ -160,6 +162,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
           if (typeof window !== "undefined") {
             localStorage.setItem("accessToken", result.token);
           }
+          window.location.href = "/home";
         } catch (error) {
           console.error("Token decode error:", error);
         }
