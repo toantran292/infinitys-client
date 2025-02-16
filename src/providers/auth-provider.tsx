@@ -11,6 +11,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
 import { instance } from "@/common/api";
+import { useToast } from "@/hooks/use-toast";
 
 type SignInFormData = {
   email: string;
@@ -68,6 +69,7 @@ const AuthContext = createContext<Context>({
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const [auth, setAuth] = useState<Auth>(defaultAuth);
+  const { toast } = useToast();
 
   //Local storage chỉ chạy trên client
   useEffect(() => {
@@ -136,8 +138,15 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         }
       }
     },
-    onError: (error) => {
+    onError: (error: unknown) => {
       console.error("Error signing in:", error);
+      toast({
+        variant: "destructive",
+        title: "Đăng nhập không thành công",
+        description:
+          (error as { response?: { data?: { message?: string } } }).response
+            ?.data?.message || ""
+      });
     }
   });
 
@@ -168,8 +177,16 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         }
       }
     },
-    onError: (error) => {
+    onError: (error: unknown) => {
       console.error("Error signing up:", error);
+
+      toast({
+        variant: "destructive",
+        title: "Đăng ký không thành công",
+        description:
+          (error as { response?: { data?: { message?: string } } }).response
+            ?.data?.message || ""
+      });
     }
   });
 
