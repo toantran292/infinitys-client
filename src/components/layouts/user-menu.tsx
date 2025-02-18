@@ -1,5 +1,5 @@
 import { LogOut, Settings, User } from "lucide-react";
-
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,10 +11,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/providers/auth-provider";
+import { jwtDecode } from "jwt-decode";
 
 export function UserMenu() {
   const { signOut } = useAuth();
 
+  const getUserIdFromToken = () => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("accessToken");
+
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+          return decoded.sub;
+        } catch (error) {
+          console.log("Lỗi khi giải mã token:", error);
+        }
+      }
+    }
+    return null;
+  };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="cursor-pointer">
@@ -29,7 +45,7 @@ export function UserMenu() {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <User />
-            <span>Hồ sơ cá nhân</span>
+            <Link href={`/profile/${getUserIdFromToken()}`}>Hồ sơ cá nhân</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Settings />
