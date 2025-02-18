@@ -3,59 +3,42 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Profile } from "../profile-page";
 import { instance } from "@/common/api";
-import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
 import { Pencil } from "lucide-react";
+import { useState } from "react";
 
-export default function ProfileCard({
-  data,
-  refreshProfile
-}: {
-  data: Profile | null;
-  refreshProfile: () => void;
-}) {
+interface FormData {
+  dateOfBirth: string;
+  gender: string;
+  major: string;
+  desiredJobPosition: string;
+}
+
+export default function ProfileCard({ data }: { data: Profile | null }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    dateOfBirth: "",
-    gender: "",
-    major: "",
-    desiredJobPosition: ""
+  const queryClient = useQueryClient();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting }
+  } = useForm<FormData>({
+    defaultValues: {
+      dateOfBirth: data?.dateOfBirth
+        ? new Date(data.dateOfBirth).toISOString().split("T")[0]
+        : "",
+      gender: data?.gender || "",
+      major: data?.major || "",
+      desiredJobPosition: data?.desiredJobPosition || ""
+    }
   });
 
-  useEffect(() => {
-    if (data) {
-      setFormData({
-        dateOfBirth: data.dateOfBirth
-          ? new Date(data.dateOfBirth).toISOString().split("T")[0]
-          : "",
-        gender: data.gender || "",
-        major: data.major || "",
-        desiredJobPosition: data.desiredJobPosition || ""
-      });
-    }
-  }, [data]);
-
-  if (!data)
-    return <div className="text-center text-gray-500">Đang tải...</div>;
-
-  let gender = "Chưa cập nhật";
-  if (data.gender) {
-    gender = data.gender === "Male" ? "Nam" : "Nữ";
-  }
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSave = async () => {
-    try {
+  const mutation = useMutation({
+    mutationFn: async (updatedData: FormData) => {
       const sanitizedData = Object.fromEntries(
-        Object.entries(formData).filter(([, value]) => value !== "")
+        Object.entries(updatedData).filter(([, value]) => value !== "")
       );
 
       if (sanitizedData.dateOfBirth) {
@@ -70,32 +53,42 @@ export default function ProfileCard({
         ).toISOString();
       }
 
-      await instance.put(`/users/profile/${data.id}`, sanitizedData);
+      await instance.put(`/users/profile/${data?.id}`, sanitizedData);
+    },
+    onSuccess: () => {
       setIsEditing(false);
-      refreshProfile();
-    } catch (error) {
-      console.error("Lỗi khi cập nhật thông tin:", error);
+      queryClient.invalidateQueries({
+        queryKey: ["PROFILE", data?.id]
+      });
     }
+  });
+
+  const onSubmit = (formData: FormData) => {
+    mutation.mutate(formData);
   };
 
-  const formatDateToDisplay = (dateString: string | undefined) => {
-    if (!dateString) return "Chưa cập nhật";
-    const date = new Date(dateString);
-    return `${date.getDate().toString().padStart(2, "0")}/${(
-      date.getMonth() + 1
-    )
-      .toString()
-      .padStart(2, "0")}/${date.getFullYear()}`;
-  };
+  if (!data)
+    return <div className="text-center text-gray-500">Đang tải...</div>;
+
+  const genderText =
+    data.gender === "Male"
+      ? "Nam"
+      : data.gender === "Female"
+        ? "Nữ"
+        : "Chưa cập nhật";
 
   return (
     <div className="relative p-6 bg-gray-50 shadow-lg rounded-lg max-w-lg mx-auto">
       <button
-        onClick={handleEdit}
+        onClick={() => {
+          reset();
+          setIsEditing(true);
+        }}
         className="absolute top-4 right-4 p-2 text-gray-600 hover:text-gray-800 transition"
       >
         <Pencil className="w-5 h-5" />
       </button>
+
       {/* Thông tin chính */}
       <div className="flex items-center space-x-4 border-b border-gray-300 pb-4">
         <Avatar className="w-20 h-20">
@@ -119,16 +112,14 @@ export default function ProfileCard({
       {/* Thông tin chi tiết */}
       <div className="mt-4 space-y-2 text-gray-700">
         {isEditing ? (
-          <div className="space-y-3">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 🎂 Ngày sinh
               </label>
               <input
                 type="date"
-                name="dateOfBirth"
-                value={formData.dateOfBirth}
-                onChange={handleChange}
+                {...register("dateOfBirth")}
                 className="w-full mt-1 p-2 border rounded-md"
               />
             </div>
@@ -138,11 +129,10 @@ export default function ProfileCard({
                 🚻 Giới tính
               </label>
               <select
-                name="gender"
-                value={formData.gender}
-                onChange={handleChange}
+                {...register("gender")}
                 className="w-full mt-1 p-2 border rounded-md"
               >
+                <option value="">Chưa cập nhật</option>
                 <option value="Male">Nam</option>
                 <option value="Female">Nữ</option>
               </select>
@@ -154,9 +144,7 @@ export default function ProfileCard({
               </label>
               <input
                 type="text"
-                name="major"
-                value={formData.major}
-                onChange={handleChange}
+                {...register("major")}
                 className="w-full mt-1 p-2 border rounded-md"
               />
             </div>
@@ -167,36 +155,45 @@ export default function ProfileCard({
               </label>
               <input
                 type="text"
-                name="desiredJobPosition"
-                value={formData.desiredJobPosition}
-                onChange={handleChange}
+                {...register("desiredJobPosition")}
                 className="w-full mt-1 p-2 border rounded-md"
               />
             </div>
 
             <div className="flex justify-end space-x-2">
               <button
+                type="button"
                 onClick={() => setIsEditing(false)}
                 className="px-4 py-2 bg-gray-400 text-white rounded-md"
               >
                 Hủy
               </button>
               <button
-                onClick={handleSave}
+                type="submit"
+                disabled={mutation.isPending || isSubmitting}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md"
               >
-                Lưu
+                {mutation.isPending || isSubmitting ? "Đang lưu..." : "Lưu"}
               </button>
             </div>
-          </div>
+
+            {mutation.isError && (
+              <p className="text-red-500 text-sm mt-2">
+                Lỗi khi cập nhật: {mutation.error?.message}
+              </p>
+            )}
+          </form>
         ) : (
           <>
             <p>
               <strong className="text-gray-900">🎂 Ngày sinh:</strong>{" "}
-              {formatDateToDisplay(data.dateOfBirth) || "Chưa cập nhật"}
+              {data.dateOfBirth
+                ? new Date(data.dateOfBirth).toLocaleDateString("vi-VN")
+                : "Chưa cập nhật"}
             </p>
             <p>
-              <strong className="text-gray-900">🚻 Giới tính:</strong> {gender}
+              <strong className="text-gray-900">🚻 Giới tính:</strong>{" "}
+              {genderText}
             </p>
             <p>
               <strong className="text-gray-900">🎓 Chuyên ngành:</strong>{" "}

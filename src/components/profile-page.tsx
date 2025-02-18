@@ -2,7 +2,7 @@ import { Layout } from "@/components/layouts";
 import ProfileCard from "./ui/ProfileCard";
 import PostList from "./ui/PostList";
 import { instance } from "@/common/api";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 interface ProfilePageProps {
   userId: string;
@@ -29,22 +29,20 @@ export interface Profile {
   posts: Post[];
 }
 
-const getProfile = async (userId: string) => {
+const getProfile = async (userId: string): Promise<Profile> => {
   const response = await instance.get(`/users/profile/${userId}`);
   return response.data;
 };
 
 export const ProfilePage = ({ userId }: ProfilePageProps) => {
-  const [profile, setProfile] = useState<Profile | null>(null);
-
-  const refreshProfile = async () => {
-    const updatedProfile = await getProfile(userId);
-    setProfile(updatedProfile);
-  };
-
-  useEffect(() => {
-    refreshProfile();
-  }, [userId]);
+  const {
+    data: profile,
+    isLoading,
+    error
+  } = useQuery({
+    queryKey: ["PROFILE", userId],
+    queryFn: () => getProfile(userId)
+  });
 
   return (
     <Layout>
@@ -53,17 +51,24 @@ export const ProfilePage = ({ userId }: ProfilePageProps) => {
           Hồ sơ cá nhân
         </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-1 flex justify-center">
-            <div className="w-full max-w-md">
-              <ProfileCard data={profile} refreshProfile={refreshProfile} />
+        {isLoading && <p className="text-center text-gray-500">Đang tải...</p>}
+        {error && (
+          <p className="text-center text-red-500">Lỗi khi tải dữ liệu</p>
+        )}
+
+        {!isLoading && !error && profile ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-1 flex justify-center">
+              <div className="w-full max-w-md">
+                <ProfileCard data={profile} />
+              </div>
+            </div>
+
+            <div className="lg:col-span-2">
+              <PostList data={profile?.posts ?? []} />
             </div>
           </div>
-
-          <div className="lg:col-span-2">
-            <PostList data={profile?.posts ?? null} />
-          </div>
-        </div>
+        ) : null}
       </div>
     </Layout>
   );
