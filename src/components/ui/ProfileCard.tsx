@@ -53,7 +53,7 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
         ).toISOString();
       }
 
-      await instance.put(`/users/profile/${data?.id}`, sanitizedData);
+      await instance.patch(`/users/${data?.id}`, sanitizedData);
     },
     onSuccess: () => {
       setIsEditing(false);
@@ -94,7 +94,7 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
         <Avatar className="w-20 h-20">
           <AvatarImage
             src="https://github.com/shadcn.png"
-            alt={data.fullName}
+            alt={data.firstName}
           />
           <AvatarFallback>
             {data.firstName[0]}
@@ -103,7 +103,7 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
         </Avatar>
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">
-            {data.fullName}
+            {data.firstName} {data.lastName}
           </h2>
           <p className="text-gray-600">{data.email}</p>
         </div>

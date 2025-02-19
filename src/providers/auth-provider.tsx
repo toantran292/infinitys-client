@@ -9,7 +9,6 @@ import {
   useContext
 } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { jwtDecode } from "jwt-decode";
 import { instance } from "@/common/api";
 import { useToast } from "@/hooks/use-toast";
 
@@ -27,11 +26,14 @@ type SignUpFormData = {
 
 type User = {
   id: string;
+  firstName: string;
+  lastName: string;
   email: string;
+  role: string;
+  active: boolean;
 };
 
 type Auth = {
-  message: string;
   token: string;
   user?: User | null;
 };
@@ -47,14 +49,8 @@ type Context = {
 };
 
 const defaultAuth: Auth = {
-  message: "",
   token: "",
   user: null
-};
-
-type Decoded = {
-  sub: string;
-  email: string;
 };
 
 const AuthContext = createContext<Context>({
@@ -71,20 +67,15 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const [auth, setAuth] = useState<Auth>(defaultAuth);
   const { toast } = useToast();
 
-  //Local storage chỉ chạy trên client
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const savedToken = localStorage.getItem("accessToken");
-      if (savedToken) {
+      const token = localStorage.getItem("accessToken");
+      const user = localStorage.getItem("user");
+      if (token && user) {
         try {
-          const decoded = jwtDecode<Decoded>(savedToken);
           setAuth({
-            message: "",
-            token: savedToken,
-            user: {
-              id: decoded.sub,
-              email: decoded.email
-            }
+            token: token,
+            user: user ? JSON.parse(user) : null
           });
         } catch {
           setAuth(defaultAuth);
@@ -97,8 +88,10 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     if (typeof window !== "undefined") {
       if (auth.token) {
         localStorage.setItem("accessToken", auth.token);
+        localStorage.setItem("user", JSON.stringify(auth.user));
       } else {
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
       }
     }
   }, [auth.token]);
@@ -113,24 +106,21 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const { mutate: signIn, isPending: isSigningIn } = useMutation({
     mutationFn: async (data: SignInFormData) => {
-      const response = await instance.post("/auths/signin", data);
+      const response = await instance.post("/auths/login", data);
       return response.data;
     },
+
     onSuccess: (result) => {
       if (result.token) {
         try {
-          const decoded = jwtDecode<Decoded>(result.token);
           setAuth({
-            message: result.message,
-            token: result.token,
-            user: {
-              id: decoded.sub,
-              email: decoded.email
-            }
+            token: result.token.accessToken,
+            user: result.user
           });
 
           if (typeof window !== "undefined") {
-            localStorage.setItem("accessToken", result.token);
+            localStorage.setItem("accessToken", result.token.accessToken);
+            localStorage.setItem("user", JSON.stringify(result.user));
           }
           window.location.href = "/home";
         } catch (error) {
@@ -152,24 +142,20 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const { mutate: signUp, isPending: isSigningUp } = useMutation({
     mutationFn: async (data: SignUpFormData) => {
-      const response = await instance.post("/auths/signup", data);
+      const response = await instance.post("/auths/register", data);
       return response.data;
     },
     onSuccess: (result) => {
       if (result.token) {
         try {
-          const decoded = jwtDecode<Decoded>(result.token);
           setAuth({
-            message: result.message,
-            token: result.token,
-            user: {
-              id: decoded.sub,
-              email: decoded.email
-            }
+            token: result.token.accessToken,
+            user: result.user
           });
 
           if (typeof window !== "undefined") {
-            localStorage.setItem("accessToken", result.token);
+            localStorage.setItem("accessToken", result.token.accessToken);
+            localStorage.setItem("user", JSON.stringify(result.user));
           }
           window.location.href = "/home";
         } catch (error) {
@@ -179,7 +165,6 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     },
     onError: (error: unknown) => {
       console.error("Error signing up:", error);
-
       toast({
         variant: "destructive",
         title: "Đăng ký không thành công",

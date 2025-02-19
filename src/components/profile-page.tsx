@@ -3,6 +3,7 @@ import ProfileCard from "./ui/ProfileCard";
 import PostList from "./ui/PostList";
 import { instance } from "@/common/api";
 import { useQuery } from "@tanstack/react-query";
+import { Loader } from "@/components/ui/Loader";
 
 interface ProfilePageProps {
   userId: string;
@@ -30,7 +31,7 @@ export interface Profile {
 }
 
 const getProfile = async (userId: string): Promise<Profile> => {
-  const response = await instance.get(`/users/profile/${userId}`);
+  const response = await instance.get(`/users/${userId}`);
   return response.data;
 };
 
@@ -44,6 +45,13 @@ export const ProfilePage = ({ userId }: ProfilePageProps) => {
     queryFn: () => getProfile(userId)
   });
 
+  if (isLoading || !profile)
+    return (
+      <div className="h-screen">
+        <Loader />
+      </div>
+    );
+
   return (
     <Layout>
       <div className="container mx-auto p-6">
@@ -51,24 +59,21 @@ export const ProfilePage = ({ userId }: ProfilePageProps) => {
           Hồ sơ cá nhân
         </h1>
 
-        {isLoading && <p className="text-center text-gray-500">Đang tải...</p>}
         {error && (
           <p className="text-center text-red-500">Lỗi khi tải dữ liệu</p>
         )}
 
-        {!isLoading && !error && profile ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-1 flex justify-center">
-              <div className="w-full max-w-md">
-                <ProfileCard data={profile} />
-              </div>
-            </div>
-
-            <div className="lg:col-span-2">
-              <PostList data={profile?.posts ?? []} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-1 flex justify-center">
+            <div className="w-full max-w-md">
+              <ProfileCard data={profile} />
             </div>
           </div>
-        ) : null}
+
+          <div className="lg:col-span-2">
+            <PostList data={profile?.posts ?? []} />
+          </div>
+        </div>
       </div>
     </Layout>
   );

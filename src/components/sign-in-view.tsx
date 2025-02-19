@@ -18,7 +18,7 @@ type SignInFormData = {
 };
 
 export default function HalfSidedGlassMorphismAuthentication() {
-  const { signIn, isSigningIn, auth } = useAuth();
+  const { signIn, isSigningIn } = useAuth();
 
   const {
     register,
@@ -110,13 +110,6 @@ export default function HalfSidedGlassMorphismAuthentication() {
                 </button>
               </div>
             </div>
-            {auth.message && (
-              <p
-                className={`mt-3 text-sm ${auth.message.includes("thành công") ? "text-green-600" : "text-red-600"}`}
-              >
-                {auth.message}
-              </p>
-            )}
             <div className="mt-6">
               <p className="mx-auto flex text-center font-medium text-black text-sm leading-tight">
                 Không có tài khoản?
