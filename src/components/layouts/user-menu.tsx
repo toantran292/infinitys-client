@@ -1,5 +1,5 @@
 import { LogOut, Settings, User } from "lucide-react";
-
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/providers/auth-provider";
 
 export function UserMenu() {
-  const { signOut } = useAuth();
+  const { signOut, auth } = useAuth();
 
   return (
     <DropdownMenu>
@@ -29,7 +29,7 @@ export function UserMenu() {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <User />
-            <span>Hồ sơ cá nhân</span>
+            <Link href={`/profile/${auth?.user?.id}`}>Hồ sơ cá nhân</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Settings />

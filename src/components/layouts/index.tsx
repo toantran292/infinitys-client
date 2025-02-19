@@ -7,7 +7,7 @@ export const Layout: FC<PropsWithChildren> = ({ children }) => {
       <div className="mx-auto w-full">
         <Header />
       </div>
-      <main className="max-w-[660px] mx-auto">{children}</main>
+      <main className="container mx-auto">{children}</main>
     </div>
   );
 };
