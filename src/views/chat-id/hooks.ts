@@ -4,7 +4,7 @@ import { GroupChat } from "@/components/chat-page";
 
 export const useGetGroupChatMessage = (group_id?: string) => {
   const { data: groupChatMessage, isLoading } = useQuery({
-    queryKey: ["GROUP_CHATS", group_id],
+    queryKey: ["GROUP_CHAT_MESSAGE", group_id],
     queryFn: () =>
       instance
         .get(`/chats/groups/${group_id}/messages`)
@@ -22,4 +22,15 @@ export const useGetGroupChats = () => {
   });
 
   return { groupChats: groupChats, isLoading };
+};
+
+
+export const useGetGroupChat = (group_id?: string) => {
+  const { data: groupChat, isLoading } = useQuery<GroupChat>({
+    queryKey: ["GROUP_CHAT", group_id],
+    queryFn: () => instance.get(`/chats/groups/${group_id}`).then(({ data }) => data),
+    enabled: Boolean(group_id)
+  });
+
+  return { groupChat, isLoading };
 };

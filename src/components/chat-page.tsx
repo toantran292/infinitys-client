@@ -39,6 +39,7 @@ export interface Message {
   user: Profile;
   content: string;
   room_id: string;
+  createdAt: string;
 }
 
 export interface GroupChat {
@@ -115,7 +116,7 @@ const ChatPage = ({ groupChatId }: ChatPageProps) => {
   }, [socket, groupChatId]);
 
   return (
-    <div className="flex flex-col justify-between w-full h-full">
+    <div className="flex flex-col justify-between w-full h-full overflow-hidden">
       <ChatTopBar />
       <ChatList messages={messages} />
       <ChatBottomBar sendMessage={handleSendMessage} />

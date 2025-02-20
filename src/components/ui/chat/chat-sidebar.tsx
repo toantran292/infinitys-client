@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarImage } from "../avatar";
 import { GroupChat } from "@/components/chat-page";
 import { useGetGroupChats } from "@/views/chat-id/hooks";
+import { memo } from "react";
 
 interface ChatSidebarProps {
   isCollapsed: boolean;
@@ -102,7 +103,7 @@ const ChatSideBarBodyProps = ({
         ) : (
           <Link
             key={index}
-            href="#"
+            href={`/chat/${chat.id}`}
             className={cn(
               buttonVariants({ variant: "secondary", size: "lg" }),
               "h-20 dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white shrink"
@@ -125,13 +126,13 @@ const ChatSideBarBodyProps = ({
   );
 };
 
-export function ChatSidebar({ isCollapsed }: ChatSidebarProps) {
+const ChatSidebar = ({ isCollapsed }: ChatSidebarProps) => {
   const { groupChats } = useGetGroupChats();
 
   return (
     <div
       data-collapsed={isCollapsed}
-      className="relative group flex flex-col h-full bg-muted/10 dark:bg-muted/20 gap-4 p-2 data-[collapsed=true]:p-2 "
+      className="relative group flex flex-col h-full bg-muted/10 dark:bg-muted/20 gap-4 p-2 data-[collapsed=true]:p-2"
     >
       <ChatSideBarHeader
         quantity={groupChats?.length || 0}
@@ -145,4 +146,6 @@ export function ChatSidebar({ isCollapsed }: ChatSidebarProps) {
       </nav>
     </div>
   );
-}
+};
+
+export default memo(ChatSidebar);

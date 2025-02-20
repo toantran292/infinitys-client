@@ -5,7 +5,7 @@ import {
   ResizablePanelGroup
 } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
-import { ChatSidebar } from "@/components/ui/chat/chat-sidebar";
+import ChatSidebar  from "@/components/ui/chat/chat-sidebar";
 import ChatPage from "@/components/chat-page";
 import React, { useState } from "react";
 
@@ -13,45 +13,34 @@ export interface ChatIdViewProps {
   groupChatId?: string;
   defaultLayout?: number[] | undefined;
   // defaultCollapsed?: boolean;
-  navCollapsedSize?: number;
 }
 
 export const ChatIdView = ({
   groupChatId,
-  defaultLayout = [320, 480],
+  defaultLayout = [50, 200],
   // defaultCollapsed = false,
-  navCollapsedSize = 30
 }: ChatIdViewProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  console.log({ isCollapsed})
+
   return (
-    <Layout sectionClassName="bg-gray-50 p-6 h-full">
+    <Layout sectionClassName="bg-gray-50 h-full max-h-full">
       <ResizablePanelGroup
         direction="horizontal"
-        onLayout={(sizes: number[]) => {
-          document.cookie = `react-resizable-panels:layout=${JSON.stringify(
-            sizes
-          )}`;
-        }}
-        className="h-full items-stretch"
+        className="h-full items-stretch max-h-full"
       >
         <ResizablePanel
           defaultSize={defaultLayout[0]}
-          collapsedSize={navCollapsedSize}
+          collapsedSize={6}
           collapsible={true}
-          minSize={24}
-          maxSize={30}
+          minSize={8}
+          maxSize={12}
           onCollapse={() => {
             setIsCollapsed(true);
-            document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-              true
-            )}`;
           }}
           onExpand={() => {
             setIsCollapsed(false);
-            document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-              false
-            )}`;
           }}
           className={cn(
             isCollapsed &&
@@ -61,7 +50,7 @@ export const ChatIdView = ({
           <ChatSidebar isCollapsed={isCollapsed} />
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
+        <ResizablePanel className="max-h-full" defaultSize={defaultLayout[1]} minSize={30}>
           {groupChatId ? <ChatPage groupChatId={groupChatId} /> : null}
         </ResizablePanel>
       </ResizablePanelGroup>

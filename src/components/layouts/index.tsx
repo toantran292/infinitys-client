@@ -7,8 +7,8 @@ interface LayoutProps extends PropsWithChildren {
 
 export const Layout: FC<LayoutProps> = ({ children, sectionClassName }) => {
   return (
-    <div className="h-screen">
-      <div className="mx-auto w-full">
+    <div className="flex flex-col h-screen max-h-screen">
+      <div className="flex mx-auto w-full">
         <Header />
       </div>
       <section className={sectionClassName}>{children}</section>

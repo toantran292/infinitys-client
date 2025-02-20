@@ -8,7 +8,7 @@ import {
   ChatBubbleAction,
   ChatBubbleActionWrapper,
   ChatBubbleAvatar,
-  ChatBubbleMessage
+  ChatBubbleMessage, ChatBubbleTimestamp
 } from "@/components/ui/chat/chat-bubble";
 import { useAuth } from "@/providers/auth-provider";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
@@ -31,7 +31,7 @@ export function ChatList({ messages }: ChatListProps) {
   ];
 
   return (
-    <div className="w-full overflow-y-hidden h-full flex flex-col">
+    <div className="flex flex-col w-full overflow-y-auto h-[calc(100vh-242px)]">
       <ChatMessageList>
         <AnimatePresence>
           {messages?.map((message, index) => {
@@ -61,9 +61,9 @@ export function ChatList({ messages }: ChatListProps) {
                   // isLoading={message.isLoading}
                   >
                     {message.content}
-                    {/*{message.timestamp && (*/}
-                    {/*  <ChatBubbleTimestamp timestamp={message.timestamp} />*/}
-                    {/*)}*/}
+                    {message.createdAt && (
+                      <ChatBubbleTimestamp timestamp={message.createdAt} />
+                    )}
                   </ChatBubbleMessage>
                   <ChatBubbleActionWrapper>
                     {actionIcons.map(({ icon: Icon, type }) => (

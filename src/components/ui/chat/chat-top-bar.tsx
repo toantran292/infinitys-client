@@ -6,6 +6,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { ExpandableChatHeader } from "@/components/ui/chat/expandable-chat";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Profile } from "@/components/profile-page";
+import { useParams } from "next/navigation";
+import { useGetGroupChat } from "@/views/chat-id/hooks";
 
 interface ChatTopbarProps {
   selectedUser?: Profile;
@@ -14,6 +16,12 @@ interface ChatTopbarProps {
 export const TopbarIcons = [{ icon: Phone }, { icon: Video }, { icon: Info }];
 
 export default function ChatTopBar({ selectedUser }: ChatTopbarProps) {
+  const { id } = useParams<{ id: string }>();
+
+  const { groupChat } = useGetGroupChat(id);
+
+  console.log({ groupChat, id })
+
   return (
     <ExpandableChatHeader>
       <div className="flex items-center gap-2">
