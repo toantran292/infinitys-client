@@ -28,10 +28,11 @@ export interface Profile {
   desiredJobPosition?: string;
   fullName: string;
   posts: Post[];
+  friend_status: null | "sent" | "waiting" | "friend";
 }
 
 const getProfile = async (userId: string): Promise<Profile> => {
-  const response = await instance.get(`/users/${userId}`);
+  const response = await instance.get(`api/users/${userId}`);
   return response.data;
 };
 

@@ -6,34 +6,8 @@ import { ChatList } from "@/components/ui/chat/chat-list";
 import ChatBottomBar from "@/components/ui/chat/chat-bottombar";
 import { memo, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
-import { useQuery } from "@tanstack/react-query";
-import instance from "@/common/api";
 import { useAuth } from "@/providers/auth-provider";
 import { useGetGroupChatMessage } from "@/views/chat-id/hooks";
-
-// const useCreateGroupChat = () => {
-//   const queryClient = useQueryClient();
-//
-//   const { mutate: createGroupChat, ...remain } = useMutation({
-//     mutationFn: (userId: string) =>
-//       instance.post(`/chats/groups`, {
-//         recipientId: userId
-//       }),
-//     onSuccess: () => {
-//       toast.success("Bank account successfully changed");
-//       queryClient
-//         .invalidateQueries({
-//           queryKey: ["GROUP_CHATS"]
-//         })
-//         .catch(console.error);
-//     },
-//     onError: (error: unknown) => {
-//       toast.error(`Error changing bank account: ${error}`);
-//     }
-//   });
-//
-//   return { createGroupChat, ...remain };
-// }
 
 export interface Message {
   user: Profile;
@@ -42,9 +16,16 @@ export interface Message {
   createdAt: string;
 }
 
+interface GroupChatMember {
+  id: string;
+  isAdmin: boolean;
+  user: Profile;
+}
+
 export interface GroupChat {
   id: string;
   name: string;
+  groupChatMembers: GroupChatMember[];
 }
 
 export interface ChatPageProps {

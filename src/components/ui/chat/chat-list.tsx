@@ -8,7 +8,8 @@ import {
   ChatBubbleAction,
   ChatBubbleActionWrapper,
   ChatBubbleAvatar,
-  ChatBubbleMessage, ChatBubbleTimestamp
+  ChatBubbleMessage,
+  ChatBubbleTimestamp
 } from "@/components/ui/chat/chat-bubble";
 import { useAuth } from "@/providers/auth-provider";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";

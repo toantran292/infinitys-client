@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Profile } from "@/components/profile-page";
 import { useParams } from "next/navigation";
 import { useGetGroupChat } from "@/views/chat-id/hooks";
+import { useAuth } from "@/providers/auth-provider";
 
 interface ChatTopbarProps {
   selectedUser?: Profile;
@@ -16,11 +17,19 @@ interface ChatTopbarProps {
 export const TopbarIcons = [{ icon: Phone }, { icon: Video }, { icon: Info }];
 
 export default function ChatTopBar({ selectedUser }: ChatTopbarProps) {
+  const { auth } = useAuth();
   const { id } = useParams<{ id: string }>();
 
   const { groupChat } = useGetGroupChat(id);
 
-  console.log({ groupChat, id })
+  console.log({ groupChat });
+
+  const groupName = groupChat?.groupChatMembers
+    .filter((m) => m.user.id !== auth.user?.id)
+    .map((m) => m.user.firstName + " " + m.user.lastName)
+    .join(", ");
+
+  // const groupChatName = groupChat?.groupChatMembers.filter()
 
   return (
     <ExpandableChatHeader>
@@ -30,9 +39,7 @@ export default function ChatTopBar({ selectedUser }: ChatTopbarProps) {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
-          <span className="font-medium">
-            {selectedUser?.firstName || "Shad"}
-          </span>
+          <span className="font-medium">{groupName || "No name"}</span>
           <span className="text-xs">Active 2 mins ago</span>
         </div>
       </div>

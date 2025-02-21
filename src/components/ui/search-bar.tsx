@@ -3,8 +3,11 @@ import { SearchIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { cn } from "@/utils/cn";
+import { useSearchParams } from "next/navigation";
 
 export const SearchBar = () => {
+  const searchParams = useSearchParams();
+  const q = searchParams.get("q");
   const [searchSubmittedOutline, setSearchSubmittedOutline] = useState(false);
   const [searchSubmittedShadow, setSearchSubmittedShadow] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -13,7 +16,12 @@ export const SearchBar = () => {
     setSearchSubmittedOutline(true);
     setSearchSubmittedShadow(true);
     toast(`Searching for ${searchValue}`);
+    window.location.href = `/search?q=${searchValue}`;
   }
+
+  useEffect(() => {
+    setSearchValue(q || "");
+  }, [q]);
 
   useEffect(() => {
     if (searchSubmittedOutline) {

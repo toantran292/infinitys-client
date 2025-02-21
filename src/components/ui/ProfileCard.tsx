@@ -5,8 +5,11 @@ import { Profile } from "../profile-page";
 import { instance } from "@/common/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { Pencil } from "lucide-react";
+import { MessageCircleCode, Pencil, UserRoundPlus } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useCreateGroupChat } from "@/views/chat-id/hooks";
+import { useAuth } from "@/providers/auth-provider";
 
 interface FormData {
   dateOfBirth: string;
@@ -16,8 +19,10 @@ interface FormData {
 }
 
 export default function ProfileCard({ data }: { data: Profile | null }) {
+  const { auth } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const queryClient = useQueryClient();
+  const { createGroupChat, isPending } = useCreateGroupChat();
 
   const {
     register,
@@ -53,7 +58,7 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
         ).toISOString();
       }
 
-      await instance.patch(`/users/${data?.id}`, sanitizedData);
+      await instance.patch(`api/users/${data?.id}`, sanitizedData);
     },
     onSuccess: () => {
       setIsEditing(false);
@@ -101,11 +106,29 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
             {data.lastName[0]}
           </AvatarFallback>
         </Avatar>
-        <div>
+        <div className="space-y-2">
           <h2 className="text-2xl font-semibold text-gray-900">
             {data.firstName} {data.lastName}
           </h2>
           <p className="text-gray-600">{data.email}</p>
+          {data.id !== auth?.user?.id ? (
+            <div className="flex gap-2 items-center">
+              <Button
+                disabled={isPending}
+                onClick={() => createGroupChat(data?.id)}
+                className="bg-neutral-500 text-white"
+              >
+                <MessageCircleCode /> nhắn tin
+              </Button>
+
+              <Button
+                disabled={isPending}
+                onClick={() => createGroupChat(data?.id)}
+              >
+                <UserRoundPlus /> Kết bạn
+              </Button>
+            </div>
+          ) : null}
         </div>
       </div>
 
