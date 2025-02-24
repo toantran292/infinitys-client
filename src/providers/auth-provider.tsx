@@ -106,7 +106,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const { mutate: signIn, isPending: isSigningIn } = useMutation({
     mutationFn: async (data: SignInFormData) => {
-      const response = await instance.post("/auths/login", data);
+      const response = await instance.post("api/auths/login", data);
       return response.data;
     },
 
@@ -142,7 +142,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const { mutate: signUp, isPending: isSigningUp } = useMutation({
     mutationFn: async (data: SignUpFormData) => {
-      const response = await instance.post("/auths/register", data);
+      const response = await instance.post("api/auths/register", data);
       return response.data;
     },
     onSuccess: (result) => {

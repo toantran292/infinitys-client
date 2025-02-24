@@ -1,13 +1,17 @@
 import Header from "@/components/layouts/header";
 import { FC, PropsWithChildren } from "react";
 
-export const Layout: FC<PropsWithChildren> = ({ children }) => {
+interface LayoutProps extends PropsWithChildren {
+  sectionClassName?: string;
+}
+
+export const Layout: FC<LayoutProps> = ({ children, sectionClassName }) => {
   return (
-    <div className="h-screen">
-      <div className="mx-auto w-full">
+    <div className="flex flex-col h-screen max-h-screen">
+      <div className="flex mx-auto w-full">
         <Header />
       </div>
-      <main className="container mx-auto">{children}</main>
+      <section className={sectionClassName}>{children}</section>
     </div>
   );
 };

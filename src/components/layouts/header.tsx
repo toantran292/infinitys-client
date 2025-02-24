@@ -15,6 +15,7 @@ const dataButtons = [
 
 export const Header = () => {
   const [elementFocused, setElementFocused] = useState<number | null>(null);
+  const [search, setSearch] = useState("");
 
   const handleHoverButton = (index: number | null) => {
     setElementFocused(index);

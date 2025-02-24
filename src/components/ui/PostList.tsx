@@ -27,10 +27,10 @@ export default function PostList({ data }: { data: Post[] | null }) {
                 {new Date(post.createdAt).toLocaleTimeString()}
               </small>
               <p className="text-gray-800">{post.content}</p>
-              <div className="mt-2 flex items-center justify-between text-gray-500 text-sm">
-                <span>❤️ {post.reacts || 0} lượt thích</span>
-                <span>💬 {post.comments?.length || 0} bình luận</span>
-              </div>
+              {/*<div className="mt-2 flex items-center justify-between text-gray-500 text-sm">*/}
+              {/*  <span>❤️ {post.reacts || 0} lượt thích</span>*/}
+              {/*  <span>💬 {post.comments?.length || 0} bình luận</span>*/}
+              {/*</div>*/}
             </div>
           </div>
         ))
