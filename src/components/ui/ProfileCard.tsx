@@ -5,8 +5,8 @@ import { Profile } from "../profile-page";
 import { instance } from "@/common/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { MessageCircleCode, Pencil, UserRoundPlus } from "lucide-react";
-import { useState } from "react";
+import { Camera, MessageCircleCode, Pencil, UserRoundPlus } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useCreateGroupChat } from "@/views/chat-id/hooks";
 import { useAuth } from "@/providers/auth-provider";
@@ -17,6 +17,40 @@ interface FormData {
   major: string;
   desiredJobPosition: string;
 }
+
+const ProfileAvatar = ({ userId }: { userId: string }) => {
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAvatar = async () => {
+      try {
+        const res = await fetch(`/api/assets/${userId}/avatar`);
+        const data = await res.json();
+        setAvatarUrl(data.url || "https://github.com/shadcn.png");
+      } catch (error) {
+        console.error("Lỗi khi lấy avatar:", error);
+        setAvatarUrl("https://github.com/shadcn.png");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAvatar();
+  }, [userId]);
+
+  if (isLoading) return <p>Loading...</p>;
+
+  return (
+    <Avatar className="w-20 h-20">
+      <AvatarImage
+        src={avatarUrl || "https://github.com/shadcn.png"}
+        alt="Avatar"
+      />
+      <AvatarFallback>U</AvatarFallback>
+    </Avatar>
+  );
+};
 
 export default function ProfileCard({ data }: { data: Profile | null }) {
   const { auth } = useAuth();
@@ -68,6 +102,53 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
     }
   });
 
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    event.target.value = "";
+
+    try {
+      const { data: presignedData } = await instance.post(
+        `api/assets/presign-link`,
+        {
+          type: "avatar",
+          suffix: `${data?.id}/${Date.now()}-${file.name}`
+        }
+      );
+
+      const presignedUrl = presignedData.url;
+      const key = presignedData.key;
+
+      if (!presignedUrl) throw new Error("Không lấy được pre-signed URL");
+
+      const uploadResponse = await fetch(presignedUrl, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type }
+      });
+
+      if (!uploadResponse.ok) throw new Error("Upload ảnh thất bại");
+
+      await instance.patch(`api/users/${data?.id}/avatar`, {
+        avatar: {
+          key,
+          name: file.name,
+          content_type: file.type,
+          size: file.size
+        }
+      });
+
+      const updatedProfile = await instance.get(`api/users/${data?.id}`);
+
+      queryClient.setQueryData(["PROFILE", data?.id], updatedProfile.data);
+    } catch (error) {
+      console.error("Lỗi khi tải ảnh lên S3:", error);
+    }
+  };
+
   const onSubmit = (formData: FormData) => {
     mutation.mutate(formData);
   };
@@ -94,18 +175,29 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
         <Pencil className="w-5 h-5" />
       </button>
 
-      {/* Thông tin chính */}
       <div className="flex items-center space-x-4 border-b border-gray-300 pb-4">
-        <Avatar className="w-20 h-20">
-          <AvatarImage
-            src="https://github.com/shadcn.png"
-            alt={data.firstName}
-          />
-          <AvatarFallback>
-            {data.firstName[0]}
-            {data.lastName[0]}
-          </AvatarFallback>
-        </Avatar>
+        <div className="relative w-20 h-20">
+          <ProfileAvatar userId={data.id} />
+
+          {data.id === auth?.user?.id && (
+            <>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                id="avatarUpload"
+                onChange={handleFileChange}
+              />
+              <label
+                htmlFor="avatarUpload"
+                className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer hover:bg-black/60 transition"
+              >
+                <Camera className="w-6 h-6 text-white" />
+              </label>
+            </>
+          )}
+        </div>
+
         <div className="space-y-2">
           <h2 className="text-2xl font-semibold text-gray-900">
             {data.firstName} {data.lastName}
@@ -132,7 +224,6 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
         </div>
       </div>
 
-      {/* Thông tin chi tiết */}
       <div className="mt-4 space-y-2 text-gray-700">
         {isEditing ? (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
