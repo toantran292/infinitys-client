@@ -1,7 +1,7 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Profile } from "../profile-page";
+import { ProfileAvatar, Profile } from "../profile-page";
 import { instance } from "@/common/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -18,33 +18,12 @@ interface FormData {
   desiredJobPosition: string;
 }
 
-const ProfileAvatar = ({ userId }: { userId: string }) => {
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAvatar = async () => {
-      try {
-        const res = await fetch(`/api/assets/${userId}/avatar`);
-        const data = await res.json();
-        setAvatarUrl(data.url || "https://github.com/shadcn.png");
-      } catch (error) {
-        console.error("Lỗi khi lấy avatar:", error);
-        setAvatarUrl("https://github.com/shadcn.png");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchAvatar();
-  }, [userId]);
-
-  if (isLoading) return <p>Loading...</p>;
+const ProfileAvatarComponet = ({ avatar }: { avatar: ProfileAvatar }) => {
 
   return (
     <Avatar className="w-20 h-20">
       <AvatarImage
-        src={avatarUrl || "https://github.com/shadcn.png"}
+        src={avatar.url || "https://github.com/shadcn.png"}
         alt="Avatar"
       />
       <AvatarFallback>U</AvatarFallback>
@@ -177,7 +156,7 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
 
       <div className="flex items-center space-x-4 border-b border-gray-300 pb-4">
         <div className="relative w-20 h-20">
-          <ProfileAvatar userId={data.id} />
+          <ProfileAvatarComponet avatar={data.avatar} />
 
           {data.id === auth?.user?.id && (
             <>
@@ -190,7 +169,7 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
               />
               <label
                 htmlFor="avatarUpload"
-                className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer hover:bg-black/60 transition"
+                className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black/50 rounded-full cursor-pointer hover:bg-black/60 transition"
               >
                 <Camera className="w-6 h-6 text-white" />
               </label>
