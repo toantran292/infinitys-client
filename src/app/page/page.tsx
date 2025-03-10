@@ -10,7 +10,7 @@ import Link from "next/link";
 
 export default function PageList() {
   const [search, setSearch] = useState("");
-  const [myPages,setPages] = useState([]);
+  const [myPages, setPages] = useState([]);
   useEffect(() => {
     async function fetchPages() {
       const pages = await getMyPage();
@@ -28,11 +28,10 @@ export default function PageList() {
       default:
         return "bg-yellow-500 text-white";
     }
-  }
+  };
   return (
     <Layout sectionClassName="bg-[#f4f2ee] min-h-screen w-full py-8">
       <div className="max-w-5xl mx-auto flex gap-6">
-
         <div className="w-2/3 bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4 border-b pb-4">
             <h2 className="text-lg font-semibold">Các trang đã đăng ký</h2>
@@ -44,13 +43,24 @@ export default function PageList() {
             />
           </div>
           <div>
-            {myPages.length === 0 ?
-              <p className="text-center text-gray-500">Không có trang nào được đăng ký.</p>
-              : (myPages
-                .filter((page) => page.name.toLowerCase().includes(search.toLowerCase()))
+            {myPages.length === 0 ? (
+              <p className="text-center text-gray-500">
+                Không có trang nào được đăng ký.
+              </p>
+            ) : (
+              myPages
+                .filter((page) =>
+                  page.name.toLowerCase().includes(search.toLowerCase())
+                )
                 .map((page) => (
-                  <div key={page.id} className="flex items-center justify-between py-3 border-b">
-                    <Link href={`/page/${page.id}`} className="flex items-center gap-3 flex-1">
+                  <div
+                    key={page.id}
+                    className="flex items-center justify-between py-3 border-b"
+                  >
+                    <Link
+                      href={`/page/${page.id}`}
+                      className="flex items-center gap-3 flex-1"
+                    >
                       <div className="flex items-center gap-3">
                         <span className="text-3xl">{page.avatar}</span>
                         <div>
@@ -60,14 +70,23 @@ export default function PageList() {
                       </div>
                     </Link>
                     <span
-                      className={`px-4 py-1 rounded-full text-sm ${getStatusClass(page.status)}`}>{page.status}</span>
+                      className={`px-4 py-1 rounded-full text-sm ${getStatusClass(page.status)}`}
+                    >
+                      {page.status}
+                    </span>
                   </div>
-                )))}
+                ))
+            )}
           </div>
         </div>
         <div className="w-1/3">
           <h1 className="text-2xl font-bold mb-4">Đăng ký trang</h1>
-          <PageTypeCard title="Công ty" description="Doanh nghiệp nhỏ, vừa và lớn" icon={<Building size={70} className="text-blue-500" />} pageType='register' />
+          <PageTypeCard
+            title="Công ty"
+            description="Doanh nghiệp nhỏ, vừa và lớn"
+            icon={<Building size={70} className="text-blue-500" />}
+            pageType="register"
+          />
         </div>
       </div>
     </Layout>

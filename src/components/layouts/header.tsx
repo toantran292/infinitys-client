@@ -10,7 +10,7 @@ const dataButtons = [
   { label: "Trang Chủ", href: "/home", icon: HomeIcon },
   { label: "Bài tập", href: "/problems", icon: BookIcon },
   { label: "Nhắn tin", href: "/chat", icon: MessageSquareIcon },
-  { label: "Thông báo", href: "/notifications", icon: BellIcon },
+  { label: "Thông báo", href: "/notifications", icon: BellIcon }
 ];
 
 export const Header = () => {

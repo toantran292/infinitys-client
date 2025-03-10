@@ -32,7 +32,7 @@ export function UserMenu() {
             <Link href={`/profile/${auth?.user?.id}`}>Hồ sơ cá nhân</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <Building2/>
+            <Building2 />
             <Link href={`/page`}>Trang công ty</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>

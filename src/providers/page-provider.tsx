@@ -6,11 +6,11 @@ type RegisterPage = {
   address: string;
   url: URL;
   email: string;
-}
+};
 export const registerPage = async (formData: RegisterPage) => {
   try {
     const response = await instance.post("api/pages/register", {
-      ...formData,
+      ...formData
     });
     if (!response) {
       throw new Error("Không thể đăng ký trang");
@@ -30,11 +30,11 @@ export const getMyPage = async () => {
       throw new Error("Không thể lấy các trang rieng");
     }
     return response;
-  }catch (error) {
+  } catch (error) {
     console.error("Lỗi khi gọi API lấy trang rieng:", error);
     throw error;
   }
-}
+};
 
 export const getPages = async () => {
   try {
@@ -62,4 +62,4 @@ export const getPageId = async (id: string) => {
     console.error("Lỗi khi gọi API lấy trang:", error);
     throw error;
   }
-}
+};

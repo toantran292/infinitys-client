@@ -20,7 +20,7 @@ export function useAutoScroll(options: UseAutoScrollOptions = {}) {
 
   const [scrollState, setScrollState] = useState<ScrollState>({
     isAtBottom: true,
-    autoScrollEnabled: true,
+    autoScrollEnabled: true
   });
 
   const checkIsAtBottom = useCallback(
@@ -46,13 +46,13 @@ export function useAutoScroll(options: UseAutoScrollOptions = {}) {
       } else {
         scrollRef.current.scrollTo({
           top: targetScrollTop,
-          behavior: smooth ? "smooth" : "auto",
+          behavior: smooth ? "smooth" : "auto"
         });
       }
 
       setScrollState({
         isAtBottom: true,
-        autoScrollEnabled: true,
+        autoScrollEnabled: true
       });
       userHasScrolled.current = false;
     },
@@ -67,7 +67,7 @@ export function useAutoScroll(options: UseAutoScrollOptions = {}) {
     setScrollState((prev) => ({
       isAtBottom: atBottom,
       // Re-enable auto-scroll if at the bottom
-      autoScrollEnabled: atBottom ? true : prev.autoScrollEnabled,
+      autoScrollEnabled: atBottom ? true : prev.autoScrollEnabled
     }));
   }, [checkIsAtBottom]);
 
@@ -120,7 +120,7 @@ export function useAutoScroll(options: UseAutoScrollOptions = {}) {
       userHasScrolled.current = true;
       setScrollState((prev) => ({
         ...prev,
-        autoScrollEnabled: false,
+        autoScrollEnabled: false
       }));
     }
   }, [checkIsAtBottom]);
@@ -130,6 +130,6 @@ export function useAutoScroll(options: UseAutoScrollOptions = {}) {
     isAtBottom: scrollState.isAtBottom,
     autoScrollEnabled: scrollState.autoScrollEnabled,
     scrollToBottom: () => scrollToBottom(false),
-    disableAutoScroll,
+    disableAutoScroll
   };
 }

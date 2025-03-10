@@ -17,7 +17,7 @@ export default function RegisterPage() {
     content: "",
     address: "",
     url: "",
-    email: "",
+    email: ""
   });
 
   // Cập nhật formData mỗi khi searchParams thay đổi
@@ -27,7 +27,7 @@ export default function RegisterPage() {
       content: searchParams.get("content") || "",
       address: searchParams.get("address") || "",
       url: searchParams.get("url") || "",
-      email: searchParams.get("email") || "",
+      email: searchParams.get("email") || ""
     });
   }, [searchParams]); // Lắng nghe sự thay đổi của searchParams
 

@@ -14,21 +14,20 @@ const chatConfig = {
     md: "sm:max-w-md sm:max-h-[600px]",
     lg: "sm:max-w-lg sm:max-h-[700px]",
     xl: "sm:max-w-xl sm:max-h-[800px]",
-    full: "sm:w-full sm:h-full",
+    full: "sm:w-full sm:h-full"
   },
   positions: {
     "bottom-right": "bottom-5 right-5",
-    "bottom-left": "bottom-5 left-5",
+    "bottom-left": "bottom-5 left-5"
   },
   chatPositions: {
     "bottom-right": "sm:bottom-[calc(100%+10px)] sm:right-0",
-    "bottom-left": "sm:bottom-[calc(100%+10px)] sm:left-0",
+    "bottom-left": "sm:bottom-[calc(100%+10px)] sm:left-0"
   },
   states: {
     open: "pointer-events-auto opacity-100 visible scale-100 translate-y-0",
-    closed:
-      "pointer-events-none opacity-0 invisible scale-100 sm:translate-y-5",
-  },
+    closed: "pointer-events-none opacity-0 invisible scale-100 sm:translate-y-5"
+  }
 };
 
 interface ExpandableChatProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -62,7 +61,7 @@ const ExpandableChat: React.FC<ExpandableChatProps> = ({
           chatConfig.chatPositions[position],
           chatConfig.dimensions[size],
           isOpen ? chatConfig.states.open : chatConfig.states.closed,
-          className,
+          className
         )}
       >
         {children}
@@ -131,7 +130,7 @@ const ExpandableChatToggle: React.FC<ExpandableChatToggleProps> = ({
     onClick={toggleChat}
     className={cn(
       "w-14 h-14 rounded-full shadow-md flex items-center justify-center hover:shadow-lg hover:shadow-black/30 transition-all duration-300",
-      className,
+      className
     )}
     {...props}
   >
@@ -149,5 +148,5 @@ export {
   ExpandableChat,
   ExpandableChatHeader,
   ExpandableChatBody,
-  ExpandableChatFooter,
+  ExpandableChatFooter
 };
