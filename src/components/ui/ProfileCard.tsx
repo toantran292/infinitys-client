@@ -23,7 +23,7 @@ const ProfileAvatarComponet = ({ avatar }: { avatar: ProfileAvatar }) => {
   return (
     <Avatar className="w-20 h-20">
       <AvatarImage
-        src={avatar.url || "https://github.com/shadcn.png"}
+        src={avatar?.url || "https://github.com/shadcn.png"}
         alt="Avatar"
       />
       <AvatarFallback>U</AvatarFallback>
