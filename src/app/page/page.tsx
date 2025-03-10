@@ -1,92 +1,73 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getMyPage, getPages } from "@/providers/page-provider";
-import Link from "next/link";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layouts";
+import PageTypeCard from "@/components/ui/PageTypeCard";
+import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
+import { Building } from "lucide-react";
+import { getMyPage } from "@/providers/page-provider";
+import Link from "next/link";
 
 export default function PageList() {
-  const [pages, setPages] = useState<
-    { id: string; name: string; address: string; content: string; email: string; url: string; status: string }[]
-  >([]);
-  const [loading, setLoading] = useState(true);
-  const [myPages, setMyPages] = useState<{ id: string; name: string }[]>([]);
-
+  const [search, setSearch] = useState("");
+  const [myPages,setPages] = useState([]);
   useEffect(() => {
-    const fetchPages = async () => {
-      try {
-        const res = await getPages();
-        setPages(res.data);
-
-        const resMyPages = await getMyPage();
-        if (resMyPages?.data?.length > 0) {
-          setMyPages(resMyPages.data);
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    async function fetchPages() {
+      const pages = await getMyPage();
+      console.log(pages);
+      setPages(pages.data);
+    }
     fetchPages();
   }, []);
-
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "approved":
+        return "bg-green-500 text-white";
+      case "rejected":
+        return "bg-red-500 text-white";
+      default:
+        return "bg-yellow-500 text-white";
+    }
+  }
   return (
-    <Layout>
-      <div className="p-6 max-w-5xl mx-auto flex gap-6">
-        <aside className="w-64 bg-white shadow-md p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-3">Trang</h2>
+    <Layout sectionClassName="bg-[#f4f2ee] min-h-screen w-full py-8">
+      <div className="max-w-5xl mx-auto flex gap-6">
 
-          {myPages.length > 0 ? (
-            <Link href="/page/me">
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm rounded-md">
-                Trang của tôi
-              </Button>
-            </Link>
-          ) : (
-            <Link href="/page/register">
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm rounded-md">
-                + Tạo Trang
-              </Button>
-            </Link>
-          )}
-        </aside>
-
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold mb-6 text-gray-800">Khám phá trang</h1>
-
-          {loading ? (
-            <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="h-24 w-full rounded-lg" />
-              ))}
-            </div>
-          ) : pages.length === 0 ? (
-            <p className="text-gray-500 text-lg">Không có trang nào để hiển thị.</p>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              {pages.data.map((page) => (
-                <Link key={page.id} href={`/page/${page.id}`}>
-                  <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
-                    <div className="h-36 bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-600 text-lg font-semibold">{page.name[0]}</span>
-                    </div>
-                    <div className="p-4">
-                      <h2 className="text-lg font-semibold">{page.name}</h2>
-                      <p className="text-sm text-gray-600">{page.content || "Không có mô tả"}</p>
-                      <p className="text-sm text-gray-500 mt-2">{page.address}</p>
-                      <button className="mt-3 w-full bg-gray-100 py-2 rounded-md text-gray-700 font-semibold">
-                        Xem trang
-                      </button>
-                    </div>
+        <div className="w-2/3 bg-white p-6 rounded-lg shadow-md">
+          <div className="flex justify-between items-center mb-4 border-b pb-4">
+            <h2 className="text-lg font-semibold">Các trang đã đăng ký</h2>
+            <Input
+              className="w-1/3"
+              placeholder="Tìm theo tên"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div>
+            {myPages.length === 0 ?
+              <p className="text-center text-gray-500">Không có trang nào được đăng ký.</p>
+              : (myPages
+                .filter((page) => page.name.toLowerCase().includes(search.toLowerCase()))
+                .map((page) => (
+                  <div key={page.id} className="flex items-center justify-between py-3 border-b">
+                    <Link href={`/page/${page.id}`} className="flex items-center gap-3 flex-1">
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl">{page.avatar}</span>
+                        <div>
+                          <p className="font-semibold">{page.name}</p>
+                          <p className="text-sm text-gray-500">{page.email}</p>
+                        </div>
+                      </div>
+                    </Link>
+                    <span
+                      className={`px-4 py-1 rounded-full text-sm ${getStatusClass(page.status)}`}>{page.status}</span>
                   </div>
-                </Link>
-              ))}
-            </div>
-          )}
+                )))}
+          </div>
+        </div>
+        <div className="w-1/3">
+          <h1 className="text-2xl font-bold mb-4">Đăng ký trang</h1>
+          <PageTypeCard title="Công ty" description="Doanh nghiệp nhỏ, vừa và lớn" icon={<Building size={70} className="text-blue-500" />} pageType='register' />
         </div>
       </div>
     </Layout>

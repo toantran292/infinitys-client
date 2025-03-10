@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import Link from "next/link";
 import { SearchBar } from "@/components/ui/search-bar";
-import { HomeIcon, BookIcon, MessageSquareIcon, BellIcon, FlagIcon } from "lucide-react";
+import { HomeIcon, BookIcon, MessageSquareIcon, BellIcon } from "lucide-react";
 import { UserMenu } from "@/components/layouts/user-menu";
 
 const dataButtons = [
@@ -11,7 +11,6 @@ const dataButtons = [
   { label: "Bài tập", href: "/problems", icon: BookIcon },
   { label: "Nhắn tin", href: "/chat", icon: MessageSquareIcon },
   { label: "Thông báo", href: "/notifications", icon: BellIcon },
-  {label: "Trang", href: "/page", icon: FlagIcon},
 ];
 
 export const Header = () => {

@@ -1,4 +1,4 @@
-import { LogOut, Settings, User } from "lucide-react";
+import { Building2, LogOut, Settings, User } from "lucide-react";
 import Link from "next/link";
 import {
   DropdownMenu,
@@ -30,6 +30,10 @@ export function UserMenu() {
           <DropdownMenuItem>
             <User />
             <Link href={`/profile/${auth?.user?.id}`}>Hồ sơ cá nhân</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Building2/>
+            <Link href={`/page`}>Trang công ty</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Settings />

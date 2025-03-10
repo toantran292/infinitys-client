@@ -27,7 +27,7 @@ export const getMyPage = async () => {
   try {
     const response = await instance.get("api/pages/me");
     if (!response) {
-      throw new Error("Không thể lấy trang rieng");
+      throw new Error("Không thể lấy các trang rieng");
     }
     return response;
   }catch (error) {
