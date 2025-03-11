@@ -23,7 +23,7 @@ export function UserMenu() {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
+      <DropdownMenuContent className="w-56 bg-white">
         <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
