@@ -9,20 +9,18 @@ interface PagePreviewProps {
   content: string;
   email: string;
 }
-
 export default function PagePreview({
-  avatar,
+  url,
   name,
   content,
   email
 }: PagePreviewProps) {
   return (
-    // border border-gray-300 shadow-sm
-    <div className="w-[420px] rounded-lg  p-4 ">
+    <div className="w-[420px] rounded-lg p-4">
       {/* Header */}
       <div className="bg-white px-4 py-2 flex items-center text-sm font-medium text-gray-700 rounded-t-lg">
         Xem trước trang
-        <div className="">
+        <div>
           <span
             className="ml-1 text-gray-500 cursor-pointer text-xs"
             title="Thông tin xem trước trang"
@@ -37,9 +35,9 @@ export default function PagePreview({
         <div className="bg-white p-5 rounded-lg flex flex-col items-start shadow-sm">
           {/* Avatar */}
           <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center border border-gray-300">
-            {avatar ? (
+            {url ? (
               <img
-                src={avatar}
+                src={url}
                 alt="Avatar Preview"
                 className="w-full h-full rounded-md object-cover"
               />
@@ -52,7 +50,7 @@ export default function PagePreview({
 
           {/* Thông tin công ty */}
           <div className="mt-4">
-            <h3 className="text-lg font-semibold text-gray-400 text-color-">
+            <h3 className="text-lg font-semibold text-gray-400">
               {name || "Tên công ty"}
             </h3>
             <p className="text-sm text-gray-500">{content || "Khẩu hiệu"}</p>

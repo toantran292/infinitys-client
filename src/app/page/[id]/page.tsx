@@ -1,26 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { Layout } from "@/components/layouts";
 import { getMyPage, getPageId } from "@/providers/page-provider";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+const TABS = [
+  { key: "home", label: "Trang chủ" },
+  { key: "about", label: "Giới thiệu" },
+  { key: "posts", label: "Bài đăng" },
+  { key: "jobs", label: "Việc làm" },
+  { key: "people", label: "Người" }
+];
+
 export default function PageDetail() {
   const { id } = useParams();
-  const isMyPage = id === "me"; // Kiểm tra nếu là trang của bản thân
-  const [page, setPage] = useState<{
-    id: string;
-    name: string;
-    content: string;
-    address: string;
-    url: string;
-    email: string;
-    status: string;
-    createdAt: string;
-    updatedAt: string;
-  } | null>(null);
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get("tab") || "home";
+  const [page, setPage] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,14 +28,11 @@ export default function PageDetail() {
 
     const fetchPageDetail = async () => {
       try {
-        let res;
-        if (isMyPage) {
-          res = await getMyPage();
-          setPage(res.data[0]);
-        } else {
-          res = await getPageId(id);
-          setPage(res.data);
-        }
+        const myPagesRes = await getMyPage();
+        const isUserAdmin = myPagesRes.data.some((p) => p.id === id);
+        setIsAdmin(isUserAdmin);
+        const res = await getPageId(id);
+        setPage(res.data || null);
       } catch (error) {
         console.error("Lỗi khi lấy chi tiết trang:", error);
       } finally {
@@ -54,96 +51,128 @@ export default function PageDetail() {
 
   return (
     <Layout sectionClassName="bg-[#f4f2ee] min-h-screen w-full py-8">
-      <div className="p-6 max-w-6xl mx-auto">
-        {/* Banner + Avatar */}
-        <div className="relative bg-gray-200 h-40 rounded-lg">
+      <div className="max-w-5xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="relative">
+          {page.banner ? (
+            <div
+              className="h-40 w-full bg-cover bg-center"
+              style={{ backgroundImage: `url(${page.banner})` }}
+            />
+          ) : (
+            <div className="h-40 w-full bg-gradient-to-r from-[#004182] to-[#0077b5] rounded-lg" />
+          )}
+
           <div className="absolute -bottom-10 left-6 bg-white p-2 rounded-full border border-gray-200">
-            <div className="w-20 h-20 bg-gray-300 rounded-full" />
+            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center">
+              <img
+                src={page.avatar?.url || "/default-avatar.png"}
+                alt={page.name}
+                className="w-full h-full rounded-full object-cover"
+              />
+            </div>
           </div>
         </div>
 
-        {/* Content chính */}
-        <div className="bg-white p-6 mt-12 rounded-lg shadow-md">
+        <div className="p-6 pt-12">
           <h1 className="text-2xl font-bold">{page.name}</h1>
+          <p className="text-gray-600">{page.content || "Không có nội dung"}</p>
+          <p className="text-gray-500 mt-1">{page.address}</p>
 
-          {/* Trạng thái */}
-          <div
-            className={`mt-2 px-3 py-1 rounded-md text-sm font-semibold w-max inline-block
-            ${
-              page.status === "approved"
-                ? "bg-green-100 text-green-700 border border-green-500"
-                : page.status === "started"
-                  ? "bg-yellow-100 text-yellow-700 border border-yellow-500"
-                  : "bg-red-100 text-red-700 border border-red-500"
-            }`}
-          >
-            {page.status === "approved" && "Đã duyệt"}
-            {page.status === "started" && "Chờ duyệt"}
-            {page.status === "rejected" && "Bị từ chối"}
+          <div className="flex gap-2 mt-4">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              + Theo dõi
+            </Button>
+            <Button variant="outline">Nhắn tin</Button>
           </div>
+        </div>
 
+        <div className="flex border-b px-6">
+          {TABS.map((tab) => (
+            <Link
+              key={tab.key}
+              href={`?tab=${tab.key}`}
+              className={`px-4 py-2 font-semibold relative transition-all duration-200
+        ${
+          currentTab === tab.key
+            ? "text-green-700 font-bold after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-green-700"
+            : "text-gray-600 hover:text-green-700 hover:font-semibold hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:bottom-0 hover:after:w-full hover:after:h-[2px] hover:after:bg-green-700"
+        }`}
+            >
+              {tab.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <div className="pt-6 max-w-5xl mx-auto">
+        {currentTab === "home" && <HomeTab page={page} />}
+        {currentTab === "about" && <AboutTab page={page} />}
+        {currentTab === "posts" && <PostsTab posts={page.posts} />}
+        {currentTab === "jobs" && <JobsTab jobs={page.jobs} />}
+        {currentTab === "people" && <PeopleTab people={page.people} />}
+      </div>
+    </Layout>
+  );
+}
+
+function HomeTab({ page }) {
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-xl font-semibold mb-3">Tổng quan</h2>
+      <p className="text-gray-600">
+        {page.content || "Chưa có mô tả về công ty này."}
+      </p>
+
+      {/* Hai cột liên hệ & đầu tư */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div className="bg-gray-100 p-4 rounded-lg">
+          <p className="text-sm text-gray-500">Thông tin liên hệ</p>
           <a
             href={page.url}
             target="_blank"
-            className="block mt-2 text-blue-500 hover:underline"
+            className="text-blue-500 hover:underline"
           >
             {page.url}
           </a>
-
-          {/* Nút Đăng ký lại - Chỉ hiển thị nếu là "/me" và bị từ chối */}
-          {isMyPage && page.status === "rejected" && (
-            <Link
-              href={{
-                pathname: "/page/register",
-                query: {
-                  name: page.name,
-                  content: page.content || "",
-                  address: page.address,
-                  url: page.url,
-                  email: page.email
-                }
-              }}
-            >
-              <Button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 mt-4 rounded-md">
-                Đăng ký lại
-              </Button>
-            </Link>
-          )}
         </div>
-
-        {/* Nội dung và thông tin */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          <div className="col-span-2 bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-3">Nội dung</h2>
-            <p className="text-gray-600">
-              {page.content || "Không có nội dung"}
-            </p>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="font-semibold text-lg">Thông tin</h3>
-            <p className="text-gray-600">
-              <strong>Địa chỉ:</strong> {page.address}
-            </p>
-            <p className="text-gray-600">
-              <strong>Email:</strong> {page.email}
-            </p>
-            <p className="text-gray-600">
-              <strong>Ngày tạo:</strong>{" "}
-              {new Date(page.createdAt).toLocaleDateString()}
-            </p>
-            <p className="text-gray-600">
-              <strong>Ngày cập nhật:</strong>{" "}
-              {new Date(page.updatedAt).toLocaleDateString()}
-            </p>
-          </div>
+        <div className="bg-gray-100 p-4 rounded-lg">
+          <p className="text-sm text-gray-500">Funding via Crunchbase</p>
+          <p className="text-lg font-semibold text-gray-800">
+            {page.funding ? `$${page.funding.toLocaleString()}` : "N/A"}
+          </p>
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Nếu không có bài viết nào */}
-      <div className="mx-auto text-center text-gray-500">
-        Chưa có bài viết nào
-      </div>
-    </Layout>
+function AboutTab({ page }) {
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-xl font-semibold mb-3">Tổng quan</h2>
+      <p className="text-gray-600">{page.content}</p>
+      <p className="text-gray-500 mt-2">🌍 {page.industry}</p>
+      <p className="text-gray-500">🏢 {page.size} nhân viên</p>
+      <p className="text-gray-500">📍 {page.address}</p>
+      <p className="text-gray-500">📆 Thành lập: {page.founded}</p>
+    </div>
+  );
+}
+
+function PostsTab({ posts }) {
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md">Chưa có bài đăng.</div>
+  );
+}
+
+function JobsTab({ jobs }) {
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md">Chưa có việc làm.</div>
+  );
+}
+
+function PeopleTab({ people }) {
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md">Chưa có nhân viên.</div>
   );
 }

@@ -16,7 +16,7 @@ export const registerPage = async (formData: RegisterPage) => {
       throw new Error("Không thể đăng ký trang");
     }
 
-    return response;
+    return response.data;
   } catch (error) {
     console.error("Lỗi khi gọi API đăng ký trang:", error);
     throw error;
@@ -60,6 +60,33 @@ export const getPageId = async (id: string) => {
     return response;
   } catch (error) {
     console.error("Lỗi khi gọi API lấy trang:", error);
+    throw error;
+  }
+};
+export const getPresignedUrl = async (suffix: string) => {
+  try {
+    const response = await instance.post("api/assets/presign-link", {
+      type: "avatar",
+      suffix
+    });
+    if (!response) {
+      throw new Error("Không thể lấy pre-signed URL");
+    }
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API lấy pre-signed URL:", error);
+    throw error;
+  }
+};
+export const getViewsAsset = async (key: string) => {
+  try {
+    const response = await instance.get(`api/assets/view-url?key=${key}`);
+    if (!response) {
+      throw new Error("Không thể lấy URL xem ảnh");
+    }
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API lấy URL xem ảnh:", error);
     throw error;
   }
 };
