@@ -12,18 +12,18 @@ const chatBubbleVariant = cva(
     variants: {
       variant: {
         received: "self-start",
-        sent: "self-end flex-row-reverse",
+        sent: "self-end flex-row-reverse"
       },
       layout: {
         default: "",
-        ai: "max-w-full w-full items-center",
-      },
+        ai: "max-w-full w-full items-center"
+      }
     },
     defaultVariants: {
       variant: "received",
-      layout: "default",
-    },
-  },
+      layout: "default"
+    }
+  }
 );
 
 interface ChatBubbleProps
@@ -35,7 +35,7 @@ const ChatBubble = React.forwardRef<HTMLDivElement, ChatBubbleProps>(
     <div
       className={cn(
         chatBubbleVariant({ variant, layout, className }),
-        "relative group",
+        "relative group"
       )}
       ref={ref}
       {...props}
@@ -44,12 +44,12 @@ const ChatBubble = React.forwardRef<HTMLDivElement, ChatBubbleProps>(
         React.isValidElement(child) && typeof child.type !== "string"
           ? React.cloneElement(child, {
               variant,
-              layout,
+              layout
             } as React.ComponentProps<typeof child.type>)
-          : child,
+          : child
       )}
     </div>
-  ),
+  )
 );
 ChatBubble.displayName = "ChatBubble";
 
@@ -63,7 +63,7 @@ interface ChatBubbleAvatarProps {
 const ChatBubbleAvatar: React.FC<ChatBubbleAvatarProps> = ({
   src,
   fallback,
-  className,
+  className
 }) => (
   <Avatar className={className}>
     <AvatarImage src={src} alt="Avatar" />
@@ -77,17 +77,17 @@ const chatBubbleMessageVariants = cva("p-4", {
     variant: {
       received:
         "bg-secondary text-secondary-foreground rounded-r-lg rounded-tl-lg",
-      sent: "bg-primary text-primary-foreground rounded-l-lg rounded-tr-lg",
+      sent: "bg-primary text-primary-foreground rounded-l-lg rounded-tr-lg"
     },
     layout: {
       default: "",
-      ai: "border-t w-full rounded-none bg-transparent",
-    },
+      ai: "border-t w-full rounded-none bg-transparent"
+    }
   },
   defaultVariants: {
     variant: "received",
-    layout: "default",
-  },
+    layout: "default"
+  }
 });
 
 interface ChatBubbleMessageProps
@@ -102,12 +102,12 @@ const ChatBubbleMessage = React.forwardRef<
 >(
   (
     { className, variant, layout, isLoading = false, children, ...props },
-    ref,
+    ref
   ) => (
     <div
       className={cn(
         chatBubbleMessageVariants({ variant, layout, className }),
-        "break-words max-w-full whitespace-pre-wrap",
+        "break-words max-w-full whitespace-pre-wrap"
       )}
       ref={ref}
       {...props}
@@ -120,7 +120,7 @@ const ChatBubbleMessage = React.forwardRef<
         children
       )}
     </div>
-  ),
+  )
 );
 ChatBubbleMessage.displayName = "ChatBubbleMessage";
 
@@ -181,7 +181,7 @@ const ChatBubbleActionWrapper = React.forwardRef<
       variant === "sent"
         ? "-left-1 -translate-x-full flex-row-reverse"
         : "-right-1 translate-x-full",
-      className,
+      className
     )}
     {...props}
   >
@@ -198,5 +198,5 @@ export {
   chatBubbleVariant,
   chatBubbleMessageVariants,
   ChatBubbleAction,
-  ChatBubbleActionWrapper,
+  ChatBubbleActionWrapper
 };

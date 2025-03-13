@@ -14,10 +14,10 @@ const ChatMessageList = React.forwardRef<HTMLDivElement, ChatMessageListProps>(
       isAtBottom,
       autoScrollEnabled,
       scrollToBottom,
-      disableAutoScroll,
+      disableAutoScroll
     } = useAutoScroll({
       smooth,
-      content: children,
+      content: children
     });
 
     return (
