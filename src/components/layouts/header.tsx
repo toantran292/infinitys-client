@@ -1,7 +1,7 @@
 "use client";
 import { UserMenu } from "@/components/layouts/user-menu";
 import { SearchBar } from "@/components/ui/search-bar";
-import { BellIcon, BookIcon, HomeIcon, MessageSquareIcon } from "lucide-react";
+import { BellIcon, BookIcon, HomeIcon, MessageSquareIcon, BriefcaseIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
@@ -10,6 +10,7 @@ import { NotificationBell } from '@/components/notification';
 const dataButtons = [
   { label: "Trang Chủ", href: "/home", icon: HomeIcon },
   { label: "Bài tập", href: "/problems", icon: BookIcon },
+  { label: "Việc làm", href: "/jobs", icon: BriefcaseIcon },
   { label: "Nhắn tin", href: "/chat", icon: MessageSquareIcon },
   { label: "Thông báo", href: "/notifications", icon: BellIcon }
 ];
