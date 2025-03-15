@@ -13,13 +13,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/providers/auth-provider";
 
 export function UserMenu() {
-  const { signOut, auth } = useAuth();
+  const { signOut, user } = useAuth();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="cursor-pointer">
         <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+          <AvatarImage src={user!.avatar?.url} alt="@shadcn" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
@@ -29,7 +29,7 @@ export function UserMenu() {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <User />
-            <Link href={`/profile/${auth?.user?.id}`}>Hồ sơ cá nhân</Link>
+            <Link href={`/profile/${user?.id}`}>Hồ sơ cá nhân</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Building2 />

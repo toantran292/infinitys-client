@@ -1,4 +1,4 @@
-import instance from "@/common/api";
+import axiosInstance from "@/lib/axios";
 
 type RegisterPage = {
   name: string;
@@ -9,7 +9,7 @@ type RegisterPage = {
 };
 export const registerPage = async (formData: RegisterPage) => {
   try {
-    const response = await instance.post("api/pages/register", {
+    const response = await axiosInstance.post("api/pages/register", {
       ...formData
     });
     if (!response) {
@@ -25,7 +25,7 @@ export const registerPage = async (formData: RegisterPage) => {
 
 export const getMyPage = async () => {
   try {
-    const response = await instance.get("api/pages/me");
+    const response = await axiosInstance.get("api/pages/me");
     if (!response) {
       throw new Error("Không thể lấy các trang rieng");
     }
@@ -38,7 +38,7 @@ export const getMyPage = async () => {
 
 export const getPages = async () => {
   try {
-    const response = await instance.get("api/pages");
+    const response = await axiosInstance.get("api/pages");
     if (!response) {
       throw new Error("Không thể lấy danh sách trang");
     }
@@ -52,7 +52,7 @@ export const getPages = async () => {
 
 export const getPageId = async (id: string) => {
   try {
-    const response = await instance.get(`api/pages/${id}`);
+    const response = await axiosInstance.get(`api/pages/${id}`);
     if (!response) {
       throw new Error("Không thể lấy trang");
     }
@@ -65,7 +65,7 @@ export const getPageId = async (id: string) => {
 };
 export const getPresignedUrl = async (suffix: string) => {
   try {
-    const response = await instance.post("api/assets/presign-link", {
+    const response = await axiosInstance.post("api/assets/presign-link", {
       type: "avatar",
       suffix
     });
@@ -80,7 +80,7 @@ export const getPresignedUrl = async (suffix: string) => {
 };
 export const getViewsAsset = async (key: string) => {
   try {
-    const response = await instance.get(`api/assets/view-url?key=${key}`);
+    const response = await axiosInstance.get(`api/assets/view-url?key=${key}`);
     if (!response) {
       throw new Error("Không thể lấy URL xem ảnh");
     }

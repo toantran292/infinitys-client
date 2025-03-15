@@ -4,13 +4,16 @@ import {
   createContext,
   FC,
   PropsWithChildren,
-  useState,
+  useContext,
   useEffect,
-  useContext
+  useState
 } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { instance } from "@/common/api";
-import { useToast } from "@/hooks/use-toast";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import axiosInstance from "@/lib/axios";
+import { useRouter } from "next/navigation";
+import { delay } from "@/lib/utils";
+import { ErrorMessage } from "@/common/error";
 
 type SignInFormData = {
   email: string;
@@ -31,165 +34,148 @@ type User = {
   email: string;
   role: string;
   active: boolean;
-};
-
-type Auth = {
-  token: string;
-  user?: User | null;
+  avatar?: {
+    url: string;
+  };
 };
 
 type Context = {
-  auth: Auth;
-  setAuth: (auth: Auth) => void;
+  user: User | null;
+  isLoading: boolean;
   signOut: () => void;
+  refetchUser: () => void;
   signIn: (data: SignInFormData) => void;
   signUp: (data: SignUpFormData) => void;
   isSigningIn: boolean;
   isSigningUp: boolean;
-};
-
-const defaultAuth: Auth = {
-  token: "",
-  user: null
+  signInError: unknown;
+  signUpError: unknown;
 };
 
 const AuthContext = createContext<Context>({
-  auth: defaultAuth,
-  setAuth: () => {},
-  signOut: () => {},
-  signIn: () => {},
-  signUp: () => {},
+  user: null,
+  isLoading: false,
+  signOut: () => { },
+  refetchUser: () => { },
+  signIn: () => { },
+  signUp: () => { },
   isSigningIn: false,
-  isSigningUp: false
+  isSigningUp: false,
+  signInError: null,
+  signUpError: null
 });
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [auth, setAuth] = useState<Auth>(defaultAuth);
-  const { toast } = useToast();
+  const router = useRouter();
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
+  // Kiểm tra localStorage khi component mount ở client-side
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("accessToken");
-      const user = localStorage.getItem("user");
-      if (token && user) {
-        try {
-          setAuth({
-            token: token,
-            user: user ? JSON.parse(user) : null
-          });
-        } catch {
-          setAuth(defaultAuth);
-        }
-      }
-    }
+    setAccessToken(localStorage.getItem("accessToken"));
   }, []);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      if (auth.token) {
-        localStorage.setItem("accessToken", auth.token);
-        localStorage.setItem("user", JSON.stringify(auth.user));
-      } else {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("user");
+  const { data: user, refetch: refetchUser, isLoading: isUserLoading } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      try {
+        const response = await axiosInstance.get("api/auths/me");
+        return response.data;
+      } catch (error) {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("accessToken");
+        }
+        throw error;
       }
-    }
-  }, [auth.token]);
+    },
+    enabled: !!accessToken, // Sử dụng state thay vì truy cập trực tiếp localStorage
+    retry: false
+  });
 
-  const signOut = () => {
-    setAuth(defaultAuth);
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("accessToken");
+  // Mutation đăng nhập
+  const signInMutation = useMutation({
+    mutationFn: async (data: SignInFormData) => {
+      const response = await axiosInstance.post("api/auths/login", data);
+      return response.data;
+    },
+    onSuccess: async (data) => {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("accessToken", data.accessToken);
+      }
+      setAccessToken(data.accessToken);
+      await refetchUser();
+
+      toast.success("Đăng nhập thành công", {
+        duration: 2000,
+        description: "Chuyển về trang chủ sau 2 giây"
+      });
+
+      await delay(2000);
+      router.push("/");
+    },
+    onError: (error: ErrorMessage) => {
+      toast.error("Đăng nhập thất bại", {
+        duration: 2000,
+        description: error.message
+      });
     }
-    window.location.href = "/";
+  });
+
+  // Mutation đăng ký
+  const signUpMutation = useMutation({
+    mutationFn: async (data: SignUpFormData) => {
+      const response = await axiosInstance.post("api/auths/register", data);
+      return response.data;
+    },
+    onSuccess: async (data) => {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("accessToken", data.token.accessToken);
+      }
+      setAccessToken(data.token.accessToken);
+      await refetchUser();
+
+      toast.success("Đăng ký thành công", {
+        duration: 2000,
+        description: "Chuyển về trang chủ sau 2 giây"
+      });
+
+      await delay(2000);
+      router.push("/");
+    },
+    onError: (error: ErrorMessage) => {
+      toast.error("Đăng ký thất bại", {
+        duration: 2000,
+        description: error.message
+      });
+    }
+  });
+
+  // Mutation đăng xuất
+  const signOutMutation = useMutation({
+    mutationFn: async () => {
+      // await axiosInstance.post("api/auths/signout");
+      localStorage.removeItem("accessToken");
+    },
+    onSuccess: () => {
+      router.push("/auth/login");
+    }
+  });
+
+  const isLoading = signInMutation.isPending || signUpMutation.isPending || signOutMutation.isPending || isUserLoading;
+
+  const value = {
+    user,
+    isLoading,
+    signIn: signInMutation.mutate,
+    signUp: signUpMutation.mutate,
+    signOut: signOutMutation.mutate,
+    refetchUser,
+    isSigningIn: signInMutation.isPending,
+    isSigningUp: signUpMutation.isPending,
+    signInError: signInMutation.error,
+    signUpError: signUpMutation.error
   };
 
-  const { mutate: signIn, isPending: isSigningIn } = useMutation({
-    mutationFn: async (data: SignInFormData) => {
-      const response = await instance.post("api/auths/login", data);
-      return response.data;
-    },
-
-    onSuccess: (result) => {
-      if (result.token) {
-        try {
-          setAuth({
-            token: result.token.accessToken,
-            user: result.user
-          });
-
-          if (typeof window !== "undefined") {
-            localStorage.setItem("accessToken", result.token.accessToken);
-            localStorage.setItem("user", JSON.stringify(result.user));
-          }
-          window.location.href = "/home";
-        } catch (error) {
-          console.error("Token decode error:", error);
-        }
-      }
-    },
-    onError: (error: unknown) => {
-      console.error("Error signing in:", error);
-      toast({
-        variant: "destructive",
-        title: "Đăng nhập không thành công",
-        description:
-          (error as { response?: { data?: { message?: string } } }).response
-            ?.data?.message || ""
-      });
-    }
-  });
-
-  const { mutate: signUp, isPending: isSigningUp } = useMutation({
-    mutationFn: async (data: SignUpFormData) => {
-      const response = await instance.post("api/auths/register", data);
-      return response.data;
-    },
-    onSuccess: (result) => {
-      if (result.token) {
-        try {
-          setAuth({
-            token: result.token.accessToken,
-            user: result.user
-          });
-
-          if (typeof window !== "undefined") {
-            localStorage.setItem("accessToken", result.token.accessToken);
-            localStorage.setItem("user", JSON.stringify(result.user));
-          }
-          window.location.href = "/home";
-        } catch (error) {
-          console.error("Token decode error:", error);
-        }
-      }
-    },
-    onError: (error: unknown) => {
-      console.error("Error signing up:", error);
-      toast({
-        variant: "destructive",
-        title: "Đăng ký không thành công",
-        description:
-          (error as { response?: { data?: { message?: string } } }).response
-            ?.data?.message || ""
-      });
-    }
-  });
-
-  return (
-    <AuthContext.Provider
-      value={{
-        auth,
-        setAuth,
-        signOut,
-        signIn,
-        signUp,
-        isSigningIn,
-        isSigningUp
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export default AuthContext;

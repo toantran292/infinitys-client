@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { HomePage } from "@/components/home-page";
+import { HomeComponent } from "@/views/home/home";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  return <HomePage />;
+  return <HomeComponent />;
 }

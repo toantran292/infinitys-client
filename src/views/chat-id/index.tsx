@@ -1,4 +1,4 @@
-import { Layout } from "@/components/layouts";
+import { ProtectedRouteLayout } from "@/components/layouts";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -25,7 +25,7 @@ export const ChatIdView = ({
   console.log({ isCollapsed });
 
   return (
-    <Layout sectionClassName="bg-gray-50 h-full max-h-full">
+    <ProtectedRouteLayout sectionClassName="bg-gray-50 h-full max-h-full">
       <ResizablePanelGroup
         direction="horizontal"
         className="h-full items-stretch max-h-full"
@@ -44,7 +44,7 @@ export const ChatIdView = ({
           }}
           className={cn(
             isCollapsed &&
-              "min-w-[50px] md:min-w-[70px] transition-all duration-300 ease-in-out"
+            "min-w-[50px] md:min-w-[70px] transition-all duration-300 ease-in-out"
           )}
         >
           <ChatSidebar isCollapsed={isCollapsed} />
@@ -58,6 +58,6 @@ export const ChatIdView = ({
           {groupChatId ? <ChatPage groupChatId={groupChatId} /> : null}
         </ResizablePanel>
       </ResizablePanelGroup>
-    </Layout>
+    </ProtectedRouteLayout>
   );
 };

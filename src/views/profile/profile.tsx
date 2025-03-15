@@ -1,10 +1,9 @@
-import { Layout } from "@/components/layouts";
-import ProfileCard from "./ui/ProfileCard";
-import PostList from "./ui/PostList";
-import { instance } from "@/common/api";
+import { ProtectedRouteLayout } from "@/components/layouts";
 import { useQuery } from "@tanstack/react-query";
 import { Loader } from "@/components/ui/Loader";
-
+import axiosInstance from "@/lib/axios";
+import PostList from "@/components/ui/PostList";
+import ProfileCard from "./components/profile-card";
 interface ProfilePageProps {
   userId: string;
 }
@@ -40,11 +39,11 @@ export interface Profile {
 }
 
 const getProfile = async (userId: string): Promise<Profile> => {
-  const response = await instance.get(`api/users/${userId}`);
+  const response = await axiosInstance.get(`api/users/${userId}`);
   return response.data;
 };
 
-export const ProfilePage = ({ userId }: ProfilePageProps) => {
+export const ProfileComponent = ({ userId }: ProfilePageProps) => {
   const {
     data: profile,
     isLoading,
@@ -62,7 +61,7 @@ export const ProfilePage = ({ userId }: ProfilePageProps) => {
     );
 
   return (
-    <Layout>
+    <ProtectedRouteLayout>
       <div className="container mx-auto p-6">
         <h1 className="text-center text-3xl font-semibold mb-6">
           Hồ sơ cá nhân
@@ -84,6 +83,6 @@ export const ProfilePage = ({ userId }: ProfilePageProps) => {
           </div>
         </div>
       </div>
-    </Layout>
+    </ProtectedRouteLayout>
   );
 };

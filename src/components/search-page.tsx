@@ -1,10 +1,10 @@
 "use client";
-import { Layout } from "@/components/layouts";
+import { ProtectedRouteLayout } from "@/components/layouts";
 import { UserCard } from "@/components/user-card";
 import { useQuery } from "@tanstack/react-query";
-import instance from "@/common/api";
+import axiosInstance from "@/lib/axios";
 import { Loader } from "@/components/ui/Loader";
-import { Profile } from "@/components/profile-page";
+import { Profile } from "@/views/profile/profile";
 import {
   useFriendRequest,
   useRejectFriendRequest
@@ -14,7 +14,7 @@ export const SearchPage = ({ q }: { q: string }) => {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["SEARCH", q],
     queryFn: () =>
-      instance
+      axiosInstance
         .get(`http://localhost:20250/search/user?q=${q}`)
         .then((res) => res.data)
   });
@@ -34,7 +34,7 @@ export const SearchPage = ({ q }: { q: string }) => {
     );
 
   return (
-    <Layout sectionClassName="mx-auto w-[760px] flex flex-col gap-4 py-4">
+    <ProtectedRouteLayout sectionClassName="mx-auto w-[760px] flex flex-col gap-4 py-4">
       <h1 className="text-center font-bold text-xl">Kết quả tìm kiếm</h1>
       {data?.map((user: Profile) => (
         <UserCard
@@ -51,6 +51,6 @@ export const SearchPage = ({ q }: { q: string }) => {
           }}
         />
       ))}
-    </Layout>
+    </ProtectedRouteLayout>
   );
 };

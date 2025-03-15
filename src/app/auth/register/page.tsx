@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import SignUpViewPage from "@/components/sign-up-view";
+import SignUpViewPage from "@/views/sign-up/sign-up";
 
 export const metadata: Metadata = {
   title: "Authentication | Sign Up",

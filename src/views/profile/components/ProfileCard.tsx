@@ -1,8 +1,7 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ProfileAvatar, Profile } from "../profile-page";
-import { instance } from "@/common/api";
+import { ProfileAvatar, Profile } from "@/views/profile/profile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { Camera, MessageCircleCode, Pencil, UserRoundPlus } from "lucide-react";
@@ -10,6 +9,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useCreateGroupChat } from "@/views/chat-id/hooks";
 import { useAuth } from "@/providers/auth-provider";
+import axiosInstance from "@/lib/axios";
 
 interface FormData {
   dateOfBirth: string;
@@ -18,7 +18,7 @@ interface FormData {
   desiredJobPosition: string;
 }
 
-const ProfileAvatarComponet = ({ avatar }: { avatar: ProfileAvatar }) => {
+const ProfileAvatarComponent = ({ avatar }: { avatar: ProfileAvatar }) => {
 
   return (
     <Avatar className="w-20 h-20">
@@ -32,7 +32,7 @@ const ProfileAvatarComponet = ({ avatar }: { avatar: ProfileAvatar }) => {
 };
 
 export default function ProfileCard({ data }: { data: Profile | null }) {
-  const { auth } = useAuth();
+  const { user, refetchUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const queryClient = useQueryClient();
   const { createGroupChat, isPending } = useCreateGroupChat();
@@ -71,7 +71,7 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
         ).toISOString();
       }
 
-      await instance.patch(`api/users/${data?.id}`, sanitizedData);
+      await axiosInstance.patch(`api/users/${data?.id}`, sanitizedData);
     },
     onSuccess: () => {
       setIsEditing(false);
@@ -90,7 +90,7 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
     event.target.value = "";
 
     try {
-      const { data: presignedData } = await instance.post(
+      const { data: presignedData } = await axiosInstance.post(
         `api/assets/presign-link`,
         {
           type: "avatar",
@@ -111,7 +111,7 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
 
       if (!uploadResponse.ok) throw new Error("Upload ảnh thất bại");
 
-      await instance.patch(`api/users/${data?.id}/avatar`, {
+      await axiosInstance.patch(`api/users/${data?.id}/avatar`, {
         avatar: {
           key,
           name: file.name,
@@ -120,9 +120,10 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
         }
       });
 
-      const updatedProfile = await instance.get(`api/users/${data?.id}`);
+      const updatedProfile = await axiosInstance.get(`api/users/${data?.id}`);
 
       queryClient.setQueryData(["PROFILE", data?.id], updatedProfile.data);
+      refetchUser();
     } catch (error) {
       console.error("Lỗi khi tải ảnh lên S3:", error);
     }
@@ -156,9 +157,9 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
 
       <div className="flex items-center space-x-4 border-b border-gray-300 pb-4">
         <div className="relative w-20 h-20">
-          <ProfileAvatarComponet avatar={data.avatar} />
+          <ProfileAvatarComponent avatar={data.avatar} />
 
-          {data.id === auth?.user?.id && (
+          {data.id === user?.id && (
             <>
               <input
                 type="file"
@@ -182,7 +183,7 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
             {data.firstName} {data.lastName}
           </h2>
           <p className="text-gray-600">{data.email}</p>
-          {data.id !== auth?.user?.id ? (
+          {data.id !== user?.id ? (
             <div className="flex gap-2 items-center">
               <Button
                 disabled={isPending}

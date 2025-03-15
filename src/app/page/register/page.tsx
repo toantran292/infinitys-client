@@ -10,14 +10,13 @@ import {
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Layout } from "@/components/layouts";
+import { ProtectedRouteLayout } from "@/components/layouts";
 import { toast } from "@/hooks/use-toast";
 import PagePreview from "@/components/ui/PagePreview";
-import instance from "@/common/api";
+import axiosInstance from "@/lib/axios";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [avatar, setAvatar] = useState<string | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
   const [presignedUrl, setPresignedUrl] = useState<string | null>(null);
@@ -39,15 +38,6 @@ export default function RegisterPage() {
       content: ""
     }
   });
-
-  useEffect(() => {
-    setValue("name", searchParams.get("name") || "");
-    setValue("url", searchParams.get("url") || "");
-    setValue("address", searchParams.get("address") || "");
-    setValue("email", searchParams.get("email") || "");
-    setValue("avatar", searchParams.get("avatar") || null);
-    setValue("content", searchParams.get("content") || "");
-  }, [searchParams, setValue]);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -92,11 +82,11 @@ export default function RegisterPage() {
         ...data,
         avatar: avatar
           ? {
-              key: avatar,
-              name: selectedFile?.name,
-              content_type: selectedFile?.type,
-              size: selectedFile?.size
-            }
+            key: avatar,
+            name: selectedFile?.name,
+            content_type: selectedFile?.type,
+            size: selectedFile?.size
+          }
           : null
       });
 
@@ -110,7 +100,7 @@ export default function RegisterPage() {
       if (selectedFile && avatar) {
         console.log("📌 Bắt đầu cập nhật Avatar cho Page:", pageId);
 
-        await instance.patch(`api/pages/${pageId}/avatar`, {
+        await axiosInstance.patch(`api/pages/${pageId}/avatar`, {
           avatar: {
             key: avatar,
             name: selectedFile.name,
@@ -130,7 +120,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <Layout>
+    <ProtectedRouteLayout>
       <div className="bg-[#f4f2ee] min-h-screen w-full flex justify-center py-10 border-t-2 border-b-2 border-gray-600">
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -239,6 +229,6 @@ export default function RegisterPage() {
           </div>
         </form>
       </div>
-    </Layout>
+    </ProtectedRouteLayout>
   );
 }
