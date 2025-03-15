@@ -31,7 +31,6 @@ export const ChatIdView = ({
         className="h-full items-stretch max-h-full"
       >
         <ChatSidebar isCollapsed={isCollapsed} />
-        <ResizableHandle withHandle />
         <ResizablePanel
           className="max-h-full"
           defaultSize={defaultLayout[1]}

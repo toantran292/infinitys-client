@@ -7,6 +7,7 @@ import { GroupChat } from "@/components/chat-page";
 import { useGetGroupChats } from "@/views/chat-id/hooks";
 import { memo } from "react";
 import { formatDistanceToNow } from "date-fns";
+import { useRouter } from "next/navigation";
 
 interface ChatSidebarProps {
   isCollapsed: boolean;
@@ -44,6 +45,7 @@ const ChatSideBarHeader = () => {
 };
 
 const ChatSideBarBody = ({ groupChats }: { groupChats: GroupChat[] }) => {
+  const router = useRouter();
   const chatPreviews: ChatPreview[] = groupChats.map((chat) => ({
     id: chat.id,
     name: chat.name,
@@ -60,11 +62,12 @@ const ChatSideBarBody = ({ groupChats }: { groupChats: GroupChat[] }) => {
         <div
           key={chat.id}
           className="flex items-center gap-3 p-4 hover:bg-gray-100 cursor-pointer relative"
+          onClick={() => router.push(`/chat/${chat.id}`)}
         >
           <div className="relative">
             <Avatar className="h-12 w-12">
               <AvatarImage src={chat.avatar} />
-              <AvatarFallback>{chat.name[0]}</AvatarFallback>
+              <AvatarFallback className="bg-gray-500 text-white">{chat.name[0]}</AvatarFallback>
             </Avatar>
             {chat.isOnline && (
               <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white" />

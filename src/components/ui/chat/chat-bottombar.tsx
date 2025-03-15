@@ -1,9 +1,9 @@
-import { Image, Paperclip, SendHorizontal, SmilePlus, ThumbsUp } from "lucide-react";
+import { SmilePlus, SendHorizontal, ThumbsUp } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChatInput } from "@/components/ui/chat/chat-input";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import EmojiPicker, { Theme, EmojiStyle } from 'emoji-picker-react';
 
 interface ChatBottombarProps {
   sendMessage: (newMessage: string) => void;
@@ -15,6 +15,7 @@ export default function ChatBottomBar({
   isLoading
 }: ChatBottombarProps) {
   const [message, setMessage] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -31,31 +32,37 @@ export default function ChatBottomBar({
     }
   };
 
+  const onEmojiClick = (emojiObject: any) => {
+    setMessage(prev => prev + emojiObject.emoji);
+    setShowEmojiPicker(false);
+  };
+
   return (
     <div className="px-4 py-3 border-t bg-white">
       <div className="flex items-end gap-2">
-        <div className="flex gap-1">
+        <div className="relative">
           <Button
             variant="ghost"
             size="icon"
             className="h-9 w-9 hover:bg-gray-100"
-          >
-            <Image size={20} className="text-gray-500" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 hover:bg-gray-100"
-          >
-            <Paperclip size={20} className="text-gray-500" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 hover:bg-gray-100"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
           >
             <SmilePlus size={20} className="text-gray-500" />
           </Button>
+          {showEmojiPicker && (
+            <div className="absolute bottom-full left-0 mb-2 z-50">
+              <EmojiPicker
+                onEmojiClick={onEmojiClick}
+                width={350}
+                height={400}
+                theme={Theme.LIGHT}
+                searchPlaceholder="Search emoji..."
+                lazyLoadEmojis={true}
+                skinTonesDisabled={true}
+                emojiStyle={EmojiStyle.NATIVE}
+              />
+            </div>
+          )}
         </div>
         <div className="flex-1 relative">
           <ChatInput

@@ -10,7 +10,8 @@ import { useGetGroupChatMessage } from "@/views/chat-id/hooks";
 
 export interface Profile {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   image?: string;
   isOnline?: boolean;
 }
@@ -106,7 +107,7 @@ const ChatPage = ({ groupChatId }: ChatPageProps) => {
   }, [socket, groupChatId]);
 
   return (
-    <div className="flex flex-col justify-between w-full h-full overflow-hidden">
+    <div className="flex flex-col w-full h-full overflow-hidden">
       <ChatTopBar />
       <ChatList messages={messages} />
       <ChatBottomBar sendMessage={handleSendMessage} />
