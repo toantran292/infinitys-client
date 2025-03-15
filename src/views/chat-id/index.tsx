@@ -30,25 +30,7 @@ export const ChatIdView = ({
         direction="horizontal"
         className="h-full items-stretch max-h-full"
       >
-        <ResizablePanel
-          defaultSize={defaultLayout[0]}
-          collapsedSize={6}
-          collapsible={true}
-          minSize={8}
-          maxSize={12}
-          onCollapse={() => {
-            setIsCollapsed(true);
-          }}
-          onExpand={() => {
-            setIsCollapsed(false);
-          }}
-          className={cn(
-            isCollapsed &&
-              "min-w-[50px] md:min-w-[70px] transition-all duration-300 ease-in-out"
-          )}
-        >
-          <ChatSidebar isCollapsed={isCollapsed} />
-        </ResizablePanel>
+        <ChatSidebar isCollapsed={isCollapsed} />
         <ResizableHandle withHandle />
         <ResizablePanel
           className="max-h-full"

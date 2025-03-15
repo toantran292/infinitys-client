@@ -1,7 +1,6 @@
 "use client";
 
 import ChatTopBar from "@/components/ui/chat/chat-top-bar";
-import { Profile } from "@/components/profile-page";
 import { ChatList } from "@/components/ui/chat/chat-list";
 import ChatBottomBar from "@/components/ui/chat/chat-bottombar";
 import { memo, useEffect, useState } from "react";
@@ -9,23 +8,33 @@ import { io, Socket } from "socket.io-client";
 import { useAuth } from "@/providers/auth-provider";
 import { useGetGroupChatMessage } from "@/views/chat-id/hooks";
 
+export interface Profile {
+  id: string;
+  name: string;
+  image?: string;
+  isOnline?: boolean;
+}
+
 export interface Message {
+  id: string;
   user: Profile;
   content: string;
   room_id: string;
   createdAt: string;
+  isRead?: boolean;
 }
 
-interface GroupChatMember {
+export interface GroupChatMember {
   id: string;
-  isAdmin: boolean;
   user: Profile;
+  groupChatId: string;
 }
 
 export interface GroupChat {
   id: string;
   name: string;
   groupChatMembers: GroupChatMember[];
+  messages?: Message[];
 }
 
 export interface ChatPageProps {
