@@ -58,7 +58,7 @@ const ChatPage = ({ groupChatId }: ChatPageProps) => {
     if (!auth.token && groupChatId) {
       console.log("No token, not connecting");
       return;
-    } // Nếu chưa có token, không kết nối
+    }
 
     const newSocket = io("http://localhost:20250", {
       auth: {
@@ -74,7 +74,7 @@ const ChatPage = ({ groupChatId }: ChatPageProps) => {
       setMessages((prev) => [...prev, data]);
     });
 
-    newSocket.on("joined_room", () => {});
+    newSocket.on("joined_room", () => { });
 
     newSocket.on("notifications", (data) => {
       console.log({ notification_data: data });

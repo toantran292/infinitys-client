@@ -16,48 +16,29 @@ interface ChatTopbarProps {
 
 export const TopbarIcons = [{ icon: Phone }, { icon: Video }, { icon: Info }];
 
-export default function ChatTopBar({ selectedUser }: ChatTopbarProps) {
-  const { auth } = useAuth();
-  const { id } = useParams<{ id: string }>();
-
-  const { groupChat } = useGetGroupChat(id);
-
-  console.log({ groupChat });
-
-  const groupName = groupChat?.groupChatMembers
-    .filter((m) => m.user.id !== auth.user?.id)
-    .map((m) => m.user.firstName + " " + m.user.lastName)
-    .join(", ");
-
-  // const groupChatName = groupChat?.groupChatMembers.filter()
+const ChatTopBar = () => {
+  const params = useParams();
+  const { groupChat } = useGetGroupChat(params.id as string);
 
   return (
-    <ExpandableChatHeader>
-      <div className="flex items-center gap-2">
-        <Avatar className="flex justify-center items-center">
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col">
-          <span className="font-medium">{groupName || "No name"}</span>
-          <span className="text-xs">Active 2 mins ago</span>
+    <div className="flex items-center gap-3 p-4 border-b bg-white">
+      <Avatar className="h-12 w-12">
+        <AvatarImage src="https://github.com/shadcn.png" alt="avatar" />
+      </Avatar>
+      <div className="flex flex-col min-w-0">
+        <h2 className="font-medium text-sm text-gray-900 truncate">
+          {groupChat?.name || "Loading..."}
+        </h2>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">
+            {groupChat?.groupChatMembers?.[0]?.user?.name || "No members"}
+          </span>
+          <span className="w-1 h-1 bg-gray-300 rounded-full" />
+          <span className="text-xs text-gray-500">Available on mobile</span>
         </div>
       </div>
-
-      <div className="flex gap-1">
-        {TopbarIcons.map((icon, index) => (
-          <Link
-            key={index}
-            href="#"
-            className={cn(
-              buttonVariants({ variant: "ghost", size: "icon" }),
-              "h-9 w-9"
-            )}
-          >
-            <icon.icon size={20} className="text-muted-foreground" />
-          </Link>
-        ))}
-      </div>
-    </ExpandableChatHeader>
+    </div>
   );
-}
+};
+
+export default ChatTopBar;

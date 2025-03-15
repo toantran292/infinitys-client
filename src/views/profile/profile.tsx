@@ -25,9 +25,11 @@ export interface ProfileAvatar {
 
 export interface Profile {
   id: string;
+  name: string;
+  avatar?: string;
+  email: string;
   firstName: string;
   lastName: string;
-  email: string;
   dateOfBirth?: string;
   gender?: string;
   major?: string;
