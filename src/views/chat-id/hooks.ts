@@ -18,14 +18,13 @@ export const useGetGroupChatMessage = (group_id?: string) => {
   return { groupChatMessage, isLoading };
 };
 
-export const useGetGroupChats = () => {
+export const useGetGroupChats = (query?: string) => {
   const { data: groupChats, isLoading } = useQuery<GroupChat[]>({
-    queryKey: ["GROUP_CHATS"],
-    queryFn: () =>
-      axiosInstance.get(`api/chats/groups`).then(({ data }) => data)
+    queryKey: ["GROUP_CHATS", query],
+    queryFn: () => axiosInstance.get(`api/chats/groups`, { params: query ? { q: query } : {} }).then(({ data }) => data)
   });
 
-  return { groupChats: groupChats, isLoading };
+  return { groupChats, isLoading };
 };
 
 export const useGetGroupChat = (group_id?: string) => {

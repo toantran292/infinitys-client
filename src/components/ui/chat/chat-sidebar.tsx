@@ -5,9 +5,11 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { GroupChat } from "@/components/chat-page";
 import { useGetGroupChats } from "@/views/chat-id/hooks";
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGroupChat } from "@/providers/group-chat-provider";
 
 interface ChatSidebarProps {
   isCollapsed: boolean;
@@ -24,6 +26,8 @@ interface ChatPreview {
 }
 
 const ChatSideBarHeader = () => {
+  const { search, setSearch } = useGroupChat();
+  
   return (
     <div className="flex flex-col border-b">
       <div className="flex justify-between p-4 items-center">
@@ -36,7 +40,9 @@ const ChatSideBarHeader = () => {
           <input
             type="text"
             placeholder="Search messages"
-            className="w-full pl-10 pr-4 py-2 bg-[#eef3f8] rounded-md text-sm focus:outline-none"
+            className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-md text-sm focus:outline-none"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
       </div>
@@ -44,16 +50,17 @@ const ChatSideBarHeader = () => {
   );
 };
 
-const ChatSideBarBody = ({ groupChats }: { groupChats: GroupChat[] }) => {
+const ChatSideBarBody = () => {
   const router = useRouter();
-  const chatPreviews: ChatPreview[] = groupChats.map((chat) => ({
+  const { groupChats } = useGroupChat();
+  const chatPreviews: ChatPreview[] = (groupChats || []).map((chat) => ({
     id: chat.id,
     name: chat.name,
-    avatar: chat.groupChatMembers?.[0]?.user?.image,
-    lastMessage: chat.messages?.[chat.messages.length - 1]?.content || "No messages",
-    timestamp: new Date(chat.messages?.[chat.messages.length - 1]?.createdAt || Date.now()),
-    isOnline: chat.groupChatMembers?.[0]?.user?.isOnline || false,
-    unread: chat.messages?.[chat.messages.length - 1]?.isRead === false
+    avatar: chat.members?.[0]?.image,
+    lastMessage: chat.lastMessage?.content || "No messages",
+    timestamp: new Date(chat.lastMessage?.createdAt || Date.now()),
+    isOnline: chat.members?.[0]?.isOnline || false,
+    unread: chat.lastMessage?.isRead === false
   }));
 
   return (
@@ -67,7 +74,7 @@ const ChatSideBarBody = ({ groupChats }: { groupChats: GroupChat[] }) => {
           <div className="relative">
             <Avatar className="h-12 w-12">
               <AvatarImage src={chat.avatar} />
-              <AvatarFallback className="bg-gray-500 text-white">{chat.name[0]}</AvatarFallback>
+              <AvatarFallback className="bg-gray-500 text-white">{chat.name}</AvatarFallback>
             </Avatar>
             {chat.isOnline && (
               <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white" />
@@ -99,14 +106,12 @@ const ChatSideBarBody = ({ groupChats }: { groupChats: GroupChat[] }) => {
 };
 
 const ChatSidebar = ({ isCollapsed }: ChatSidebarProps) => {
-  const { groupChats } = useGetGroupChats();
-
   if (isCollapsed) return null;
 
   return (
     <div className="w-[420px] flex flex-col h-full bg-white border-r">
       <ChatSideBarHeader />
-      <ChatSideBarBody groupChats={groupChats || []} />
+      <ChatSideBarBody />
     </div>
   );
 };

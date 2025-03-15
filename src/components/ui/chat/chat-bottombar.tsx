@@ -39,7 +39,7 @@ export default function ChatBottomBar({
 
   return (
     <div className="px-4 py-3 border-t bg-white">
-      <div className="flex items-end gap-2">
+      <div className="flex items-center gap-2">
         <div className="relative">
           <Button
             variant="ghost"
@@ -71,7 +71,6 @@ export default function ChatBottomBar({
             onKeyDown={handleKeyPress}
             onChange={handleInputChange}
             placeholder="Write a message..."
-            className="min-h-[44px] py-3 px-4 rounded-2xl bg-[#f2f2f2] focus:bg-white focus:ring-1 focus:ring-[#0a66c2]"
           />
         </div>
         <AnimatePresence initial={false}>

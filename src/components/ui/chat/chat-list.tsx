@@ -72,7 +72,7 @@ export function ChatList({ messages }: ChatListProps) {
                   </div>
                   {message.createdAt && (
                     <span className="text-[11px] text-gray-500 mt-1">
-                      {format(new Date(message.createdAt), "h:mm a")}
+                      {format(new Date(message.createdAt), 'h:mm aa')}
                     </span>
                   )}
                 </div>

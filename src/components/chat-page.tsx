@@ -36,6 +36,8 @@ export interface GroupChat {
   name: string;
   groupChatMembers: GroupChatMember[];
   messages?: Message[];
+  members?: Profile[];
+  lastMessage?: Message;
 }
 
 export interface ChatPageProps {
