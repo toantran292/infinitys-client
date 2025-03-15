@@ -42,7 +42,6 @@ export function useAvatarUpload({
 
       const fileData: FileUploadResponse = {
         key,
-        url: "", // URL sẽ được server trả về
         name: file.name,
         content_type: file.type,
         size: file.size

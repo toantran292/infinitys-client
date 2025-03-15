@@ -67,7 +67,7 @@ export function PageList({ pages, onReapply, isLoading }: PageListProps) {
             <div className="flex items-center gap-3">
               <Avatar className="w-20 h-20">
                 <AvatarImage
-                  src={page.avatar.url || "https://github.com/shadcn.png"}
+                  src={page.avatar?.url || "https://github.com/shadcn.png"}
                   alt="Avatar"
                 />
                 <AvatarFallback>U</AvatarFallback>
@@ -88,7 +88,7 @@ export function PageList({ pages, onReapply, isLoading }: PageListProps) {
           {page.status === "rejected" && (
             <Button
               className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md ml-4"
-              onClick={() => onReapply(page)}
+              onClick={() => onReapply()}
             >
               Đăng ký lại
             </Button>

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Building } from "lucide-react";
 
 interface PagePreviewProps {
-  avatar: string | null;
+  url: string;
   name: string;
   content: string;
   email: string;

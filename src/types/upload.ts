@@ -1,6 +1,6 @@
 export interface FileUploadResponse {
   key: string;
-  url: string;
+  url?: string;
   name: string;
   content_type: string;
   size: number;

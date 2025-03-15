@@ -1,6 +1,6 @@
 interface PageHeaderProps {
   page: {
-    banner?: string;
+    banner?: { url: string };
     avatar?: { url: string };
     name: string;
     content?: string;
@@ -13,10 +13,10 @@ export function PageHeader({ page, children }: PageHeaderProps) {
   return (
     <>
       <div className="relative">
-        {page.banner ? (
+        {page.banner?.url ? (
           <div
             className="h-40 w-full bg-cover bg-center"
-            style={{ backgroundImage: `url(${page.banner})` }}
+            style={{ backgroundImage: `url(${page.banner?.url})` }}
           />
         ) : (
           <div className="h-40 w-full bg-gradient-to-r from-[#004182] to-[#0077b5] rounded-lg" />

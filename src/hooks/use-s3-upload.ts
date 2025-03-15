@@ -14,14 +14,18 @@ export function useS3Upload({
   onSuccess,
   onError
 }: UseS3UploadOptions) {
-  const uploadToS3 = async (file: File): Promise<PresignedUrlResponse> => {
+  const uploadToS3 = async (
+    file: File,
+    _prefix?: string
+  ): Promise<PresignedUrlResponse> => {
+    const actualPrefix = _prefix || prefix;
     try {
       const { data: presignedData } =
         await axiosInstance.post<PresignedUrlResponse>(
           `api/assets/presign-link`,
           {
             type,
-            suffix: `${prefix}/${Date.now()}-${String(file.name).trim().replace(/\s+/g, "-")}`
+            suffix: `${actualPrefix}/${Date.now()}-${String(file.name).trim().replace(/\s+/g, "-")}`
           }
         );
 
