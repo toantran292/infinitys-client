@@ -1,10 +1,10 @@
 "use client";
-import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
-import Link from "next/link";
-import { SearchBar } from "@/components/ui/search-bar";
-import { HomeIcon, BookIcon, MessageSquareIcon, BellIcon } from "lucide-react";
 import { UserMenu } from "@/components/layouts/user-menu";
+import { SearchBar } from "@/components/ui/search-bar";
+import { BellIcon, BookIcon, HomeIcon, MessageSquareIcon } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
+import { useState } from "react";
 
 const dataButtons = [
   { label: "Trang Chủ", href: "/home", icon: HomeIcon },
@@ -15,7 +15,6 @@ const dataButtons = [
 
 export const Header = () => {
   const [elementFocused, setElementFocused] = useState<number | null>(null);
-  const [search, setSearch] = useState("");
 
   const handleHoverButton = (index: number | null) => {
     setElementFocused(index);

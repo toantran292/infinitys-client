@@ -1,19 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import {
-  registerPage,
-  getPresignedUrl,
-  getViewsAsset
-} from "@/providers/page-provider";
-import { useForm } from "react-hook-form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { ProtectedRouteLayout } from "@/components/layouts";
-import { toast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import PagePreview from "@/components/ui/PagePreview";
+import { toast } from "@/hooks/use-toast";
 import axiosInstance from "@/lib/axios";
+import {
+  getPresignedUrl,
+  getViewsAsset,
+  registerPage
+} from "@/providers/page-provider";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -82,11 +82,11 @@ export default function RegisterPage() {
         ...data,
         avatar: avatar
           ? {
-            key: avatar,
-            name: selectedFile?.name,
-            content_type: selectedFile?.type,
-            size: selectedFile?.size
-          }
+              key: avatar,
+              name: selectedFile?.name,
+              content_type: selectedFile?.type,
+              size: selectedFile?.size
+            }
           : null
       });
 

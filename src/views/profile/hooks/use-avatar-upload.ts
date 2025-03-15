@@ -1,61 +1,72 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axiosInstance from "@/lib/axios";
 import { useS3Upload } from "@/hooks/use-s3-upload";
+import axiosInstance from "@/lib/axios";
+import type { FileUploadResponse, S3UploadError } from "@/types/upload";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface AvatarUploadResponse {
-    url: string;
-    key: string;
+  url: string;
+  key: string;
 }
 
 interface AvatarData {
-    key: string;
-    name: string;
-    content_type: string;
-    size: number;
+  key: string;
+  name: string;
+  content_type: string;
+  size: number;
 }
 
 interface UseAvatarUploadProps {
-    userId: string;
-    onSuccess?: () => void;
-    onError?: (error: Error) => void;
+  userId: string;
+  onSuccess?: () => void;
+  onError?: (error: S3UploadError) => void;
 }
 
-export function useAvatarUpload({ userId, onSuccess, onError }: UseAvatarUploadProps) {
-    const queryClient = useQueryClient();
-    const { uploadToS3 } = useS3Upload({
-        type: "avatar",
-        prefix: userId
-    });
+export function useAvatarUpload({
+  userId,
+  onSuccess,
+  onError
+}: UseAvatarUploadProps) {
+  const queryClient = useQueryClient();
+  const { uploadToS3 } = useS3Upload({
+    type: "avatar",
+    prefix: userId,
+    onError: (error: S3UploadError) => {
+      console.error("Upload error:", error);
+      onError?.(error);
+    }
+  });
 
-    const mutation = useMutation({
-        mutationFn: async (file: File) => {
-            // Upload file và lấy key
-            const { key } = await uploadToS3(file);
+  const mutation = useMutation<FileUploadResponse, S3UploadError, File>({
+    mutationFn: async (file: File) => {
+      const { key } = await uploadToS3(file);
 
-            // Cập nhật avatar trong database
-            await axiosInstance.patch(`api/users/${userId}/avatar`, {
-                avatar: {
-                    key,
-                    name: file.name,
-                    content_type: file.type,
-                    size: file.size
-                }
-            });
+      const fileData: FileUploadResponse = {
+        key,
+        url: "", // URL sẽ được server trả về
+        name: file.name,
+        content_type: file.type,
+        size: file.size
+      };
 
-            // Lấy profile mới
-            const { data: updatedProfile } = await axiosInstance.get(`api/users/${userId}`);
-            return updatedProfile;
-        },
-        onSuccess: (data) => {
-            queryClient.setQueryData(["PROFILE", userId], data);
-            onSuccess?.();
-        },
-        onError
-    });
+      await axiosInstance.patch(`api/users/${userId}/avatar`, {
+        avatar: fileData
+      });
 
-    return {
-        uploadAvatar: mutation.mutate,
-        isUploading: mutation.isPending,
-        error: mutation.error
-    };
-} 
+      const { data: updatedProfile } = await axiosInstance.get(
+        `api/users/${userId}`
+      );
+      return updatedProfile;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["PROFILE", userId], data);
+      onSuccess?.();
+    },
+    onError
+  });
+
+  return {
+    uploadAvatar: mutation.mutate,
+    isUploading: mutation.isPending,
+    error: mutation.error
+  };
+}

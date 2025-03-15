@@ -17,7 +17,10 @@ const Layout: FC<LayoutProps> = ({ children, sectionClassName }) => {
   );
 };
 
-export const ProtectedRouteLayout: FC<LayoutProps> = ({ children, sectionClassName }) => {
+export const ProtectedRouteLayout: FC<LayoutProps> = ({
+  children,
+  sectionClassName
+}) => {
   return (
     <ProtectedRoute>
       <Layout sectionClassName={sectionClassName}>{children}</Layout>

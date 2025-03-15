@@ -1,52 +1,58 @@
 import axiosInstance from "@/lib/axios";
-
-interface PresignedUrlResponse {
-    url: string;
-    key: string;
-}
+import { PresignedUrlResponse, S3UploadError } from "@/types/upload";
 
 interface UseS3UploadOptions {
-    type: string;
-    prefix?: string;
-    onSuccess?: (data: { key: string; url: string }) => void;
-    onError?: (error: Error) => void;
+  type: string;
+  prefix?: string;
+  onSuccess?: (data: { key: string; url: string }) => void;
+  onError?: (error: Error) => void;
 }
 
-export function useS3Upload({ type, prefix = "", onSuccess, onError }: UseS3UploadOptions) {
-    const uploadToS3 = async (file: File) => {
-        try {
-            // 1. Lấy presigned URL
-            const { data: presignedData } = await axiosInstance.post<PresignedUrlResponse>(
-                `api/assets/presign-link`,
-                {
-                    type,
-                    suffix: `${prefix}/${Date.now()}-${String(file.name).trim().replace(/\s+/g, "-")}`
-                }
-            );
+export function useS3Upload({
+  type,
+  prefix = "",
+  onSuccess,
+  onError
+}: UseS3UploadOptions) {
+  const uploadToS3 = async (file: File): Promise<PresignedUrlResponse> => {
+    try {
+      const { data: presignedData } =
+        await axiosInstance.post<PresignedUrlResponse>(
+          `api/assets/presign-link`,
+          {
+            type,
+            suffix: `${prefix}/${Date.now()}-${String(file.name).trim().replace(/\s+/g, "-")}`
+          }
+        );
 
-            if (!presignedData.url) {
-                throw new Error("Không lấy được pre-signed URL");
-            }
+      if (!presignedData?.url) {
+        throw new S3UploadError("Không lấy được pre-signed URL");
+      }
 
-            // 2. Upload file lên S3
-            const uploadResponse = await fetch(presignedData.url, {
-                method: "PUT",
-                body: file,
-                headers: { "Content-Type": file.type }
-            });
+      const uploadResponse = await fetch(presignedData.url, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type }
+      });
 
-            if (!uploadResponse.ok) {
-                throw new Error("Upload file thất bại");
-            }
+      if (!uploadResponse.ok) {
+        throw new S3UploadError(
+          `Upload thất bại: ${uploadResponse.statusText}`
+        );
+      }
 
-            onSuccess?.({ key: presignedData.key, url: presignedData.url });
-            return presignedData;
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Lỗi không xác định";
-            onError?.(new Error(errorMessage));
-            throw error;
-        }
-    };
+      onSuccess?.({ key: presignedData.key, url: presignedData.url });
+      return presignedData;
+    } catch (error) {
+      const uploadError =
+        error instanceof Error
+          ? new S3UploadError(error.message)
+          : new S3UploadError("Lỗi không xác định");
 
-    return { uploadToS3 };
-} 
+      onError?.(uploadError);
+      throw uploadError;
+    }
+  };
+
+  return { uploadToS3 };
+}

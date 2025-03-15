@@ -55,10 +55,10 @@ type Context = {
 const AuthContext = createContext<Context>({
   user: null,
   isLoading: false,
-  signOut: () => { },
-  refetchUser: () => { },
-  signIn: () => { },
-  signUp: () => { },
+  signOut: () => {},
+  refetchUser: () => {},
+  signIn: () => {},
+  signUp: () => {},
   isSigningIn: false,
   isSigningUp: false,
   signInError: null,
@@ -74,7 +74,11 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     setAccessToken(localStorage.getItem("accessToken"));
   }, []);
 
-  const { data: user, refetch: refetchUser, isLoading: isUserLoading } = useQuery({
+  const {
+    data: user,
+    refetch: refetchUser,
+    isLoading: isUserLoading
+  } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
       try {
@@ -160,7 +164,11 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   });
 
-  const isLoading = signInMutation.isPending || signUpMutation.isPending || signOutMutation.isPending || isUserLoading;
+  const isLoading =
+    signInMutation.isPending ||
+    signUpMutation.isPending ||
+    signOutMutation.isPending ||
+    isUserLoading;
 
   const value = {
     user,

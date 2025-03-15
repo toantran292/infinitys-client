@@ -21,7 +21,8 @@ export const useGetGroupChatMessage = (group_id?: string) => {
 export const useGetGroupChats = () => {
   const { data: groupChats, isLoading } = useQuery<GroupChat[]>({
     queryKey: ["GROUP_CHATS"],
-    queryFn: () => axiosInstance.get(`api/chats/groups`).then(({ data }) => data)
+    queryFn: () =>
+      axiosInstance.get(`api/chats/groups`).then(({ data }) => data)
   });
 
   return { groupChats: groupChats, isLoading };
@@ -31,7 +32,9 @@ export const useGetGroupChat = (group_id?: string) => {
   const { data: groupChat, isLoading } = useQuery<GroupChat>({
     queryKey: ["GROUP_CHAT", group_id],
     queryFn: () =>
-      axiosInstance.get(`api/chats/groups/${group_id}`).then(({ data }) => data),
+      axiosInstance
+        .get(`api/chats/groups/${group_id}`)
+        .then(({ data }) => data),
     enabled: Boolean(group_id)
   });
 
