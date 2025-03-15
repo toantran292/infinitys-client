@@ -1,15 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import instance from "@/common/api";
+import axiosInstance from "@/lib/axios";
 import { GroupChat } from "@/components/chat-page";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Profile } from "@/components/profile-page";
+import { Profile } from "@/views/profile/profile";
 
 export const useGetGroupChatMessage = (group_id?: string) => {
   const { data: groupChatMessage, isLoading } = useQuery({
     queryKey: ["GROUP_CHAT_MESSAGE", group_id],
     queryFn: () =>
-      instance
+      axiosInstance
         .get(`api/chats/groups/${group_id}/messages`)
         .then(({ data }) => data),
     enabled: Boolean(group_id)
@@ -21,7 +21,8 @@ export const useGetGroupChatMessage = (group_id?: string) => {
 export const useGetGroupChats = () => {
   const { data: groupChats, isLoading } = useQuery<GroupChat[]>({
     queryKey: ["GROUP_CHATS"],
-    queryFn: () => instance.get(`api/chats/groups`).then(({ data }) => data)
+    queryFn: () =>
+      axiosInstance.get(`api/chats/groups`).then(({ data }) => data)
   });
 
   return { groupChats: groupChats, isLoading };
@@ -31,7 +32,9 @@ export const useGetGroupChat = (group_id?: string) => {
   const { data: groupChat, isLoading } = useQuery<GroupChat>({
     queryKey: ["GROUP_CHAT", group_id],
     queryFn: () =>
-      instance.get(`api/chats/groups/${group_id}`).then(({ data }) => data),
+      axiosInstance
+        .get(`api/chats/groups/${group_id}`)
+        .then(({ data }) => data),
     enabled: Boolean(group_id)
   });
 
@@ -44,7 +47,7 @@ export const useCreateGroupChat = () => {
 
   const { mutate: createGroupChat, ...remain } = useMutation({
     mutationFn: (userId: string) =>
-      instance.post(`api/chats/groups/recipients/${userId}`),
+      axiosInstance.post(`api/chats/groups/recipients/${userId}`),
     onSuccess: ({ data }) => {
       queryClient
         .invalidateQueries({
@@ -75,13 +78,13 @@ export const useFriendRequest = ({ onSuccess }: { onSuccess: () => void }) => {
     }) => {
       switch (friend_status) {
         case "sent":
-          return instance.post(`api/friends/${userId}/cancel`);
+          return axiosInstance.post(`api/friends/${userId}/cancel`);
         case "waiting":
-          return instance.post(`api/friends/${userId}/accept`);
+          return axiosInstance.post(`api/friends/${userId}/accept`);
         case "friend":
-          return instance.post(`api/friends/${userId}`);
+          return axiosInstance.post(`api/friends/${userId}`);
         default:
-          return instance.post(`api/friends/${userId}`);
+          return axiosInstance.post(`api/friends/${userId}`);
       }
     },
     onSuccess: () => onSuccess(),
@@ -100,7 +103,7 @@ export const useRejectFriendRequest = ({
 }) => {
   const { mutate: rejectFriendRequest, ...remain } = useMutation({
     mutationFn: ({ userId }: { userId: string }) => {
-      return instance.post(`api/friends/${userId}/reject`);
+      return axiosInstance.post(`api/friends/${userId}/reject`);
     },
     onSuccess: () => onSuccess(),
     onError: (error: unknown) => {

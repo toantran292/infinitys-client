@@ -1,0 +1,62 @@
+import axiosInstance from "@/lib/axios";
+import { PresignedUrlResponse, S3UploadError } from "@/types/upload";
+
+interface UseS3UploadOptions {
+  type: string;
+  prefix?: string;
+  onSuccess?: (data: { key: string; url: string }) => void;
+  onError?: (error: Error) => void;
+}
+
+export function useS3Upload({
+  type,
+  prefix = "",
+  onSuccess,
+  onError
+}: UseS3UploadOptions) {
+  const uploadToS3 = async (
+    file: File,
+    _prefix?: string
+  ): Promise<PresignedUrlResponse> => {
+    const actualPrefix = _prefix || prefix;
+    try {
+      const { data: presignedData } =
+        await axiosInstance.post<PresignedUrlResponse>(
+          `api/assets/presign-link`,
+          {
+            type,
+            suffix: `${actualPrefix}/${Date.now()}-${String(file.name).trim().replace(/\s+/g, "-")}`
+          }
+        );
+
+      if (!presignedData?.url) {
+        throw new S3UploadError("Không lấy được pre-signed URL");
+      }
+
+      const uploadResponse = await fetch(presignedData.url, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type }
+      });
+
+      if (!uploadResponse.ok) {
+        throw new S3UploadError(
+          `Upload thất bại: ${uploadResponse.statusText}`
+        );
+      }
+
+      onSuccess?.({ key: presignedData.key, url: presignedData.url });
+      return presignedData;
+    } catch (error) {
+      const uploadError =
+        error instanceof Error
+          ? new S3UploadError(error.message)
+          : new S3UploadError("Lỗi không xác định");
+
+      onError?.(uploadError);
+      throw uploadError;
+    }
+  };
+
+  return { uploadToS3 };
+}

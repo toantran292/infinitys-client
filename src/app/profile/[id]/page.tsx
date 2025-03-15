@@ -1,10 +1,10 @@
 "use client";
 
-import { ProfilePage } from "@/components/profile-page";
+import { ProfileComponent } from "@/views/profile/profile";
 import { useParams } from "next/navigation";
 
 export default function Profile() {
   const { id } = useParams();
 
-  return <ProfilePage userId={id as string} />;
+  return <ProfileComponent userId={id as string} />;
 }
