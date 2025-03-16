@@ -6,7 +6,9 @@ import ManageInvitations from "@/views/mynetwork/components/request-manage";
 
 export default function MyNetWorkView() {
   return (
-    <ProtectedRouteLayout sectionClassName={"flex gap-4 justify-center pt-4"}>
+    <ProtectedRouteLayout
+      sectionClassName={"flex gap-4 justify-center pt-4 items-start"}
+    >
       <MyNetworkManage />
       <ManageInvitations />
     </ProtectedRouteLayout>

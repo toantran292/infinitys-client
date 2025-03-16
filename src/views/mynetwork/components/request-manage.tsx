@@ -2,15 +2,27 @@
 
 import { useState } from "react";
 import { Settings, TicketX } from "lucide-react";
-import { useConnectionRequests, useConnectionSuggestions } from "@/views/mynetwork/hooks/use-connections";
+import {
+  useConnectionRequests,
+  useConnectionSuggestions
+} from "@/views/mynetwork/hooks/use-connections";
 import Link from "next/link";
-import { useFriendRequest, useRejectFriendRequest, useRemoveFriend } from "@/views/chat-id/hooks";
+import {
+  useFriendRequest,
+  useRejectFriendRequest
+} from "@/views/chat-id/hooks";
 
 const ManageInvitations = () => {
   const [activeTab, setActiveTab] = useState<"received" | "sent">("received");
 
-  const { data: receivedRequests = [], refetch: refetchRequests, isLoading, error } = useConnectionRequests();
-  const { data: sentRequests = [],  refetch: refetchSentRequests  } = useConnectionSuggestions();
+  const {
+    data: receivedRequests = [],
+    refetch: refetchRequests,
+    isLoading,
+    error
+  } = useConnectionRequests();
+  const { data: sentRequests = [], refetch: refetchSentRequests } =
+    useConnectionSuggestions();
 
   // Xử lý Accept/Cancel request
   const { friendRequest } = useFriendRequest({
@@ -19,8 +31,9 @@ const ManageInvitations = () => {
       refetchSentRequests();
     }
   });
-  const { rejectRequest } = useRejectFriendRequest({ onSuccess: () => refetchRequests() });
-
+  const { rejectRequest } = useRejectFriendRequest({
+    onSuccess: () => refetchRequests()
+  });
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error loading friend requests.</p>;
@@ -38,7 +51,9 @@ const ManageInvitations = () => {
       <div className="flex border-b border-gray-300">
         <button
           className={`py-2 px-4 font-medium ${
-            activeTab === "received" ? "text-green-600 border-b-2 border-green-600" : "text-gray-500"
+            activeTab === "received"
+              ? "text-green-600 border-b-2 border-green-600"
+              : "text-gray-500"
           }`}
           onClick={() => setActiveTab("received")}
         >
@@ -46,7 +61,9 @@ const ManageInvitations = () => {
         </button>
         <button
           className={`py-2 px-4 font-medium ${
-            activeTab === "sent" ? "text-green-600 border-b-2 border-green-600" : "text-gray-500"
+            activeTab === "sent"
+              ? "text-green-600 border-b-2 border-green-600"
+              : "text-gray-500"
           }`}
           onClick={() => setActiveTab("sent")}
         >
@@ -64,14 +81,27 @@ const ManageInvitations = () => {
         ) : (
           <ul className="space-y-3">
             {activeList.map((user: any) => {
-              const avatarUrl = user.avatar?.length > 0 ? user.avatar[0].url : "https://via.placeholder.com/50";
+              const avatarUrl =
+                user.avatar?.length > 0
+                  ? user.avatar[0].url
+                  : "http://www.w3.org/2000/svg";
 
               return (
-                <li key={user.id} className="flex items-center justify-between p-3 border rounded-md">
-                  <Link href={`/profile/${user.id}`} className="font-medium text-gray-800 hover:underline">
+                <li
+                  key={user.id}
+                  className="flex items-center justify-between p-3 border rounded-md"
+                >
+                  <Link
+                    href={`/profile/${user.id}`}
+                    className="font-medium text-gray-800 hover:underline"
+                  >
                     <div className="flex items-center space-x-3">
                       {/* Avatar */}
-                      <img src={avatarUrl} alt={user.firstName} className="w-12 h-12 rounded-full object-cover" />
+                      <img
+                        src={avatarUrl}
+                        alt={user.firstName}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
                       {/* Thông tin user */}
                       <div>
                         {user.firstName} {user.lastName}
@@ -85,7 +115,12 @@ const ManageInvitations = () => {
                     <div className="flex space-x-2">
                       <button
                         className="border border-blue-600 text-blue-600 font-semibold px-4 py-1.5 rounded-full text-sm hover:bg-blue-600 hover:text-white transition"
-                        onClick={() => friendRequest({ userId: user.id, friend_status: "waiting" })}
+                        onClick={() =>
+                          friendRequest({
+                            userId: user.id,
+                            friend_status: "waiting"
+                          })
+                        }
                       >
                         Chấp nhận
                       </button>
@@ -101,7 +136,12 @@ const ManageInvitations = () => {
                       <span>Đã gửi</span>
                       <button
                         className="border border-gray-400 text-gray-500 px-3 py-1 rounded-full text-sm hover:bg-gray-300 transition"
-                        onClick={() => friendRequest({ userId: user.id, friend_status: "sent" })}
+                        onClick={() =>
+                          friendRequest({
+                            userId: user.id,
+                            friend_status: "sent"
+                          })
+                        }
                       >
                         Hủy kết bạn
                       </button>
