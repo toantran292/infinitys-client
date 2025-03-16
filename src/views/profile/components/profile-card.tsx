@@ -9,7 +9,7 @@ import axiosInstance from "@/lib/axios";
 import { ProfileAvatarComponent } from "./profile-avatar";
 import { ProfileForm } from "./profile-form";
 import type { ProfileFormData } from "./profile-form";
-import { useAvatarUpload } from "../hooks/use-avatar-upload";
+import { UserUploadType, useUserUpload } from "../hooks/use-user-upload";
 import { toast } from "sonner";
 
 export default function ProfileCard({ data }: { data: Profile | null }) {
@@ -17,8 +17,9 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
   const [isEditing, setIsEditing] = useState(false);
   const queryClient = useQueryClient();
   const { createGroupChat, isPending } = useCreateGroupChat();
-  const { uploadAvatar } = useAvatarUpload({
+  const { action: uploadAvatar } = useUserUpload({
     userId: data?.id || "",
+    type: UserUploadType.AVATAR,
     onSuccess: () => {
       toast.success("Ảnh đã được tải lên");
       refetchUser();

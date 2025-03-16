@@ -78,7 +78,7 @@ const ChatPage = ({ groupChatId }: ChatPageProps) => {
       return;
     }
 
-    const newSocket = io("http://localhost:20250", {
+    const newSocket = io("http://localhost:20250/chats", {
       auth: {
         user,
         token: accessToken

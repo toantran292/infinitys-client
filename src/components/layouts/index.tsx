@@ -1,3 +1,5 @@
+'use client';
+
 import Header from "@/components/layouts/header";
 import { FC, PropsWithChildren } from "react";
 import { ProtectedRoute } from "../auth/protected-route";
@@ -8,11 +10,20 @@ interface LayoutProps extends PropsWithChildren {
 
 const Layout: FC<LayoutProps> = ({ children, sectionClassName }) => {
   return (
-    <div className="flex flex-col h-screen max-h-screen">
-      <div className="flex mx-auto w-full">
-        <Header />
+    <div className="min-h-screen bg-[#f4f2ee]">
+      {/* Header cố định */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b">
+        <div className="max-w-[1128px] mx-auto">
+          <Header />
+        </div>
       </div>
-      <section className={sectionClassName}>{children}</section>
+
+      {/* Main content với padding-top để tránh header */}
+      <main className="pt-[72px] min-h-screen">
+        <div className={`max-w-[1128px] mx-auto ${sectionClassName}`}>
+          {children}
+        </div>
+      </main>
     </div>
   );
 };

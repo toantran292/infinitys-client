@@ -5,6 +5,7 @@ import { QueryClientProviderWrapper } from "@/providers/query-client";
 import { AuthProvider } from "@/providers/auth-provider";
 import { Toaster } from "sonner";
 import { GroupChatProvider } from '@/providers/group-chat-provider';
+import { NotificationProvider } from "@/contexts/NotificationContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,9 +33,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryClientProviderWrapper>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              {children}
+              <Toaster richColors closeButton />
+            </NotificationProvider>
+          </AuthProvider>
         </QueryClientProviderWrapper>
-        <Toaster richColors closeButton />
       </body>
     </html>
   );

@@ -3,6 +3,11 @@ import axiosInstance from "@/lib/axios";
 import type { FileUploadResponse, S3UploadError } from "@/types/upload";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+export enum UserUploadType {
+  AVATAR = "avatar",
+  BANNER = "banner"
+}
+
 interface AvatarUploadResponse {
   url: string;
   key: string;
@@ -15,20 +20,22 @@ interface AvatarData {
   size: number;
 }
 
-interface UseAvatarUploadProps {
+interface UseUserUploadProps {
   userId: string;
+  type: UserUploadType;
   onSuccess?: () => void;
   onError?: (error: S3UploadError) => void;
 }
 
-export function useAvatarUpload({
+export function useUserUpload({
   userId,
+  type,
   onSuccess,
   onError
-}: UseAvatarUploadProps) {
+}: UseUserUploadProps) {
   const queryClient = useQueryClient();
   const { uploadToS3 } = useS3Upload({
-    type: "avatar",
+    type,
     prefix: userId,
     onError: (error: S3UploadError) => {
       console.error("Upload error:", error);
@@ -64,7 +71,7 @@ export function useAvatarUpload({
   });
 
   return {
-    uploadAvatar: mutation.mutate,
+    action: mutation.mutate,
     isUploading: mutation.isPending,
     error: mutation.error
   };
