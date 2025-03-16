@@ -5,8 +5,10 @@ import { Building } from "lucide-react";
 import { useState } from "react";
 import { PageList } from "./components/page-list";
 import { usePages } from "./hooks/use-pages";
+import { useRouter } from "next/navigation";
 
 export default function PagesComponent() {
+  const router = useRouter();
   const [params, setParams] = useState({
     page: 1,
     limit: 10,
@@ -15,14 +17,14 @@ export default function PagesComponent() {
 
   const { data, isLoading } = usePages(params);
 
-  const handleReapply = () => {
-    console.log("hihi");
+  const handleReapply = (id) => {
+    router.push(`/page/register?id=${id}`);
   };
 
   return (
-    <ProtectedRouteLayout sectionClassName="bg-[#f4f2ee] min-h-screen w-full py-8">
-      <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 px-4">
-        <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+    <ProtectedRouteLayout sectionClassName="bg-[#f4f2ee] min-h-screen w-full h-full py-8 pt-3">
+      <div className="max-w-5xl mx-auto flex flex-wrap lg:flex-nowrap gap-6 px-4">
+        <div className="flex-1 bg-white p-6 rounded-lg shadow-md min-w-[300px] bg-black">
           <div className="flex justify-between items-center mb-4 border-b pb-4">
             <h2 className="text-lg font-semibold">Các trang đã đăng ký</h2>
             <Input
@@ -39,7 +41,7 @@ export default function PagesComponent() {
           />
         </div>
 
-        <div className="lg:col-span-1 bg-white p-6 rounded-lg shadow-md min-h-[300px] flex flex-col justify-center items-center m-auto">
+        <div className="w-[300px] bg-white p-6 rounded-lg shadow-md flex flex-col justify-center items-center">
           <h1 className="text-2xl font-bold mb-4">Đăng ký trang</h1>
           <PageTypeCard
             title="Công ty"

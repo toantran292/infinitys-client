@@ -6,6 +6,7 @@ import { AuthProvider } from "@/providers/auth-provider";
 import { Toaster } from "sonner";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { ChatProvider } from "@/contexts/ChatContext";
+import { PageProvider } from "@/providers/page-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,10 +36,12 @@ export default function RootLayout({
         <QueryClientProviderWrapper>
           <AuthProvider>
             <NotificationProvider>
+              <PageProvider>
               <ChatProvider>
                 <main className="flex-1 relative">{children}</main>
               </ChatProvider>
               <Toaster richColors closeButton />
+              </PageProvider>
             </NotificationProvider>
           </AuthProvider>
         </QueryClientProviderWrapper>

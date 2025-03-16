@@ -6,7 +6,8 @@ import {
   BookIcon,
   HomeIcon,
   MessageSquareIcon,
-  BriefcaseIcon
+  BriefcaseIcon,
+  Users
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
@@ -24,6 +25,7 @@ export const Header = () => {
     { label: "Bài tập", href: "/problems", icon: BookIcon },
     { label: "Việc làm", href: "/jobs", icon: BriefcaseIcon },
     { label: "Nhắn tin", href: "/chat", icon: MessageSquareIcon },
+    {label: "Mạng lưới", href: "/mynetwork", icon: Users},
     {
       label: "Thông báo",
       href: "#",

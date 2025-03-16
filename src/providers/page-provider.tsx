@@ -1,92 +1,101 @@
+"use client";
+import { createContext, useContext, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
 
-type RegisterPage = {
+export type Page = {
+  id: string;
   name: string;
   content?: string;
   address: string;
-  url: URL;
+  url: string;
   email: string;
-};
-export const registerPage = async (formData: RegisterPage) => {
-  try {
-    const response = await axiosInstance.post("api/pages/register", {
-      ...formData
-    });
-    if (!response) {
-      throw new Error("Không thể đăng ký trang");
-    }
-
-    return response.data;
-  } catch (error) {
-    console.error("Lỗi khi gọi API đăng ký trang:", error);
-    throw error;
-  }
+  status: string;
+  avatar?: { url: string };
 };
 
-export const getMyPage = async () => {
-  try {
-    const response = await axiosInstance.get("api/pages/me");
-    if (!response) {
-      throw new Error("Không thể lấy các trang rieng");
-    }
-    return response;
-  } catch (error) {
-    console.error("Lỗi khi gọi API lấy trang rieng:", error);
-    throw error;
-  }
+type PageContextType = {
+  pages: Page[] | null;
+  myPages: Page[] | null;
+  page: Page | null;
+  isLoading: boolean;
+  registerPage: (data: Page) => Promise<void>;
+  getPageById: (id: string) => void;
+  revalidatePages: () => void;
 };
 
-export const getPages = async () => {
-  try {
-    const response = await axiosInstance.get("api/pages");
-    if (!response) {
-      throw new Error("Không thể lấy danh sách trang");
-    }
+const PageContext = createContext<PageContextType | undefined>(undefined);
 
-    return response;
-  } catch (error) {
-    console.error("Lỗi khi gọi API lấy danh sách trang:", error);
-    throw error;
-  }
+export const PageProvider = ({ children }: { children: React.ReactNode }) => {
+  const queryClient = useQueryClient();
+  const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
+
+  // Lấy danh sách tất cả trang
+  const { data: pages, isLoading } = useQuery<Page[]>({
+    queryKey: ["pages"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/api/pages");
+      return res.data;
+    },
+  });
+
+  // Lấy trang cá nhân của user
+  const { data: myPages } = useQuery<Page[]>({
+    queryKey: ["myPages"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/api/pages/me");
+      return res.data;
+    },
+  });
+
+  // Lấy thông tin page theo ID
+  const { data: page } = useQuery<Page>({
+    queryKey: ["page", selectedPageId],
+    queryFn: async () => {
+      if (!selectedPageId) return null;
+      const res = await axiosInstance.get(`/api/pages/${selectedPageId}`);
+      return res.data;
+    },
+    enabled: !!selectedPageId,
+  });
+
+  // Mutation để đăng ký trang
+  const registerMutation = useMutation({
+    mutationFn: async (data: Page) => {
+      const res = await axiosInstance.post("/api/pages/register", data);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["pages"]); // Refresh lại danh sách trang
+    },
+  });
+
+  const registerPage = async (data: Page) => {
+    await registerMutation.mutateAsync(data);
+  };
+
+  const getPageById = (id: string) => {
+    setSelectedPageId(id);
+  };
+
+  // Revalidate lại danh sách pages
+  const revalidatePages = () => {
+    queryClient.invalidateQueries(["pages"]);
+  };
+
+  return (
+    <PageContext.Provider
+      value={{ pages, myPages, page, isLoading, registerPage, getPageById, revalidatePages }}
+    >
+      {children}
+    </PageContext.Provider>
+  );
 };
 
-export const getPageId = async (id: string) => {
-  try {
-    const response = await axiosInstance.get(`api/pages/${id}`);
-    if (!response) {
-      throw new Error("Không thể lấy trang");
-    }
-
-    return response;
-  } catch (error) {
-    console.error("Lỗi khi gọi API lấy trang:", error);
-    throw error;
+export const usePages = () => {
+  const context = useContext(PageContext);
+  if (!context) {
+    throw new Error("usePages phải được dùng trong PageProvider");
   }
-};
-export const getPresignedUrl = async (suffix: string) => {
-  try {
-    const response = await axiosInstance.post("api/assets/presign-link", {
-      type: "avatar",
-      suffix
-    });
-    if (!response) {
-      throw new Error("Không thể lấy pre-signed URL");
-    }
-    return response.data;
-  } catch (error) {
-    console.error("Lỗi khi gọi API lấy pre-signed URL:", error);
-    throw error;
-  }
-};
-export const getViewsAsset = async (key: string) => {
-  try {
-    const response = await axiosInstance.get(`api/assets/view-url?key=${key}`);
-    if (!response) {
-      throw new Error("Không thể lấy URL xem ảnh");
-    }
-    return response.data;
-  } catch (error) {
-    console.error("Lỗi khi gọi API lấy URL xem ảnh:", error);
-    throw error;
-  }
+  return context;
 };

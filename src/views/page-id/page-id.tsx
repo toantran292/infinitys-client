@@ -30,6 +30,7 @@ export default function PagesIdComponent() {
       axiosInstance.get(`/api/pages/${id}`).then((res) => res.data),
     enabled: !!id
   });
+  console.log(page);
 
   const isAdmin = useMemo(() => {
     return page?.admin_user_id === user?.id;

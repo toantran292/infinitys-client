@@ -89,7 +89,7 @@ export function PageList({ pages, onReapply, isLoading }: PageListProps) {
           {page.status === "rejected" && (
             <Button
               className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md ml-4"
-              onClick={() => onReapply()}
+              onClick={() => onReapply(page.id)}
             >
               Đăng ký lại
             </Button>
