@@ -1,15 +1,13 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { GroupChat } from "@/components/chat-page";
-import { useGetGroupChats } from "@/views/chat-id/hooks";
-import { memo, useEffect, useState } from "react";
+import { memo } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
 import { useGroupChat } from "@/providers/group-chat-provider";
+import { Button } from "../button";
 
 interface ChatSidebarProps {
   isCollapsed: boolean;
@@ -21,17 +19,26 @@ interface ChatPreview {
   avatar?: string;
   lastMessage: string;
   timestamp: Date;
-  isOnline: boolean;
+  isOnline?: boolean;
   unread?: boolean;
 }
 
 const ChatSideBarHeader = () => {
+  const router = useRouter();
   const { search, setSearch } = useGroupChat();
-  
+
   return (
     <div className="flex flex-col border-b">
       <div className="flex justify-between p-4 items-center">
         <h1 className="text-xl font-semibold">Messaging</h1>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => router.push(`/chat/new`)}
+        >
+          <Plus className="h-5 w-5" />
+        </Button>
       </div>
 
       <div className="px-4 pb-3">
@@ -46,22 +53,23 @@ const ChatSideBarHeader = () => {
           />
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
 const ChatSideBarBody = () => {
   const router = useRouter();
   const { groupChats } = useGroupChat();
-  const chatPreviews: ChatPreview[] = (groupChats || []).map((chat) => ({
-    id: chat.id,
-    name: chat.name,
-    avatar: chat.members?.[0]?.image,
-    lastMessage: chat.lastMessage?.content || "No messages",
-    timestamp: new Date(chat.lastMessage?.createdAt || Date.now()),
-    isOnline: chat.members?.[0]?.isOnline || false,
-    unread: chat.lastMessage?.isRead === false
-  }));
+  const chatPreviews: ChatPreview[] = (groupChats || []).map((chat) => {
+    const notGroupChat = chat.members?.length === 1;
+    return {
+      id: chat.id,
+      name: (notGroupChat ? chat.members?.[0]?.fullName : chat.name) || "Unnamed User",
+      avatar: (notGroupChat ? chat.members?.[0]?.avatar?.url : null) || "",
+      lastMessage: chat.lastMessage?.content || "No messages",
+      timestamp: new Date(chat.lastMessage?.createdAt || Date.now()),
+    }
+  });
 
   return (
     <div className="flex-1 overflow-y-auto">

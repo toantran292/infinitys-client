@@ -1,4 +1,3 @@
-// import { Message, UserData } from "@/app/data";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
@@ -16,14 +15,14 @@ const getMessageVariant = (currentUserId?: string, selectedUserId?: string) =>
   currentUserId === selectedUserId ? "sent" : "received";
 
 export function ChatList({ messages }: ChatListProps) {
-  const { auth } = useAuth();
+  const { user } = useAuth();
 
   return (
     <div className="flex flex-col w-full overflow-y-auto h-[calc(100vh-242px)] bg-white">
       <ChatMessageList>
         <AnimatePresence>
           {messages?.map((message, index) => {
-            const isSentByMe = getMessageVariant(auth?.user?.id, message.user.id) === "sent";
+            const isSentByMe = getMessageVariant(user?.id, message.user.id) === "sent";
             return (
               <motion.div
                 key={message.id || index}
@@ -47,7 +46,7 @@ export function ChatList({ messages }: ChatListProps) {
               >
                 {!isSentByMe && (
                   <Avatar className="h-9 w-9 mt-5">
-                    <AvatarImage src={message.user.image} />
+                    <AvatarImage src={message.user.avatar?.url || ""} />
                     <AvatarFallback className="bg-gray-500 text-white">{message.user?.firstName?.[0]}</AvatarFallback>
                   </Avatar>
                 )}

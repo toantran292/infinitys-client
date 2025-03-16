@@ -1,14 +1,14 @@
 import { ProtectedRouteLayout } from "@/components/layouts";
 import {
-  ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup
 } from "@/components/ui/resizable";
-import { cn } from "@/lib/utils";
 import ChatSidebar from "@/components/ui/chat/chat-sidebar";
 import ChatPage from "@/components/chat-page";
 import React, { useState } from "react";
 import { GroupChatProvider } from "@/providers/group-chat-provider";
+import NewChatPage from "@/components/new-chat-page";
+
 
 export interface ChatIdViewProps {
   groupChatId?: string;
@@ -23,8 +23,6 @@ export const ChatIdView = ({
 }: ChatIdViewProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  console.log({ isCollapsed });
-
   return (
     <GroupChatProvider>
       <ProtectedRouteLayout sectionClassName="bg-gray-50 h-full max-h-full">
@@ -38,7 +36,11 @@ export const ChatIdView = ({
             defaultSize={defaultLayout[1]}
             minSize={30}
           >
-            {groupChatId ? <ChatPage groupChatId={groupChatId} /> : null}
+            {groupChatId === "new" ? (
+              <NewChatPage />
+            ) : groupChatId ? (
+              <ChatPage groupChatId={groupChatId} />
+            ) : null}
           </ResizablePanel>
         </ResizablePanelGroup>
       </ProtectedRouteLayout>

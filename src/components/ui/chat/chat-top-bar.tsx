@@ -10,23 +10,31 @@ const ChatTopBar = () => {
   const params = useParams();
   const { groupChat } = useGetGroupChat(params.id as string);
 
-  const members = groupChat?.groupChatMembers?.map((member) => `${member.user.firstName} ${member.user.lastName}`) || [];
+  if (!groupChat) {
+    return null;
+  }
+
+  const isGroupChat = groupChat.members!.length > 1;
+
+  const members = groupChat.members!;
 
   return (
     <div className="flex items-center gap-3 p-4 border-b bg-white">
       <Avatar className="h-12 w-12">
-        <AvatarImage src="" alt="avatar" />
-        <AvatarFallback className="bg-gray-500 text-white">{members[1]?.charAt(0)}</AvatarFallback>
+        <AvatarImage src={isGroupChat ? "" : members[0]?.avatar?.url || ""} alt="avatar" />
+        <AvatarFallback className="bg-gray-500 text-white">{members[0]?.fullName?.charAt(0)}</AvatarFallback>
       </Avatar>
       <div className="flex flex-col min-w-0">
         <h2 className="font-medium text-sm text-gray-900 truncate">
-          {members.length > 2 ? groupChat?.name || "Loading..." : members[1]}
+          {isGroupChat ? groupChat?.name : members[0]?.fullName}
         </h2>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500">
-            {members?.join(", ") || "No members"}
-          </span>
-        </div>
+        {isGroupChat && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">
+              {members?.join(", ") || "No members"}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

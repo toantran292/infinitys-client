@@ -12,7 +12,10 @@ export interface Profile {
   id: string;
   firstName: string;
   lastName: string;
-  image?: string;
+  fullName: string;
+  avatar?: {
+    url: string;
+  };
   isOnline?: boolean;
 }
 
@@ -45,7 +48,7 @@ export interface ChatPageProps {
 }
 
 const ChatPage = ({ groupChatId }: ChatPageProps) => {
-  const { auth } = useAuth();
+  const { user, accessToken } = useAuth();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -54,7 +57,7 @@ const ChatPage = ({ groupChatId }: ChatPageProps) => {
   const handleSendMessage = (content: string) => {
     if (content.trim() && groupChatId && socket) {
       const result = {
-        user: auth.user!,
+        user: user!,
         room_id: groupChatId,
         content
       };
@@ -67,22 +70,19 @@ const ChatPage = ({ groupChatId }: ChatPageProps) => {
   }, [groupChatMessage]);
 
   useEffect(() => {
-    if (!auth.token && groupChatId) {
+    if (!accessToken && groupChatId) {
       console.log("No token, not connecting");
       return;
     }
 
     const newSocket = io("http://localhost:20250", {
       auth: {
-        user: auth.user,
-        token: auth.token
+        user,
+        token: accessToken
       }
     });
 
     newSocket.on("receive_message", (data) => {
-      console.log("TEST");
-      console.log(data);
-
       setMessages((prev) => [...prev, data]);
     });
 
@@ -100,7 +100,7 @@ const ChatPage = ({ groupChatId }: ChatPageProps) => {
       newSocket.off("joined_room");
       newSocket.disconnect(); // Ngắt kết nối khi component unmount
     };
-  }, [auth.token]);
+  }, [accessToken]);
 
   useEffect(() => {
     if (groupChatId && socket) {

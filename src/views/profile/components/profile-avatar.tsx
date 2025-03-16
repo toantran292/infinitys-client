@@ -3,7 +3,7 @@ import { Camera } from "lucide-react";
 import { ProfileAvatar } from "@/views/profile/profile";
 
 interface ProfileAvatarProps {
-  avatar: ProfileAvatar;
+  avatar?: ProfileAvatar;
   canEdit?: boolean;
   onFileChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }

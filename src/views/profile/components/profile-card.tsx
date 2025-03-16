@@ -98,7 +98,7 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
                 onClick={() => createGroupChat(data?.id)}
                 className="bg-neutral-500 text-white"
               >
-                <MessageCircleCode /> nhắn tin
+                <MessageCircleCode /> Nhắn tin
               </Button>
               <Button
                 disabled={isPending}

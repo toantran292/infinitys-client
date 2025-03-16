@@ -41,6 +41,7 @@ type User = {
 
 type Context = {
   user: User | null;
+  accessToken: string | null;
   isLoading: boolean;
   signOut: () => void;
   refetchUser: () => void;
@@ -54,11 +55,12 @@ type Context = {
 
 const AuthContext = createContext<Context>({
   user: null,
+  accessToken: null,
   isLoading: false,
-  signOut: () => {},
-  refetchUser: () => {},
-  signIn: () => {},
-  signUp: () => {},
+  signOut: () => { },
+  refetchUser: () => { },
+  signIn: () => { },
+  signUp: () => { },
   isSigningIn: false,
   isSigningUp: false,
   signInError: null,
@@ -103,9 +105,9 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     },
     onSuccess: async (data) => {
       if (typeof window !== "undefined") {
-        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("accessToken", data.token.accessToken);
       }
-      setAccessToken(data.accessToken);
+      setAccessToken(data.token.accessToken);
       await refetchUser();
 
       toast.success("Đăng nhập thành công", {
@@ -172,6 +174,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const value = {
     user,
+    accessToken,
     isLoading,
     signIn: signInMutation.mutate,
     signUp: signUpMutation.mutate,

@@ -46,7 +46,9 @@ export const useCreateGroupChat = () => {
 
   const { mutate: createGroupChat, ...remain } = useMutation({
     mutationFn: (userId: string) =>
-      axiosInstance.post(`api/chats/groups/recipients/${userId}`),
+      axiosInstance.post(`api/chats/groups`, {
+        userIds: [userId]
+      }),
     onSuccess: ({ data }) => {
       queryClient
         .invalidateQueries({
