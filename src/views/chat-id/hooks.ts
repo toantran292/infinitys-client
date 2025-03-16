@@ -19,12 +19,12 @@ export const useGetGroupChatMessage = (group_id?: string) => {
 };
 
 export const useGetGroupChats = (query?: string) => {
-  const { data: groupChats, isLoading } = useQuery<GroupChat[]>({
+  const { data: groupChats, isLoading, refetch: refetchGroupChats } = useQuery<GroupChat[]>({
     queryKey: ["GROUP_CHATS", query],
     queryFn: () => axiosInstance.get(`api/chats/groups`, { params: query ? { q: query } : {} }).then(({ data }) => data)
   });
 
-  return { groupChats, isLoading };
+  return { groupChats, isLoading, refetchGroupChats };
 };
 
 export const useGetGroupChat = (group_id?: string) => {
@@ -45,9 +45,9 @@ export const useCreateGroupChat = () => {
   const router = useRouter();
 
   const { mutate: createGroupChat, ...remain } = useMutation({
-    mutationFn: (userId: string) =>
+    mutationFn: (userIds: string[]) =>
       axiosInstance.post(`api/chats/groups`, {
-        userIds: [userId]
+        userIds
       }),
     onSuccess: ({ data }) => {
       queryClient
@@ -113,4 +113,26 @@ export const useRejectFriendRequest = ({
   });
 
   return { rejectFriendRequest, ...remain };
+};
+
+export const useGetFriends = (userId?: string) => {
+  const { data: friends, isLoading } = useQuery({
+    queryKey: ["FRIENDS", userId],
+    queryFn: () =>
+      axiosInstance
+        .get(`api/friends/${userId}`)
+        .then(({ data }) => data)
+  });
+
+  return { friends, isLoading };
+};
+
+export const useGetGroupChatbyMembersIds = (memberIds: string[] = []) => {
+  const { data: group, isLoading } = useQuery({
+    queryKey: ["GROUP_CHAT_BY_MEMBER_IDS", memberIds],
+    queryFn: () => axiosInstance.post(`api/chats/groups/search-by-members`, { memberIds }).then(({ data }) => data),
+    enabled: memberIds.length > 0
+  });
+
+  return { group, isLoading };
 };

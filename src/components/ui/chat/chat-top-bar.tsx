@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Info, Phone, Video } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useParams } from "next/navigation";
@@ -10,13 +10,33 @@ const ChatTopBar = () => {
   const params = useParams();
   const { groupChat } = useGetGroupChat(params.id as string);
 
+  const isGroupChat = useMemo(() => {
+    if (!groupChat) return false;
+    return groupChat.members!.length > 1;
+  }, [groupChat]);
+
+  const members = useMemo(() => {
+    if (!groupChat) return [];
+    return groupChat.members!;
+  }, [groupChat]);
+
+  const groupName = useMemo(() => {
+    if (!groupChat) return "";
+    if (!isGroupChat) return members[0]?.fullName;
+
+    if (groupChat.name) return groupChat.name;
+
+    const memberNames = members.slice(0, 2).map((member) => member.fullName).join(", ");
+
+    if (members.length === 2) return memberNames;
+
+    return `${memberNames} và ${members.length - 2} người khác`;
+  }, [groupChat]);
+
+
   if (!groupChat) {
     return null;
   }
-
-  const isGroupChat = groupChat.members!.length > 1;
-
-  const members = groupChat.members!;
 
   return (
     <div className="flex items-center gap-3 p-4 border-b bg-white">
@@ -26,12 +46,12 @@ const ChatTopBar = () => {
       </Avatar>
       <div className="flex flex-col min-w-0">
         <h2 className="font-medium text-sm text-gray-900 truncate">
-          {isGroupChat ? groupChat?.name : members[0]?.fullName}
+          {groupName}
         </h2>
         {isGroupChat && (
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500">
-              {members?.join(", ") || "No members"}
+              {members?.map((member) => member.fullName).join(", ") || "No members"}
             </span>
           </div>
         )}

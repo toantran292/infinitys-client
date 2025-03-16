@@ -60,7 +60,7 @@ export const UserCard: FC<{
           variant="outline"
           className="w-full hover:bg-neutral-100"
           disabled={isPending}
-          onClick={() => createGroupChat(user.id)}
+          onClick={() => createGroupChat([user.id])}
         >
           Nhắn tin
         </Button>

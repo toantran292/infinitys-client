@@ -186,7 +186,7 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
             <div className="flex gap-2 items-center">
               <Button
                 disabled={isPending}
-                onClick={() => createGroupChat(data?.id)}
+                onClick={() => createGroupChat([data.id])}
                 className="bg-neutral-500 text-white"
               >
                 <MessageCircleCode /> nhắn tin
@@ -194,7 +194,7 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
 
               <Button
                 disabled={isPending}
-                onClick={() => createGroupChat(data?.id)}
+                onClick={() => createGroupChat([data.id])}
               >
                 <UserRoundPlus /> Kết bạn
               </Button>

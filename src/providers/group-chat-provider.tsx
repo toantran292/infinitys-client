@@ -16,6 +16,7 @@ interface GroupChatContextType {
     currentGroupChatLoading: boolean;
     search: string;
     setSearch: (search: string) => void;
+    refetchGroupChats: () => void;
 }
 
 const GroupChatContext = createContext<GroupChatContextType | undefined>(undefined);
@@ -26,7 +27,7 @@ export function GroupChatProvider({ children }: { children: React.ReactNode }) {
     const [selectedChat, setSelectedChat] = useState<GroupChat | null>(null);
 
     // Lấy danh sách group chats
-    const { groupChats, isLoading } = useGetGroupChats(search);
+    const { groupChats, isLoading, refetchGroupChats } = useGetGroupChats(search);
 
     // Lấy thông tin chi tiết của group chat được chọn
     const { groupChat: currentGroupChat, isLoading: currentGroupChatLoading } = useGetGroupChat(selectedChat?.id);
@@ -44,7 +45,8 @@ export function GroupChatProvider({ children }: { children: React.ReactNode }) {
         currentGroupChat,
         currentGroupChatLoading,
         search,
-        setSearch
+        setSearch,
+        refetchGroupChats
     };
 
     return (

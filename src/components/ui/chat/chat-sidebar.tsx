@@ -3,7 +3,7 @@
 import { Plus, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useGroupChat } from "@/providers/group-chat-provider";
@@ -60,7 +60,7 @@ const ChatSideBarHeader = () => {
 const ChatSideBarBody = () => {
   const router = useRouter();
   const { groupChats } = useGroupChat();
-  const chatPreviews: ChatPreview[] = (groupChats || []).map((chat) => {
+  const chatPreviews: ChatPreview[] = useMemo(() => (groupChats || []).map((chat) => {
     const notGroupChat = chat.members?.length === 1;
     return {
       id: chat.id,
@@ -69,7 +69,9 @@ const ChatSideBarBody = () => {
       lastMessage: chat.lastMessage?.content || "No messages",
       timestamp: new Date(chat.lastMessage?.createdAt || Date.now()),
     }
-  });
+  }), [groupChats]);
+
+  console.log("chatPreviews - rerender");
 
   return (
     <div className="flex-1 overflow-y-auto">

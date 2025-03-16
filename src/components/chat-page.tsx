@@ -6,8 +6,9 @@ import ChatBottomBar from "@/components/ui/chat/chat-bottombar";
 import { memo, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "@/providers/auth-provider";
-import { useGetGroupChatMessage } from "@/views/chat-id/hooks";
-
+import { useGetGroupChatMessage, useGetGroupChats } from "@/views/chat-id/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGroupChat } from "@/providers/group-chat-provider";
 export interface Profile {
   id: string;
   firstName: string;
@@ -51,8 +52,9 @@ const ChatPage = ({ groupChatId }: ChatPageProps) => {
   const { user, accessToken } = useAuth();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-
+  const queryClient = useQueryClient();
   const { groupChatMessage } = useGetGroupChatMessage(groupChatId);
+  const { refetchGroupChats } = useGroupChat();
 
   const handleSendMessage = (content: string) => {
     if (content.trim() && groupChatId && socket) {
@@ -62,6 +64,7 @@ const ChatPage = ({ groupChatId }: ChatPageProps) => {
         content
       };
       socket.emit("send_message", result);
+      refetchGroupChats();
     }
   };
 
@@ -98,7 +101,7 @@ const ChatPage = ({ groupChatId }: ChatPageProps) => {
       newSocket.off("notifications");
       newSocket.off("receive_message");
       newSocket.off("joined_room");
-      newSocket.disconnect(); // Ngắt kết nối khi component unmount
+      newSocket.disconnect();
     };
   }, [accessToken]);
 
