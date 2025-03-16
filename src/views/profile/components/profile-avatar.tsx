@@ -3,24 +3,27 @@ import { Camera } from "lucide-react";
 import { ProfileAvatar } from "@/views/profile/profile";
 
 interface ProfileAvatarProps {
-  avatar?: ProfileAvatar;
+  avatar: ProfileAvatar;
+  fallback?: string;
   canEdit?: boolean;
   onFileChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export function ProfileAvatarComponent({
   avatar,
+  fallback,
   canEdit,
   onFileChange
 }: ProfileAvatarProps) {
   return (
-    <div className="relative w-20 h-20">
-      <Avatar className="w-20 h-20">
+    <div className="relative">
+      <Avatar className="w-[144px] h-[144px] border-4 border-white">
         <AvatarImage
           src={avatar?.url || "https://github.com/shadcn.png"}
           alt="Avatar"
+          className="object-cover w-full h-full"
         />
-        <AvatarFallback>U</AvatarFallback>
+        <AvatarFallback>{fallback}</AvatarFallback>
       </Avatar>
 
       {canEdit && (
