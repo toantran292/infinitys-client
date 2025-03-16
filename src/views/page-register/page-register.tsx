@@ -1,7 +1,7 @@
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
 import { useS3Upload } from "@/hooks/use-s3-upload";
 import { FileUploadResponse, S3UploadError } from "@/types/upload";
@@ -10,10 +10,15 @@ import { Input } from "@/components/ui/input";
 import { ProtectedRouteLayout } from "@/components/layouts";
 import { Button } from "@/components/ui/button";
 import PagePreview from "@/components/ui/PagePreview";
+import { usePages } from "@/providers/page-provider";
 
 export function PageRegisterComponent() {
   const router = useRouter();
   const [avatarFile, setAvatarFile] = useState<File | undefined>();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const {page,getPageById} = usePages();
+  const [avatarData, setAvatarData] = useState<FileUploadResponse | null>(null);
 
   const { uploadToS3 } = useS3Upload({
     type: "avatar",
@@ -26,16 +31,39 @@ export function PageRegisterComponent() {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors }
   } = useForm({
     defaultValues: {
-      name: "",
+      name: page?.name || "",
       url: "",
       address: "",
       email: "",
       content: ""
     }
   });
+  useEffect(() => {
+    if (id) {
+      getPageById(id);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (page) {
+      reset({
+        name: page.name || "",
+        url: page.url || "",
+        address: page.address || "",
+        email: page.email || "",
+        content: page.content || ""
+      });
+      if (page?.avatar?.url) {
+        setAvatarData(
+          page.avatar.url
+        );
+      }
+    }
+  }, [page, reset]);
 
   const { mutate: registerPageMutation, isPending } = useMutation({
     mutationFn: async (data: any) => {
@@ -179,7 +207,7 @@ export function PageRegisterComponent() {
 
           <div className="w-1/3 sticky top-6 self-start">
             <PagePreview
-              url={avatarFile ? URL.createObjectURL(avatarFile) : ""}
+              url={avatarFile instanceof File ? URL.createObjectURL(avatarFile) : avatarData || ""}
               name={watch("name")}
               content={watch("content")}
               email={watch("email")}
