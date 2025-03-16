@@ -25,9 +25,10 @@ export interface ProfileAvatar {
 
 export interface Profile {
   id: string;
+  name: string;
+  email: string;
   firstName: string;
   lastName: string;
-  email: string;
   dateOfBirth?: string;
   gender?: string;
   major?: string;
@@ -35,7 +36,7 @@ export interface Profile {
   fullName: string;
   posts: Post[];
   friend_status: null | "sent" | "waiting" | "friend";
-  avatar: ProfileAvatar;
+  avatar?: ProfileAvatar;
 }
 
 const getProfile = async (userId: string): Promise<Profile> => {

@@ -1,63 +1,63 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Info, Phone, Video } from "lucide-react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
-import { ExpandableChatHeader } from "@/components/ui/chat/expandable-chat";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Profile } from "@/components/profile-page";
 import { useParams } from "next/navigation";
 import { useGetGroupChat } from "@/views/chat-id/hooks";
-import { useAuth } from "@/providers/auth-provider";
-
-interface ChatTopbarProps {
-  selectedUser?: Profile;
-}
 
 export const TopbarIcons = [{ icon: Phone }, { icon: Video }, { icon: Info }];
 
-export default function ChatTopBar({ selectedUser }: ChatTopbarProps) {
-  const { auth } = useAuth();
-  const { id } = useParams<{ id: string }>();
+const ChatTopBar = () => {
+  const params = useParams();
+  const { groupChat } = useGetGroupChat(params.id as string);
 
-  const { groupChat } = useGetGroupChat(id);
+  const isGroupChat = useMemo(() => {
+    if (!groupChat) return false;
+    return groupChat.members!.length > 1;
+  }, [groupChat]);
 
-  console.log({ groupChat });
+  const members = useMemo(() => {
+    if (!groupChat) return [];
+    return groupChat.members!;
+  }, [groupChat]);
 
-  const groupName = groupChat?.groupChatMembers
-    .filter((m) => m.user.id !== auth.user?.id)
-    .map((m) => m.user.firstName + " " + m.user.lastName)
-    .join(", ");
+  const groupName = useMemo(() => {
+    if (!groupChat) return "";
+    if (!isGroupChat) return members[0]?.fullName;
 
-  // const groupChatName = groupChat?.groupChatMembers.filter()
+    if (groupChat.name) return groupChat.name;
+
+    const memberNames = members.slice(0, 2).map((member) => member.fullName).join(", ");
+
+    if (members.length === 2) return memberNames;
+
+    return `${memberNames} và ${members.length - 2} người khác`;
+  }, [groupChat]);
+
+
+  if (!groupChat) {
+    return null;
+  }
 
   return (
-    <ExpandableChatHeader>
-      <div className="flex items-center gap-2">
-        <Avatar className="flex justify-center items-center">
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col">
-          <span className="font-medium">{groupName || "No name"}</span>
-          <span className="text-xs">Active 2 mins ago</span>
-        </div>
+    <div className="flex items-center gap-3 p-4 border-b bg-white">
+      <Avatar className="h-12 w-12">
+        <AvatarImage src={isGroupChat ? "" : members[0]?.avatar?.url || ""} alt="avatar" />
+        <AvatarFallback className="bg-gray-500 text-white">{members[0]?.fullName?.charAt(0)}</AvatarFallback>
+      </Avatar>
+      <div className="flex flex-col min-w-0">
+        <h2 className="font-medium text-sm text-gray-900 truncate">
+          {groupName}
+        </h2>
+        {isGroupChat && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">
+              {members?.map((member) => member.fullName).join(", ") || "No members"}
+            </span>
+          </div>
+        )}
       </div>
-
-      <div className="flex gap-1">
-        {TopbarIcons.map((icon, index) => (
-          <Link
-            key={index}
-            href="#"
-            className={cn(
-              buttonVariants({ variant: "ghost", size: "icon" }),
-              "h-9 w-9"
-            )}
-          >
-            <icon.icon size={20} className="text-muted-foreground" />
-          </Link>
-        ))}
-      </div>
-    </ExpandableChatHeader>
+    </div>
   );
-}
+};
+
+export default ChatTopBar;

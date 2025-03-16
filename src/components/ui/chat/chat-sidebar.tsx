@@ -1,149 +1,127 @@
 "use client";
 
-import Link from "next/link";
-import { MoreHorizontal, SquarePen } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from "@/components/ui/tooltip";
-import { Avatar, AvatarImage } from "../avatar";
-import { GroupChat } from "@/components/chat-page";
-import { useGetGroupChats } from "@/views/chat-id/hooks";
-import { memo } from "react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { memo, useMemo } from "react";
+import { formatDistanceToNow } from "date-fns";
+import { useRouter } from "next/navigation";
+import { useGroupChat } from "@/providers/group-chat-provider";
+import { Button } from "../button";
 
 interface ChatSidebarProps {
   isCollapsed: boolean;
 }
 
-interface ChatSidebarHeaderProps extends ChatSidebarProps {
-  quantity: number;
+interface ChatPreview {
+  id: string;
+  name: string;
+  avatar?: string;
+  lastMessage: string;
+  timestamp: Date;
+  isOnline?: boolean;
+  unread?: boolean;
 }
 
-interface ChatSideBarBodyProps extends ChatSidebarProps {
-  groupChats: GroupChat[];
-}
+const ChatSideBarHeader = () => {
+  const router = useRouter();
+  const { search, setSearch } = useGroupChat();
 
-const ChatSideBarHeader = ({
-  isCollapsed,
-  quantity
-}: ChatSidebarHeaderProps) => {
-  return isCollapsed ? (
-    <></>
-  ) : (
-    <div className="flex justify-between p-2 items-center">
-      <div className="flex gap-2 items-center text-2xl">
-        <p className="font-medium">Chats</p>
-        <span className="text-zinc-300">({quantity})</span>
+  return (
+    <div className="flex flex-col border-b">
+      <div className="flex justify-between p-4 items-center">
+        <h1 className="text-xl font-semibold">Messaging</h1>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => router.push(`/chat/new`)}
+        >
+          <Plus className="h-5 w-5" />
+        </Button>
       </div>
 
-      <div>
-        <Link
-          href="#"
-          className={cn(
-            buttonVariants({ variant: "ghost", size: "icon" }),
-            "h-9 w-9"
-          )}
-        >
-          <MoreHorizontal size={20} />
-        </Link>
-
-        <Link
-          href="#"
-          className={cn(
-            buttonVariants({ variant: "ghost", size: "icon" }),
-            "h-9 w-9"
-          )}
-        >
-          <SquarePen size={20} />
-        </Link>
+      <div className="px-4 pb-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Search messages"
+            className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-md text-sm focus:outline-none"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
       </div>
+    </div >
+  );
+};
+
+const ChatSideBarBody = () => {
+  const router = useRouter();
+  const { groupChats } = useGroupChat();
+  const chatPreviews: ChatPreview[] = useMemo(() => (groupChats || []).map((chat) => {
+    const notGroupChat = chat.members?.length === 1;
+    return {
+      id: chat.id,
+      name: (notGroupChat ? chat.members?.[0]?.fullName : chat.name) || "Unnamed User",
+      avatar: (notGroupChat ? chat.members?.[0]?.avatar?.url : null) || "",
+      lastMessage: chat.lastMessage?.content || "No messages",
+      timestamp: new Date(chat.lastMessage?.createdAt || Date.now()),
+    }
+  }), [groupChats]);
+
+  console.log("chatPreviews - rerender");
+
+  return (
+    <div className="flex-1 overflow-y-auto">
+      {chatPreviews.map((chat) => (
+        <div
+          key={chat.id}
+          className="flex items-center gap-3 p-4 hover:bg-gray-100 cursor-pointer relative"
+          onClick={() => router.push(`/chat/${chat.id}`)}
+        >
+          <div className="relative">
+            <Avatar className="h-12 w-12">
+              <AvatarImage src={chat.avatar} />
+              <AvatarFallback className="bg-gray-500 text-white">{chat.name}</AvatarFallback>
+            </Avatar>
+            {chat.isOnline && (
+              <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex justify-between items-start">
+              <h3 className="font-semibold text-sm text-gray-900 truncate">
+                {chat.name}
+              </h3>
+              <span className="text-xs text-gray-500">
+                {formatDistanceToNow(chat.timestamp, { addSuffix: true })}
+              </span>
+            </div>
+            <p className={cn(
+              "text-sm truncate",
+              chat.unread ? "text-gray-900 font-medium" : "text-gray-500"
+            )}>
+              {chat.lastMessage}
+            </p>
+          </div>
+          {chat.unread && (
+            <div className="absolute top-4 right-4 h-2 w-2 rounded-full bg-blue-600" />
+          )}
+        </div>
+      ))}
     </div>
   );
 };
 
-const ChatSideBarBodyProps = ({
-  groupChats,
-  isCollapsed
-}: ChatSideBarBodyProps) => {
-  return (
-    <>
-      {groupChats.map((chat, index) =>
-        isCollapsed ? (
-          <TooltipProvider key={index}>
-            <Tooltip key={index} delayDuration={0}>
-              <TooltipTrigger asChild>
-                <Link
-                  href={`/chat/${chat.id}`}
-                  className={cn(
-                    buttonVariants({ variant: "secondary", size: "icon" }),
-                    "h-11 w-11 md:h-16 md:w-16 dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
-                  )}
-                >
-                  <Avatar className="flex justify-center items-center">
-                    <AvatarImage
-                      src="https://github.com/shadcn.png"
-                      alt="avatar"
-                      width={6}
-                      height={6}
-                      className="w-10 h-10 "
-                    />
-                  </Avatar>{" "}
-                  <span className="sr-only">{chat.name}</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right" className="flex items-center gap-4">
-                {chat.name}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ) : (
-          <Link
-            key={index}
-            href={`/chat/${chat.id}`}
-            className={cn(
-              buttonVariants({ variant: "secondary", size: "lg" }),
-              "h-20 dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white shrink"
-            )}
-          >
-            <Avatar className="flex justify-center items-center">
-              <AvatarImage
-                src="https://github.com/shadcn.png"
-                alt="avatar"
-                width={6}
-                height={6}
-                className="w-10 h-10 "
-              />
-            </Avatar>
-            <span className="sr-only">{chat.name}</span>
-          </Link>
-        )
-      )}
-    </>
-  );
-};
-
 const ChatSidebar = ({ isCollapsed }: ChatSidebarProps) => {
-  const { groupChats } = useGetGroupChats();
+  if (isCollapsed) return null;
 
   return (
-    <div
-      data-collapsed={isCollapsed}
-      className="relative group flex flex-col h-full bg-muted/10 dark:bg-muted/20 gap-4 p-2 data-[collapsed=true]:p-2"
-    >
-      <ChatSideBarHeader
-        quantity={groupChats?.length || 0}
-        isCollapsed={isCollapsed}
-      />
-      <nav className="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2">
-        <ChatSideBarBodyProps
-          groupChats={groupChats || []}
-          isCollapsed={isCollapsed}
-        />
-      </nav>
+    <div className="w-[420px] flex flex-col h-full bg-white border-r">
+      <ChatSideBarHeader />
+      <ChatSideBarBody />
     </div>
   );
 };

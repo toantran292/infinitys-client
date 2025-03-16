@@ -4,6 +4,7 @@ import "./globals.css";
 import { QueryClientProviderWrapper } from "@/providers/query-client";
 import { AuthProvider } from "@/providers/auth-provider";
 import { Toaster } from "sonner";
+import { GroupChatProvider } from '@/providers/group-chat-provider';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
