@@ -1,7 +1,7 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { FC } from "react";
-import { Profile } from "@/components/profile-page";
+import { Profile } from "@/views/profile/profile";
 import Link from "next/link";
 import { useCreateGroupChat } from "@/views/chat-id/hooks";
 
@@ -14,7 +14,8 @@ export const UserCard: FC<{
   user: Profile;
   onFriendRequest: () => void;
   onRejectFriendRequest: () => void;
-}> = ({ user, onFriendRequest, onRejectFriendRequest }) => {
+  onRemoveFriend: () => void;
+}> = ({ user, onFriendRequest, onRejectFriendRequest, onRemoveFriend }) => {
   const { createGroupChat, isPending } = useCreateGroupChat();
 
   return (
@@ -35,16 +36,16 @@ export const UserCard: FC<{
       <div className="flex gap-2 w-full">
         {(["sent", "waiting"].includes(user.friend_status ?? "") ||
           !user.friend_status) && (
-          <Button
-            variant="default"
-            className="w-full bg-neutral-500 text-white hover:bg-neutral-600"
-            onClick={onFriendRequest}
-          >
-            {!user.friend_status
-              ? "Kết bạn"
-              : textButton[user.friend_status as "sent" | "waiting"]}
-          </Button>
-        )}
+            <Button
+              variant="default"
+              className="w-full bg-neutral-500 text-white hover:bg-neutral-600"
+              onClick={onFriendRequest}
+            >
+              {!user.friend_status
+                ? "Kết bạn"
+                : textButton[user.friend_status as "sent" | "waiting"]}
+            </Button>
+          )}
 
         {user.friend_status === "waiting" && (
           <Button
@@ -56,6 +57,16 @@ export const UserCard: FC<{
           </Button>
         )}
 
+        {user.friend_status === "friend" && (
+          <Button
+            variant="default"
+            className="w-full bg-neutral-500 text-white hover:bg-neutral-600"
+            onClick={onRemoveFriend}
+          >
+            Xóa kết bạn
+          </Button>
+        )}
+
         <Button
           variant="outline"
           className="w-full hover:bg-neutral-100"
@@ -64,6 +75,7 @@ export const UserCard: FC<{
         >
           Nhắn tin
         </Button>
+
       </div>
     </div>
   );

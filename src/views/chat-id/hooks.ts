@@ -115,6 +115,20 @@ export const useRejectFriendRequest = ({
   return { rejectFriendRequest, ...remain };
 };
 
+export const useRemoveFriend = ({ onSuccess }: { onSuccess: () => void }) => {
+  const { mutate: removeFriend, ...remain } = useMutation({
+    mutationFn: ({ userId }: { userId: string }) => {
+      return axiosInstance.delete(`api/friends/${userId}`);
+    },
+    onSuccess: () => onSuccess(),
+    onError: (error: unknown) => {
+      toast.error(`Error changing bank account: ${error}`);
+    }
+  });
+
+  return { removeFriend, ...remain };
+};
+
 export const useGetFriends = (userId?: string) => {
   const { data: friends, isLoading } = useQuery({
     queryKey: ["FRIENDS", userId],

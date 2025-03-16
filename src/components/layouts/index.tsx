@@ -1,3 +1,5 @@
+'use client';
+
 import Header from "@/components/layouts/header";
 import { FC, PropsWithChildren } from "react";
 import { ProtectedRoute } from "../auth/protected-route";

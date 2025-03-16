@@ -7,7 +7,8 @@ import { Loader } from "@/components/ui/Loader";
 import { Profile } from "@/views/profile/profile";
 import {
   useFriendRequest,
-  useRejectFriendRequest
+  useRejectFriendRequest,
+  useRemoveFriend
 } from "@/views/chat-id/hooks";
 
 export const SearchPage = ({ q }: { q: string }) => {
@@ -23,6 +24,9 @@ export const SearchPage = ({ q }: { q: string }) => {
     onSuccess: () => refetch()
   });
   const { rejectFriendRequest } = useRejectFriendRequest({
+    onSuccess: () => refetch()
+  });
+  const { removeFriend } = useRemoveFriend({
     onSuccess: () => refetch()
   });
 
@@ -48,6 +52,9 @@ export const SearchPage = ({ q }: { q: string }) => {
           }}
           onRejectFriendRequest={() => {
             rejectFriendRequest({ userId: user.id });
+          }}
+          onRemoveFriend={() => {
+            removeFriend({ userId: user.id });
           }}
         />
       ))}
