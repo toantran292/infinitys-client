@@ -8,7 +8,7 @@ import { useState } from "react";
 import { NotificationBell } from '@/components/notification';
 
 const dataButtons = [
-  { label: "Trang Chủ", href: "/home", icon: HomeIcon },
+  { label: "Trang Chủ", href: "/", icon: HomeIcon },
   { label: "Bài tập", href: "/problems", icon: BookIcon },
   { label: "Việc làm", href: "/jobs", icon: BriefcaseIcon },
   { label: "Nhắn tin", href: "/chat", icon: MessageSquareIcon },
