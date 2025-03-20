@@ -7,6 +7,9 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
 import { Profile } from "../profile";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { CommentSection } from "@/components/post/comment";
 
 
 interface Post {
@@ -15,6 +18,9 @@ interface Post {
   createdAt: string;
   updatedAt: string;
   author: Profile;
+  comment_count: number;
+  react_count: number;
+  is_reacted: boolean;
 }
 
 const getPosts = async (): Promise<Post[]> => {
@@ -22,7 +28,12 @@ const getPosts = async (): Promise<Post[]> => {
   return response.data;
 };
 
-export const PostList = () => {
+interface PostListProps {
+  showAll?: boolean;
+}
+
+export const PostList = ({ showAll = false }: PostListProps) => {
+  const router = useRouter();
   const { data: posts, isLoading, error } = useQuery({
     queryKey: ['posts'],
     queryFn: getPosts,
@@ -30,6 +41,16 @@ export const PostList = () => {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading posts</div>;
+
+  if (showAll) {
+    return (
+      <div className="space-y-4">
+        {posts?.map((post) => (
+          <PostCard key={post.id} post={post} />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-lg border border-gray-200 p-4 mb-4">
@@ -50,6 +71,14 @@ export const PostList = () => {
         <CarouselPrevious className="absolute -left-1 top-1/2 -translate-y-1/2 h-10 w-10 border-2 bg-gray-100 hover:bg-white/90 -translate-x-1/2" />
         <CarouselNext className="absolute -right-1 top-1/2 -translate-y-1/2 h-10 w-10 border-2 bg-gray-100 hover:bg-white/90 translate-x-1/2" />
       </Carousel>
+
+      <Button
+        variant="outline"
+        className="w-full mt-2 border-gray-200"
+        onClick={() => router.push('/activity')}
+      >
+        Hiển thị tất cả bài viết
+      </Button>
     </div>
   );
 }
@@ -60,6 +89,7 @@ interface PostCardProps {
 
 export const PostCard = ({ post }: PostCardProps) => {
   const queryClient = useQueryClient();
+  const [showComments, setShowComments] = useState(false);
 
   const getTimeAgo = (date: string) => {
     const hours = Math.floor((new Date().getTime() - new Date(date).getTime()) / (1000 * 60 * 60));
@@ -68,9 +98,26 @@ export const PostCard = ({ post }: PostCardProps) => {
 
   const { mutate: likePost } = useMutation({
     mutationFn: async () => {
-      await axiosInstance.post(`/api/posts/${post.id}/react`, {});
+      await axiosInstance.post(`/api/reacts`, {
+        targetId: post.id,
+        targetType: 'posts'
+      });
     },
     onSuccess: () => {
+      queryClient.setQueryData(['posts'], (oldData: Post[] | undefined) => {
+        if (!oldData) return oldData;
+        return oldData.map(p => {
+          if (p.id === post.id) {
+            return {
+              ...p,
+              is_reacted: !p.is_reacted,
+              react_count: p.is_reacted ? p.react_count - 1 : p.react_count + 1
+            };
+          }
+          return p;
+        });
+      });
+
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
   });
@@ -92,23 +139,40 @@ export const PostCard = ({ post }: PostCardProps) => {
         <p className="text-sm line-clamp-3">{post.content}</p>
       </div>
 
-
       <div className="w-full h-full min-h-[300px]">
         {/* Nao co ảnh thì thêm */}
-        <img src="https://github.com/shadcn.png" alt="post" />
+        <img src="https://github.com/shadcn.png" alt="post" className="w-full object-cover" />
       </div>
 
-
-      <div className="flex items-center gap-2">
-        <Button className="text-sm flex items-center gap-1 flex-1" variant="ghost" onClick={() => likePost()}>
-          <ThumbsUp size={16} />
-          Like
-        </Button>
-        <Button className="text-sm flex items-center gap-1 flex-1" variant="ghost">
-          <MessageCircle size={16} />
-          Comment
-        </Button>
+      <div className="flex flex-col gap-2">
+        <div className="flex justify-between text-sm text-gray-500 px-2 border-b border-gray-200 pb-1">
+          <span>{post.react_count} likes</span>
+          <span>{post.comment_count} comments</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            className={`text-sm flex items-center gap-1 flex-1 ${post.is_reacted ? 'bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700' : ''}`}
+            variant="ghost"
+            onClick={() => likePost()}
+          >
+            <ThumbsUp size={16} className={post.is_reacted ? 'fill-current' : ''} />
+            Like
+          </Button>
+          <Button
+            className="text-sm flex items-center gap-1 flex-1"
+            variant="ghost"
+            onClick={() => setShowComments(!showComments)}
+          >
+            <MessageCircle size={16} />
+            Comment
+          </Button>
+        </div>
+        {showComments && (
+          <div className="mt-4">
+            <CommentSection postId={post.id} />
+          </div>
+        )}
       </div>
-    </div >
+    </div>
   );
 }

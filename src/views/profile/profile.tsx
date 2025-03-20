@@ -4,6 +4,7 @@ import { Loader } from "@/components/ui/Loader";
 import axiosInstance from "@/lib/axios";
 import { PostList } from "@/views/profile/components/post-list";
 import ArtDecordProfileCard from "./components/art-decord-profile-card";
+import { Button } from "@/components/ui/button";
 
 interface ProfilePageProps {
   userId: string;
