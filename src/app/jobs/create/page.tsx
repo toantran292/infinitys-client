@@ -27,10 +27,9 @@ import {
 interface Company {
     id: string;
     name: string;
-}
-
-interface UserData {
-    companies: Company[];
+    avatar?: {
+        url: string;
+    };
 }
 
 const formSchema = z.object({
@@ -97,11 +96,6 @@ export default function CreateJobPage() {
             setShowNoCompanyDialog(true);
         }
     }, [companies, isLoadingCompanies]);
-
-    const handleReturnToJobs = () => {
-        setShowNoCompanyDialog(false);
-        router.push('/jobs');
-    };
 
     const form = useForm<JobFormData>({
         resolver: zodResolver(formSchema),
@@ -190,6 +184,7 @@ export default function CreateJobPage() {
                                                         options={companies?.map((company: Company) => ({
                                                             label: company.name,
                                                             value: company.id,
+                                                            avatar: company.avatar?.url
                                                         }))}
                                                         value={field.value}
                                                         onValueChange={field.onChange}
@@ -364,6 +359,7 @@ export default function CreateJobPage() {
                                     location={formValues.location || "Địa điểm làm việc"}
                                     workType={formValues.workType || "Hình thức làm việc"}
                                     jobType={formValues.jobType || "Loại hợp đồng"}
+                                    avatar={companies?.find((c: Company) => c.id === formValues.pageId)?.avatar?.url || "https://github.com/shadcn.png"}
                                 />
                             </div>
                         </div>

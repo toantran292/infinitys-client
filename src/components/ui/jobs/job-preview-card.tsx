@@ -11,6 +11,12 @@ interface JobPreviewCardProps {
     jobType: string;
     companyLogo?: string;
     status?: string;
+    avatar?: {
+        id: string;
+        url: string;
+        createdAt: string;
+        updatedAt: string;
+    }
 }
 
 export function JobPreviewCard({
@@ -19,13 +25,13 @@ export function JobPreviewCard({
     location,
     workType,
     jobType,
-    companyLogo = "/placeholder-company.png",
+    avatar
 }: JobPreviewCardProps) {
     return (
         <div className="flex gap-4 p-4 rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow">
             <div className="shrink-0 h-14 w-14 rounded-lg bg-white border flex items-center justify-center overflow-hidden">
                 <Image
-                    src={companyLogo}
+                    src={avatar?.url || "https://github.com/shadcn.png"}
                     alt='Logo'
                     width={56}
                     height={56}

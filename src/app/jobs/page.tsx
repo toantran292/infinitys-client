@@ -8,64 +8,19 @@ import { ProfileCard } from "@/components/ui/profile/profile-card";
 import { useProfile } from "@/hooks/use-profile";
 import { useAuth } from "@/providers/auth-provider";
 import { useQuery } from "@tanstack/react-query";
-import instance from "@/common/api";
+import { instance } from "@/lib/axios-instance";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-
-interface JobPost {
-    id: string;
-    title: string;
-    description: string;
-    location: string;
-    workType: string;
-    jobType: string;
-    createdAt: string;
-    pageUser: {
-        id: string;
-        page: {
-            id: string;
-            name: string;
-            email: string;
-            address: string;
-            createdAt: string;
-            updatedAt: string;
-            url: string;
-            status: string;
-        }
-        user: {
-            id: string;
-            firstName: string;
-            lastName: string;
-            email: string;
-            createdAt: string;
-            updatedAt: string;
-        };
-        createdAt: string;
-        updatedAt: string;
-        role: string;
-    }
-}
-
-interface ApiResponse {
-    data: JobPost[];
-    meta: {
-        page: number;
-        take: number;
-        itemCount: number;
-        pageCount: number;
-        hasNextPage: boolean;
-        hasPreviousPage: boolean;
-    };
-}
+import { JobPost, ApiResponse } from "@/types/job";
 
 export default function JobsPage() {
-    const { auth } = useAuth();
-    const { data: profile, isLoading } = useProfile(auth?.user?.id);
+    const { user } = useAuth();
+    const { data: profile, isLoading } = useProfile(user?.id);
     const [page, setPage] = useState(1);
     const take = 10;
 
-    const { data: response, isLoading: isLoadingJobs } = useQuery<ApiResponse>({
+    const { data: response, isLoading: isLoadingJobs } = useQuery<ApiResponse<JobPost>>({
         queryKey: ['jobs', page],
         queryFn: () => instance.get(`/api/recruitment-posts?page=${page}&take=${take}&order=DESC`).then(res => res.data)
     });
@@ -231,7 +186,7 @@ export default function JobsPage() {
                                                         <div className="p-4 hover:bg-accent cursor-pointer flex gap-4">
                                                             <div className="h-12 w-12 relative rounded-lg bg-muted flex items-center justify-center overflow-hidden">
                                                                 <Image
-                                                                    src="/placeholder.png"
+                                                                    src={job.pageUser.page.avatar?.url || "https://github.com/shadcn.png"}
                                                                     alt={job.pageUser.page.name}
                                                                     fill
                                                                     className="object-cover"

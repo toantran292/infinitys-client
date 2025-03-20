@@ -8,6 +8,7 @@ import { InputForm } from "@/components/ui/input";
 interface ComboboxOption {
     label: string;
     value: string;
+    avatar?: string;
 }
 
 interface ComboboxProps {
@@ -53,7 +54,7 @@ export function Combobox({
 
     return (
         <div className="relative">
-            <div className="relative">
+            <div className="relative flex items-center">
                 <InputForm
                     ref={inputRef}
                     type="text"
@@ -61,9 +62,24 @@ export function Combobox({
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onFocus={() => setIsOpen(true)}
                     placeholder={placeholder}
-                    className={cn("h-11 pl-10", className)}
+                    className={cn(
+                        "h-11",
+                        value && options?.find(opt => getOptionValue(opt) === value) && typeof options?.find(opt => getOptionValue(opt) === value) !== "string"
+                            ? "pl-16"
+                            : "pl-10",
+                        className
+                    )}
                 />
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <div className="absolute left-0 flex items-center h-full px-3 gap-1">
+                    <Search className="h-4 w-4 text-muted-foreground" />
+                    {value && options?.find(opt => getOptionValue(opt) === value) && typeof options?.find(opt => getOptionValue(opt) === value) !== "string" && (
+                        <img
+                            src={(options?.find(opt => getOptionValue(opt) === value) as ComboboxOption).avatar || "https://github.com/shadcn.png"}
+                            alt=""
+                            className="w-5 h-5 rounded-full object-cover"
+                        />
+                    )}
+                </div>
             </div>
 
             {isOpen && (
@@ -78,7 +94,7 @@ export function Combobox({
                                 <div
                                     key={getOptionValue(option)}
                                     className={cn(
-                                        "px-4 py-2 text-sm cursor-pointer hover:bg-gray-100",
+                                        "px-4 py-2 text-sm cursor-pointer hover:bg-gray-100 flex items-center gap-2",
                                         value === getOptionValue(option) && "bg-gray-100"
                                     )}
                                     onClick={() => {
@@ -87,6 +103,9 @@ export function Combobox({
                                         setIsOpen(false);
                                     }}
                                 >
+                                    {typeof option !== "string" && (
+                                        <img src={option.avatar || "https://github.com/shadcn.png"} alt="" className="w-5 h-5 rounded-full object-cover" />
+                                    )}
                                     {getOptionLabel(option)}
                                 </div>
                             ))}

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { instance } from "@/common/api";
-import { Profile } from "@/components/profile-page";
+import { instance } from "@/lib/axios-instance";
+import { Profile } from "@/views/profile/types";
 
 export function useProfile(userId: string | undefined) {
     return useQuery({
