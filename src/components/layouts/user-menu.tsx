@@ -18,9 +18,9 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="cursor-pointer">
-        <Avatar>
+        <Avatar className="bg-gray-500 text-white">
           <AvatarImage src={user?.avatar?.url} alt="@shadcn" />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarFallback>{user?.firstName.charAt(0)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 bg-white">

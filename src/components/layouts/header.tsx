@@ -25,7 +25,7 @@ export const Header = () => {
   return (
     <header className="flex items-center justify-between h-[72px] px-4">
       <div className="flex items-center gap-2">
-        <h1 className="text-neutral-500">InfinityS</h1>
+        <h1 className="text-neutral-500 font-bold text-xl">InfinityS</h1>
         <SearchBar />
       </div>
 

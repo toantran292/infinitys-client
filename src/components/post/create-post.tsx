@@ -30,7 +30,7 @@ export const CreatePost = () => {
     return (
         <div className="w-full bg-white rounded-lg shadow p-4">
             <div className="flex items-center gap-3 mb-4">
-                <Avatar className="size-10 flex-shrink-0">
+                <Avatar className="size-10 flex-shrink-0 bg-gray-500 text-white">
                     <AvatarImage src={user!.avatar?.url} alt="avatar" />
                     <AvatarFallback>{user!.firstName.charAt(0)}</AvatarFallback>
                 </Avatar>
