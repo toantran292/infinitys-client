@@ -1,16 +1,12 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, MessageCircle } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
 import { Profile } from "../profile";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { CommentSection } from "@/components/post/comment";
-
+import { PostCard } from "@/components/post/post-card";
 
 interface Post {
   id: string;
@@ -79,100 +75,6 @@ export const PostList = ({ showAll = false }: PostListProps) => {
       >
         Hiển thị tất cả bài viết
       </Button>
-    </div>
-  );
-}
-
-interface PostCardProps {
-  post: Post;
-}
-
-export const PostCard = ({ post }: PostCardProps) => {
-  const queryClient = useQueryClient();
-  const [showComments, setShowComments] = useState(false);
-
-  const getTimeAgo = (date: string) => {
-    const hours = Math.floor((new Date().getTime() - new Date(date).getTime()) / (1000 * 60 * 60));
-    return `${hours} hours ago`;
-  };
-
-  const { mutate: likePost } = useMutation({
-    mutationFn: async () => {
-      await axiosInstance.post(`/api/reacts`, {
-        targetId: post.id,
-        targetType: 'posts'
-      });
-    },
-    onSuccess: () => {
-      queryClient.setQueryData(['posts'], (oldData: Post[] | undefined) => {
-        if (!oldData) return oldData;
-        return oldData.map(p => {
-          if (p.id === post.id) {
-            return {
-              ...p,
-              is_reacted: !p.is_reacted,
-              react_count: p.is_reacted ? p.react_count - 1 : p.react_count + 1
-            };
-          }
-          return p;
-        });
-      });
-
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-    },
-  });
-
-  return (
-    <div className="p-4 border border-gray-200 rounded-lg w-full space-y-4">
-      <div className="flex gap-4">
-        <Avatar className="w-10 h-10">
-          <AvatarImage src={post.author?.avatar?.url} />
-          <AvatarFallback className="bg-gray-500 text-white">{`${post.author.firstName[0]}${post.author.lastName[0]}`}</AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col gap-1">
-          <p className="text-sm font-bold">{`${post.author.firstName} ${post.author.lastName}`}</p>
-          <p className="text-xs text-gray-500">{getTimeAgo(post.createdAt)}</p>
-        </div>
-      </div>
-
-      <div>
-        <p className="text-sm line-clamp-3">{post.content}</p>
-      </div>
-
-      <div className="w-full h-full min-h-[300px]">
-        {/* Nao co ảnh thì thêm */}
-        <img src="https://github.com/shadcn.png" alt="post" className="w-full object-cover" />
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <div className="flex justify-between text-sm text-gray-500 px-2 border-b border-gray-200 pb-1">
-          <span>{post.react_count} likes</span>
-          <span>{post.comment_count} comments</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            className={`text-sm flex items-center gap-1 flex-1 ${post.is_reacted ? 'bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700' : ''}`}
-            variant="ghost"
-            onClick={() => likePost()}
-          >
-            <ThumbsUp size={16} className={post.is_reacted ? 'fill-current' : ''} />
-            Like
-          </Button>
-          <Button
-            className="text-sm flex items-center gap-1 flex-1"
-            variant="ghost"
-            onClick={() => setShowComments(!showComments)}
-          >
-            <MessageCircle size={16} />
-            Comment
-          </Button>
-        </div>
-        {showComments && (
-          <div className="mt-4">
-            <CommentSection postId={post.id} />
-          </div>
-        )}
-      </div>
     </div>
   );
 }
