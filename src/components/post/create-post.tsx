@@ -1,9 +1,7 @@
 "use client";
 import { useAuth } from "@/providers/auth-provider";
 import { ImageIcon, VideoIcon, FileTextIcon } from "lucide-react";
-import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { useState } from "react";
 import { CreatePostButton } from "./create-post-button";
 
 const postOptions = [
