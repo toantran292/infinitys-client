@@ -4,7 +4,7 @@ import { ThumbsUp, MessageCircle } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
 import { useState } from "react";
-import { CommentSection } from "@/components/post/comment";
+import { CommentSection } from "@/components/comment/comment-list";
 import { Profile } from "@/views/profile/profile";
 
 interface Post {
@@ -15,7 +15,6 @@ interface Post {
     author: Profile;
     comment_count: number;
     react_count: number;
-    is_reacted: boolean;
 }
 
 interface PostCardProps {
@@ -27,18 +26,15 @@ export const PostCard = ({ post }: PostCardProps) => {
     const [showComments, setShowComments] = useState(false);
     const [isLikeAnimating, setIsLikeAnimating] = useState(false);
 
-    const { data: reactStatus } = useQuery({
+    const { data: reactStatus, isLoading: isLoadingReactStatus } = useQuery({
         queryKey: ['react', post.id],
         queryFn: async () => {
-            const response = await axiosInstance.get(`/api/reacts/check`, {
-                params: {
-                    targetId: post.id,
-                    targetType: 'posts'
-                }
+            const response = await axiosInstance.post(`/api/reacts/${post.id}`, {
+                targetId: post.id,
+                targetType: 'posts'
             });
             return response.data;
         },
-        initialData: { isActive: post.is_reacted }
     });
 
     const getTimeAgo = (date: string) => {
@@ -63,15 +59,14 @@ export const PostCard = ({ post }: PostCardProps) => {
                     if (p.id === post.id) {
                         return {
                             ...p,
-                            is_reacted: !p.is_reacted,
-                            react_count: p.is_reacted ? p.react_count - 1 : p.react_count + 1
+                            is_reacted: !reactStatus?.isActive,
+                            react_count: reactStatus?.isActive ? p.react_count - 1 : p.react_count + 1
                         };
                     }
                     return p;
                 });
             });
 
-            // Update the react status in the cache
             queryClient.setQueryData(['react', post.id], (old: any) => ({
                 isActive: !old?.isActive
             }));
@@ -81,7 +76,13 @@ export const PostCard = ({ post }: PostCardProps) => {
         },
     });
 
-    const isReacted = reactStatus?.isActive ?? post.is_reacted;
+    if (isLoadingReactStatus) {
+        return <div>Loading...</div>;
+    }
+
+    const isReacted = reactStatus?.isActive;
+
+    console.log(isReacted);
 
     return (
         <div className="p-4 border border-gray-200 rounded-lg w-full space-y-4">

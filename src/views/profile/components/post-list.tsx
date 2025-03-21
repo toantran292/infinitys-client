@@ -64,8 +64,8 @@ export const PostList = ({ showAll = false }: PostListProps) => {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="absolute -left-1 top-1/2 -translate-y-1/2 h-10 w-10 border-2 bg-gray-100 hover:bg-white/90 -translate-x-1/2" />
-        <CarouselNext className="absolute -right-1 top-1/2 -translate-y-1/2 h-10 w-10 border-2 bg-gray-100 hover:bg-white/90 translate-x-1/2" />
+        <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-gray-600/70 hover:bg-gray-600/90 border-none text-white" />
+        <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-gray-600/70 hover:bg-gray-600/90 border-none text-white" />
       </Carousel>
 
       <Button

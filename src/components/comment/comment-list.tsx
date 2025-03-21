@@ -6,14 +6,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
 import { useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
-import { SmilePlus } from "lucide-react";
+import { SmilePlus, ThumbsUp } from "lucide-react";
 import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
+import { CommentCard } from "./comment-card";
 
 interface Comment {
     id: string;
     content: string;
     createdAt: string;
     author: Profile;
+    react_count: number;
+    is_reacted?: boolean;
 }
 
 interface CommentSectionProps {
@@ -30,6 +33,7 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
     const queryClient = useQueryClient();
     const { user: currentUser } = useAuth();
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
     const { data: comments, isLoading } = useQuery({
         queryKey: ['comments', postId],
         queryFn: () => getComments(postId),
@@ -57,11 +61,6 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
 
     const onEmojiClick = (emoji: any) => {
         setNewComment(newComment + emoji.emoji);
-    };
-
-    const getTimeAgo = (date: string) => {
-        const hours = Math.floor((new Date().getTime() - new Date(date).getTime()) / (1000 * 60 * 60));
-        return `${hours} hours ago`;
     };
 
     return (
@@ -124,37 +123,7 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
             ) : (
                 <div className="space-y-4">
                     {comments?.map((comment) => (
-                        <div key={comment.id} className="flex gap-3 group">
-                            <Avatar className="w-10 h-10 mt-1">
-                                <AvatarImage src={comment.author?.avatar?.url} />
-                                <AvatarFallback className="bg-gray-500 text-white">
-                                    {`${comment.author.firstName[0]}${comment.author.lastName[0]}`}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                                <div className="bg-gray-100 rounded-2xl py-2.5 px-4">
-                                    <div className="flex items-start justify-between group">
-                                        <div>
-                                            <p className="text-sm font-semibold hover:text-blue-600 hover:underline cursor-pointer">
-                                                {`${comment.author.firstName} ${comment.author.lastName}`}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <p className="text-sm mt-1.5 text-gray-900">{comment.content}</p>
-                                </div>
-                                <div className="flex items-center gap-1 mt-1 px-4">
-                                    <button className="text-xs text-gray-500 hover:text-gray-900 font-medium py-1 px-2 hover:bg-gray-100 rounded-md">
-                                        Like
-                                    </button>
-                                    <span className="text-xs text-gray-400">•</span>
-                                    <button className="text-xs text-gray-500 hover:text-gray-900 font-medium py-1 px-2 hover:bg-gray-100 rounded-md">
-                                        Reply
-                                    </button>
-                                    <span className="text-xs text-gray-400">•</span>
-                                    <span className="text-xs text-gray-500 py-1 px-2">{getTimeAgo(comment.createdAt)}</span>
-                                </div>
-                            </div>
-                        </div>
+                        <CommentCard key={comment.id} comment={comment} postId={postId} />
                     ))}
                 </div>
             )}

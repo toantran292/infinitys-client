@@ -22,7 +22,7 @@ const useCreatePost = () => {
         onSuccess: () => {
             queryClient
                 .invalidateQueries({
-                    queryKey: ["POSTS"]
+                    queryKey: ["posts"]
                 })
                 .catch(console.error);
             setIsCreatePostOpen(false);
