@@ -85,7 +85,7 @@ export const PostCard = ({ post }: PostCardProps) => {
     console.log(isReacted);
 
     return (
-        <div className="p-4 border border-gray-200 rounded-lg w-full space-y-4">
+        <div className="p-4 border border-gray-200 rounded-lg w-full space-y-4 bg-white">
             <div className="flex gap-4">
                 <Avatar className="w-10 h-10">
                     <AvatarImage src={post.author?.avatar?.url} />
