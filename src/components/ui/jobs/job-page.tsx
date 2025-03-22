@@ -7,11 +7,10 @@ import { Header } from "@/components/layouts/header";
 import { ProfileCard } from "@/components/ui/profile/profile-card";
 import { useProfile } from "@/hooks/use-profile";
 import { useAuth } from "@/providers/auth-provider";
-import { useQuery } from "@tanstack/react-query";
-import Image from "next/image";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
-import { JobPost, ApiResponse } from "@/types/job";
+import { JobPost, JobPostResponse } from "@/types/job";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -24,12 +23,24 @@ export default function JobsPageUI() {
     const [showNoCompanyDialog, setShowNoCompanyDialog] = useState(false);
     const router = useRouter();
 
-    const { data: response, isLoading: isLoadingJobs } = useQuery<ApiResponse<JobPost>>({
+    const { data: response, isLoading: isLoadingJobs } = useQuery<JobPostResponse>({
         queryKey: ['jobs', page],
         queryFn: () => axiosInstance.get(`/api/recruitment-posts?page=${page}&take=${take}&order=DESC`).then(res => res.data)
     });
 
-    const jobs = response?.data || [];
+    const jobs: JobPost[] = response?.items || [];
+
+    const pageQueries = useQueries({
+        queries: jobs.map((job) => ({
+            queryKey: ['page', job.pageUser.page.id],
+            queryFn: () => axiosInstance.get(`/api/pages/${job.pageUser.page.id}`).then(res => res.data),
+            staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+        }))
+    });
+
+    const isLoadingPages = pageQueries.some(query => query.isLoading);
+    const pages = pageQueries.map(query => query.data);
+
     const total = response?.meta?.itemCount || 0;
     const totalPages = response?.meta?.pageCount || 1;
 
@@ -178,7 +189,7 @@ export default function JobsPageUI() {
                             {/* Job Listings */}
                             <div className="rounded-lg border">
                                 <h2 className="p-4 font-semibold border-b">Danh sách việc làm ({total})</h2>
-                                {isLoadingJobs ? (
+                                {isLoadingJobs || isLoadingPages ? (
                                     <div className="p-4 space-y-4">
                                         {[1, 2, 3].map((i) => (
                                             <div key={i} className="animate-pulse flex gap-4">
@@ -194,27 +205,28 @@ export default function JobsPageUI() {
                                 ) : (
                                     <>
                                         <div className="divide-y">
-                                            {jobs.map((job) => {
+                                            {jobs.map((job, index) => {
                                                 const timeAgo = new Date(job.createdAt).toLocaleDateString('vi-VN', {
                                                     year: 'numeric',
                                                     month: 'long',
                                                     day: 'numeric'
                                                 });
 
+                                                const page = pages[index];
+
                                                 return (
                                                     <Link href={`/jobs/${job.id}`} key={job.id}>
                                                         <div className="p-4 hover:bg-accent cursor-pointer flex gap-4">
                                                             <div className="h-12 w-12 relative rounded-lg bg-muted flex items-center justify-center overflow-hidden">
-                                                                <Image
-                                                                    src={job.pageUser.page.avatar?.url || "https://github.com/shadcn.png"}
-                                                                    alt={job.pageUser.page.name}
-                                                                    fill
+                                                                <img
+                                                                    src={page?.avatar?.url || "https://github.com/shadcn.png"}
+                                                                    alt={page?.name || "Company"}
                                                                     className="object-cover"
                                                                 />
                                                             </div>
                                                             <div className="flex-1">
                                                                 <h3 className="font-medium text-primary">{job.title}</h3>
-                                                                <p className="text-sm text-muted-foreground">{job.pageUser.page.name}</p>
+                                                                <p className="text-sm text-muted-foreground">{page?.name || "Loading..."}</p>
                                                                 <p className="text-sm text-muted-foreground">{job.location}</p>
                                                                 <div className="flex items-center gap-2 mt-2">
                                                                     <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">

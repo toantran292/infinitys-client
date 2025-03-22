@@ -9,6 +9,10 @@ import { JobPost, Page } from "@/types/job";
 import { useQuery } from "@tanstack/react-query";
 import ProfileCard from "@/views/profile/components/profile-card";
 import axiosInstance from "@/lib/axios";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { ErrorMessage } from "@/common/error";
+
 interface JobDetailPageProps {
     jobId: string;
 }
@@ -22,10 +26,35 @@ export function JobDetailPage({ jobId }: JobDetailPageProps) {
         queryFn: () => axiosInstance.get(`/api/recruitment-posts/${jobId}`).then(res => res.data)
     });
 
+    const { data: application } = useQuery({
+        queryKey: ['application', jobId],
+        queryFn: () => axiosInstance.get(`/api/applications/${jobId}`).then(res => res.data),
+        enabled: !!user && !!jobId
+    });
+
     const { data: page, isLoading: isLoadingPage } = useQuery<Page>({
         queryKey: ['page', job?.pageUser.page.id],
-        queryFn: () => axiosInstance.get(`/api/pages/${job?.pageUser.page.id}`).then(res => res.data)
+        queryFn: () => axiosInstance.get(`/api/pages/${job?.pageUser.page.id}`).then(res => res.data),
+        enabled: !!job?.pageUser.page.id
     });
+
+    const applyMutation = useMutation({
+        mutationFn: () => axiosInstance.post('/api/applications', { jobId }),
+        onSuccess: () => {
+            toast.success('Ứng tuyển thành công!');
+        },
+        onError: (error: ErrorMessage) => {
+            toast.error(error.message);
+        }
+    });
+
+    const handleApply = () => {
+        if (!user) {
+            toast.error('Vui lòng đăng nhập để ứng tuyển');
+            return;
+        }
+        applyMutation.mutate();
+    };
 
     if (isLoadingJob || isLoadingPage) {
         return (
@@ -51,7 +80,8 @@ export function JobDetailPage({ jobId }: JobDetailPageProps) {
         month: 'long',
         day: 'numeric'
     });
-    console.log({ profile });
+
+    console.log({ application });
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
@@ -100,8 +130,12 @@ export function JobDetailPage({ jobId }: JobDetailPageProps) {
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-4 mt-6 justify-end">
-                                            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full">
-                                                Ứng tuyển
+                                            <Button
+                                                className={`px-6 py-2 rounded-full ${application ? 'bg-gray-500 hover:bg-gray-600' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                                                onClick={handleApply}
+                                                disabled={applyMutation.isPending || application}
+                                            >
+                                                {application ? 'Đã ứng tuyển' : applyMutation.isPending ? 'Đang xử lý...' : 'Ứng tuyển'}
                                             </Button>
                                             <Button variant="outline" className="rounded-full">
                                                 Lưu
