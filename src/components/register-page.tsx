@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import Input from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import { registerPage } from "@/providers/page-provider";
 
 export default function RegisterPage() {
