@@ -14,7 +14,7 @@ const getNewsfeed = async () => {
 
 export const HomeComponent = () => {
   const { data: posts, isLoading, error } = useQuery({
-    queryKey: ['post'],
+    queryKey: ['posts'],
     queryFn: getNewsfeed
   });
 

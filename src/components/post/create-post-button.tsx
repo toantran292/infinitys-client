@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";;
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/providers/auth-provider";
 import { Button } from "../ui/button";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -61,7 +61,7 @@ export function CreatePostButton() {
                     <div className="flex items-center">
                         <Avatar className="h-10 w-10 mr-3">
                             <AvatarImage src={user?.avatar?.url || ""} />
-                            <AvatarFallback>
+                            <AvatarFallback className="bg-gray-500 text-white">
                                 {user?.firstName?.charAt(0)}
                                 {user?.lastName?.charAt(0)}
                             </AvatarFallback>
