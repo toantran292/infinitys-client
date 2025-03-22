@@ -4,41 +4,10 @@ import { Loader } from "@/components/ui/Loader";
 import axiosInstance from "@/lib/axios";
 import PostList from "@/components/ui/PostList";
 import ArtDecordProfileCard from "./components/art-decord-profile-card";
+import { Profile } from "@/types/job";
 
 interface ProfilePageProps {
   userId: string;
-}
-
-export interface Post {
-  id: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  name: string;
-}
-
-export interface ProfileAvatar {
-  id: string;
-  url: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Profile {
-  id: string;
-  name: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  dateOfBirth?: string;
-  gender?: string;
-  major?: string;
-  desiredJobPosition?: string;
-  fullName: string;
-  posts: Post[];
-  friend_status: null | "sent" | "waiting" | "friend";
-  avatar: ProfileAvatar;
-  connections?: number;
 }
 
 const getProfile = async (userId: string): Promise<Profile> => {

@@ -3,14 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layouts/header";
 import { JobDescriptionViewer } from "@/components/ui/editor/job-description-viewer";
-import Image from "next/image";
 import { useProfile } from "@/hooks/use-profile";
 import { useAuth } from "@/providers/auth-provider";
-import { JobPost } from "@/types/job";
-import { instance } from "@/lib/axios-instance";
+import { JobPost, Page } from "@/types/job";
 import { useQuery } from "@tanstack/react-query";
 import ProfileCard from "@/views/profile/components/profile-card";
-
+import axiosInstance from "@/lib/axios";
 interface JobDetailPageProps {
     jobId: string;
 }
@@ -21,10 +19,15 @@ export function JobDetailPage({ jobId }: JobDetailPageProps) {
 
     const { data: job, isLoading: isLoadingJob } = useQuery<JobPost>({
         queryKey: ['job', jobId],
-        queryFn: () => instance.get(`/api/recruitment-posts/${jobId}`).then(res => res.data)
+        queryFn: () => axiosInstance.get(`/api/recruitment-posts/${jobId}`).then(res => res.data)
     });
 
-    if (isLoadingJob) {
+    const { data: page, isLoading: isLoadingPage } = useQuery<Page>({
+        queryKey: ['page', job?.pageUser.page.id],
+        queryFn: () => axiosInstance.get(`/api/pages/${job?.pageUser.page.id}`).then(res => res.data)
+    });
+
+    if (isLoadingJob || isLoadingPage) {
         return (
             <div className="min-h-screen flex flex-col bg-gray-50">
                 <Header />
@@ -41,7 +44,6 @@ export function JobDetailPage({ jobId }: JobDetailPageProps) {
     }
 
     if (!job) return null;
-    const page = job.pageUser.page;
     const author = job.pageUser.user;
 
     const timeAgo = new Date(job.createdAt).toLocaleDateString('vi-VN', {
@@ -49,6 +51,7 @@ export function JobDetailPage({ jobId }: JobDetailPageProps) {
         month: 'long',
         day: 'numeric'
     });
+    console.log({ profile });
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
@@ -62,10 +65,9 @@ export function JobDetailPage({ jobId }: JobDetailPageProps) {
                             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                                 <div className="flex gap-4">
                                     <div className="w-[72px] h-[72px] relative rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                                        <Image
-                                            src={page.avatar?.url || "https://github.com/shadcn.png"}
-                                            alt={page.name}
-                                            fill
+                                        <img
+                                            src={page?.avatar?.url || "https://github.com/shadcn.png"}
+                                            alt={page?.name || "Tên công ty"}
                                             className="object-cover"
                                         />
                                     </div>
@@ -75,7 +77,7 @@ export function JobDetailPage({ jobId }: JobDetailPageProps) {
                                         </h1>
                                         <div className="space-y-1 text-sm">
                                             <p className="font-medium">
-                                                {page.name}
+                                                {page?.name || "Tên công ty"}
                                             </p>
                                             <p className="text-gray-600">
                                                 {job.location} • {timeAgo}
@@ -144,23 +146,22 @@ export function JobDetailPage({ jobId }: JobDetailPageProps) {
                                     <h2 className="text-base font-semibold mb-4">Thông tin công ty</h2>
                                     <div className="flex items-center gap-3 mb-4">
                                         <div className="w-12 h-12 relative rounded-lg overflow-hidden bg-gray-100">
-                                            <Image
-                                                src={page.avatar?.url || "https://github.com/shadcn.png"}
+                                            <img
+                                                src={page?.avatar?.url || "https://github.com/shadcn.png"}
                                                 alt="Logo"
-                                                fill
                                                 className="object-cover"
                                             />
                                         </div>
                                         <div>
-                                            <h3 className="font-medium">{page.name}</h3>
-                                            <p className="text-sm text-gray-600">{page.address}</p>
+                                            <h3 className="font-medium">{page?.name || "Tên công ty"}</h3>
+                                            <p className="text-sm text-gray-600">{page?.address || "Địa chỉ công ty"}</p>
                                         </div>
                                     </div>
                                     <div className="space-y-3 text-sm">
-                                        {page.url && (
-                                            <p>
-                                                <a href={page.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                                                    {page.url}
+                                        {page?.url && (
+                                            <p className="break-all">
+                                                <a href={page?.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-block max-w-full overflow-hidden text-ellipsis">
+                                                    {page?.url}
                                                 </a>
                                             </p>
                                         )}

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { Building2, MapPin, Clock } from "lucide-react";
 
 interface JobPreviewCardProps {
@@ -11,12 +10,7 @@ interface JobPreviewCardProps {
     jobType: string;
     companyLogo?: string;
     status?: string;
-    avatar?: {
-        id: string;
-        url: string;
-        createdAt: string;
-        updatedAt: string;
-    }
+    avatar?: string;
 }
 
 export function JobPreviewCard({
@@ -30,8 +24,8 @@ export function JobPreviewCard({
     return (
         <div className="flex gap-4 p-4 rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow">
             <div className="shrink-0 h-14 w-14 rounded-lg bg-white border flex items-center justify-center overflow-hidden">
-                <Image
-                    src={avatar?.url || "https://github.com/shadcn.png"}
+                <img
+                    src={avatar || "https://github.com/shadcn.png"}
                     alt='Logo'
                     width={56}
                     height={56}
