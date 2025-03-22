@@ -1,4 +1,4 @@
-import { Profile } from "@/views/profile/profile";
+import { Profile } from "@/types/job";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Pencil, MessageCircleCode, UserRoundPlus } from "lucide-react";
 import { useState } from "react";

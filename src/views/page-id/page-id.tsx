@@ -48,7 +48,7 @@ export default function PagesIdComponent() {
       case "posts":
         return <NewPostsTab posts={page.posts} />;
       case "jobs":
-        return <NewJobsTab jobs={page.jobs} />;
+        return <NewJobsTab pageId={page.id} />;
       case "people":
         return <NewPeopleTab people={page.people} />;
       default:

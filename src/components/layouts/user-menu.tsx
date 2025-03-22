@@ -19,7 +19,7 @@ export function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="cursor-pointer">
         <Avatar>
-          <AvatarImage src={user!.avatar?.url} alt="@shadcn" />
+          <AvatarImage src={user?.avatar?.url} alt="@shadcn" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
