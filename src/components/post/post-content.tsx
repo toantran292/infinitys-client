@@ -17,21 +17,18 @@ export const PostContent = ({ content }: PostContentProps) => {
         editable: false,
     });
 
-    // Kiểm tra chiều cao khi editor được khởi tạo và khi component mount
     useEffect(() => {
         const checkHeight = () => {
             if (contentRef.current) {
-                const shouldShow = contentRef.current.scrollHeight > 72;
+                const shouldShow = contentRef.current.scrollHeight > 32;
                 setShouldShowMore(shouldShow);
             }
         };
 
-        // Kiểm tra ngay khi editor sẵn sàng
         if (editor) {
             checkHeight();
         }
 
-        // Thêm một setTimeout để đảm bảo nội dung đã được render
         const timer = setTimeout(checkHeight, 100);
 
         return () => clearTimeout(timer);
@@ -41,7 +38,7 @@ export const PostContent = ({ content }: PostContentProps) => {
         <div>
             <div
                 ref={contentRef}
-                className={`relative ${!isExpanded ? 'max-h-[72px] overflow-hidden' : ''}`}
+                className={`relative ${!isExpanded ? 'max-h-[36px] overflow-hidden' : ''}`}
             >
                 <div className="prose prose-sm max-w-none text-sm">
                     <EditorContent editor={editor} />

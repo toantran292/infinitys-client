@@ -9,6 +9,7 @@ import { Profile } from "../chat-page";
 import { PostContent } from './post-content';
 import Image from 'next/image';
 import { ImageViewerModal } from "./image-viewer-modal";
+import { cx } from "class-variance-authority";
 
 interface Post {
     id: string;
@@ -21,13 +22,15 @@ interface Post {
     images: Array<{
         url: string;
     }>;
+    showAll?: boolean
 }
 
 interface PostCardProps {
     post: Post;
+    showAll?: boolean
 }
 
-export const PostCard = ({ post }: PostCardProps) => {
+export const PostCard = ({ post, showAll = false }: PostCardProps) => {
     const queryClient = useQueryClient();
     const [showComments, setShowComments] = useState(false);
     const [isLikeAnimating, setIsLikeAnimating] = useState(false);
@@ -108,7 +111,7 @@ export const PostCard = ({ post }: PostCardProps) => {
     const isReacted = reactStatus?.isActive;
 
     return (
-        <div className="border border-gray-200 rounded-lg w-full bg-white shadow-sm">
+        <div className="border border-gray-200 rounded-lg w-full bg-white shadow-sm h-full flex flex-col justify-between">
             <div className="p-4 space-y-4">
                 <div className="flex gap-2 items-center">
                     <Avatar className="h-12 w-12">
@@ -124,21 +127,36 @@ export const PostCard = ({ post }: PostCardProps) => {
                 <PostContent content={post.content} />
             </div>
 
-            <div className="h-[250px]">
+            <div className={cx(
+                (!post?.images?.length && showAll) ? "h-0" :
+                    (showAll && post.images?.length === 1) ? "h-auto" :
+                        "h-[250px]"
+            )}>
                 {post.images && post.images.length > 0 ? (
-                    <div className={`grid gap-1 h-full ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                    <div className={`grid gap-1 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} ${showAll && post.images.length === 1 ? 'h-auto' : 'h-full'}`}>
                         {post.images.slice(0, Math.min(2, post.images.length)).map((image, index) => (
                             <div
                                 key={index}
-                                className="relative h-full cursor-pointer"
+                                className={`relative cursor-pointer ${showAll && post.images.length === 1 ? 'h-auto aspect-auto' : 'h-full'}`}
                                 onClick={() => handleImageClick(index)}
                             >
-                                <Image
-                                    src={image.url}
-                                    alt={`Post image ${index + 1}`}
-                                    fill
-                                    className="object-cover"
-                                />
+                                {showAll && post.images.length === 1 ? (
+                                    <Image
+                                        src={image.url}
+                                        alt={`Post image ${index + 1}`}
+                                        width={1000}
+                                        height={1000}
+                                        className="object-contain w-full"
+                                        style={{ maxHeight: '600px' }}
+                                    />
+                                ) : (
+                                    <Image
+                                        src={image.url}
+                                        alt={`Post image ${index + 1}`}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                )}
                                 {index === 1 && post.images.length > 2 && (
                                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                                         <span className="text-white text-2xl font-bold">
@@ -150,7 +168,7 @@ export const PostCard = ({ post }: PostCardProps) => {
                         ))}
                     </div>
                 ) : (
-                    <div className="h-full bg-gray-50"></div>
+                    <div className="h-full"></div>
                 )}
             </div>
 
@@ -199,6 +217,6 @@ export const PostCard = ({ post }: PostCardProps) => {
                     </div>
                 )}
             </div>
-        </div >
+        </div>
     );
 } 

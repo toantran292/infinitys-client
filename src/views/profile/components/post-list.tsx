@@ -38,11 +38,12 @@ export const PostList = ({ showAll = false }: PostListProps) => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading posts</div>;
 
+
   if (showAll) {
     return (
       <div className="space-y-4">
         {posts?.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <PostCard key={post.id} post={post} showAll={true} />
         ))}
       </div>
     );
