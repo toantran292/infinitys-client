@@ -1,15 +1,15 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ProfileAvatar, Profile } from "@/views/profile/profile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { Camera, MessageCircleCode, Pencil, UserRoundPlus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useCreateGroupChat } from "@/views/chat-id/hooks";
 import { useAuth } from "@/providers/auth-provider";
 import axiosInstance from "@/lib/axios";
+import { Profile, ProfileAvatar } from "../types";
 
 interface FormData {
   dateOfBirth: string;
@@ -22,10 +22,10 @@ const ProfileAvatarComponent = ({ avatar }: { avatar: ProfileAvatar }) => {
   return (
     <Avatar className="w-20 h-20">
       <AvatarImage
-        src={avatar?.url || "https://github.com/shadcn.png"}
+        src={avatar?.url}
         alt="Avatar"
       />
-      <AvatarFallback>U</AvatarFallback>
+      <AvatarFallback>T</AvatarFallback>
     </Avatar>
   );
 };

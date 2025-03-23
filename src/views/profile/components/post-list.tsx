@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
-import { Profile } from "../profile";
 import { useRouter } from "next/navigation";
 import { PostCard } from "@/components/post/post-card";
+import { Profile } from "../types";
 
 interface Post {
   id: string;

@@ -85,7 +85,7 @@ export const CommentCard = ({ comment, postId }: { comment: Comment, postId: str
     const displayReactCount = reactCommentStatus?.react_count || comment.react_count;
 
     return (
-        <div key={comment.id} className="flex gap-3 group">
+        <div key={comment.id} className="flex gap-2 group">
             <Avatar className="w-10 h-10 mt-1">
                 <AvatarImage src={comment.author?.avatar?.url} />
                 <AvatarFallback className="bg-gray-500 text-white">

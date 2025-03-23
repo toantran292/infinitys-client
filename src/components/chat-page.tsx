@@ -74,11 +74,12 @@ const ChatPage = ({ groupChatId }: ChatPageProps) => {
 
   useEffect(() => {
     if (!accessToken && groupChatId) {
+      console.log({ accessToken, groupChatId });
       console.log("No token, not connecting");
       return;
     }
 
-    const newSocket = io("http://localhost:20250/chats", {
+    const newSocket = io("http://localhost:20250", {
       auth: {
         user,
         token: accessToken
@@ -93,6 +94,18 @@ const ChatPage = ({ groupChatId }: ChatPageProps) => {
 
     newSocket.on("notifications", (data) => {
       console.log({ notification_data: data });
+    });
+
+    newSocket.on("connect", () => {
+      console.log("Socket connected!");
+    });
+
+    newSocket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+    });
+
+    newSocket.on("error", (error) => {
+      console.error("Socket error:", error);
     });
 
     setSocket(newSocket);

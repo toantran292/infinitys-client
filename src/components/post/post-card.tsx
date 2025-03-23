@@ -5,7 +5,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
 import { useState } from "react";
 import { CommentSection } from "@/components/comment/comment-list";
-import { Profile } from "@/views/profile/profile";
+import { Profile } from "../chat-page";
+import { PostContent } from './post-content';
 
 interface Post {
     id: string;
@@ -39,7 +40,7 @@ export const PostCard = ({ post }: PostCardProps) => {
 
     const getTimeAgo = (date: string) => {
         const hours = Math.floor((new Date().getTime() - new Date(date).getTime()) / (1000 * 60 * 60));
-        return `${hours} hours ago`;
+        return `${hours} giờ trước`;
     };
 
     const { mutate: likePost } = useMutation({
@@ -82,30 +83,28 @@ export const PostCard = ({ post }: PostCardProps) => {
 
     const isReacted = reactStatus?.isActive;
 
-    console.log(isReacted);
-
     return (
-        <div className="p-4 border border-gray-200 rounded-lg w-full space-y-4 bg-white">
-            <div className="flex gap-4">
-                <Avatar className="w-10 h-10">
-                    <AvatarImage src={post.author?.avatar?.url} />
-                    <AvatarFallback className="bg-gray-500 text-white">{`${post.author.firstName[0]}${post.author.lastName[0]}`}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col gap-1">
-                    <p className="text-sm font-bold">{`${post.author.firstName} ${post.author.lastName}`}</p>
-                    <p className="text-xs text-gray-500">{getTimeAgo(post.createdAt)}</p>
+        <div className="border border-gray-200 rounded-lg w-full bg-white shadow-sm">
+            <div className="p-4 space-y-4">
+                <div className="flex gap-2 items-center">
+                    <Avatar className="size-12">
+                        <AvatarImage src={post.author?.avatar?.url} />
+                        <AvatarFallback className="bg-gray-500 text-white">{`${post.author.firstName[0]}${post.author.lastName[0]}`}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                        <p className="font-bold">{`${post.author.firstName} ${post.author.lastName}`}</p>
+                        <p className="text-xs text-gray-500">{getTimeAgo(post.createdAt)}</p>
+                    </div>
                 </div>
-            </div>
 
-            <div>
-                <p className="text-sm line-clamp-3">{post.content}</p>
+                <PostContent content={post.content} />
             </div>
 
             <div className="w-full h-full min-h-[300px]">
                 <img src="https://github.com/shadcn.png" alt="post" className="w-full object-cover" />
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 p-4">
                 <div className="flex justify-between text-sm text-gray-500 px-2 border-b border-gray-200 pb-1">
                     <div className="flex items-center gap-1">
                         <div className={`flex items-center justify-center w-5 h-5 rounded-full bg-blue-500 transition-transform ${isLikeAnimating ? 'scale-125' : ''}`}>
@@ -122,7 +121,7 @@ export const PostCard = ({ post }: PostCardProps) => {
                         onClick={() => likePost()}
                     >
                         <ThumbsUp size={16} className={isReacted ? 'fill-current' : ''} />
-                        Like
+                        Thích
                     </Button>
                     <Button
                         className="text-sm flex items-center gap-1 flex-1"
@@ -130,7 +129,7 @@ export const PostCard = ({ post }: PostCardProps) => {
                         onClick={() => setShowComments(!showComments)}
                     >
                         <MessageCircle size={16} />
-                        Comment
+                        Bình luận
                     </Button>
                 </div>
                 {showComments && (
@@ -139,6 +138,6 @@ export const PostCard = ({ post }: PostCardProps) => {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 } 

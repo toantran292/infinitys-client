@@ -1,13 +1,13 @@
 "use client";
 import { Dialog, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";;
-import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/providers/auth-provider";
 import { Button } from "../ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
 import { toast } from "sonner";
 import { useState } from "react";
+import TiptapEditor from "./editor-component";
 
 const useCreatePost = () => {
     const queryClient = useQueryClient();
@@ -51,42 +51,42 @@ export function CreatePostButton() {
     return (
         <Dialog open={isCreatePostOpen} onOpenChange={setIsCreatePostOpen}>
             <DialogTrigger asChild>
-                <button className="flex-1 text-left px-4 py-2 bg-gray-100 rounded-full text-gray-500">
+                <button className="flex-1 text-left px-4 py-3 rounded-full text-gray-600 border border-gray-500 text-sm">
                     Bạn muốn đăng gì?
                 </button>
             </DialogTrigger>
 
-            <DialogContent className="bg-white p-6" position="top" size="xl" >
+            <DialogContent className="bg-white p-6 max-w-3xl" position="top" size="xl">
                 <DialogTitle className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
-                        <Avatar className="h-10 w-10 mr-3">
+                        <Avatar className="size-14 mr-3">
                             <AvatarImage src={user?.avatar?.url || ""} />
                             <AvatarFallback className="bg-gray-500 text-white">
                                 {user?.firstName?.charAt(0)}
-                                {user?.lastName?.charAt(0)}
                             </AvatarFallback>
                         </Avatar>
 
-                        <div>
-                            <h2 className="font-semibold">
+                        <div className="space-y-4">
+                            <h2 className="font-semibold text-xl">
                                 {user?.firstName} {user?.lastName}
                             </h2>
-                            <span className="text-sm text-gray-600">Tạo bài đăng</span>
+                            <span className="text-sm font-thin text-gray-600">Tạo bài đăng</span>
                         </div>
                     </div>
                 </DialogTitle>
 
-                <Textarea
-                    placeholder="Bạn muốn chia sẻ điều gì?"
-                    className="min-h-[300px] resize-none border-none placeholder:text-gray-400 rounded-md p-2 !text-2xl md:text-2xl shadow-none"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                />
+                <TiptapEditor content={content} setContent={setContent} />
 
-                <DialogFooter className="border-t border-gray-200 ">
-                    <Button className="bg-primary text-white rounded-full mt-6" onClick={() => createPost(content)} disabled={isPending}>{isPending ? "Đang đăng..." : "Đăng bài viết"}</Button>
+                <DialogFooter className="border-t border-gray-200">
+                    <Button
+                        className="bg-primary text-white rounded-full mt-4 px-4 text-sm"
+                        onClick={() => createPost(content)}
+                        disabled={isPending}
+                    >
+                        {isPending ? "Đang đăng..." : "Đăng bài viết"}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
-        </Dialog >
+        </Dialog>
     );
 } 

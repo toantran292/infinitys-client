@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Profile } from "@/views/profile/profile";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
 import { useState } from "react";
@@ -9,6 +8,7 @@ import { useAuth } from "@/providers/auth-provider";
 import { SmilePlus, ThumbsUp } from "lucide-react";
 import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
 import { CommentCard } from "./comment-card";
+import { Profile } from "../chat-page";
 
 interface Comment {
     id: string;
@@ -65,8 +65,8 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
 
     return (
         <div className="space-y-4">
-            <form onSubmit={handleSubmitComment} className="flex items-start gap-3">
-                <Avatar className="w-10 h-10 mt-1">
+            <form onSubmit={handleSubmitComment} className="flex items-center gap-3">
+                <Avatar className="size-10">
                     <AvatarImage src={currentUser?.avatar?.url} />
                     <AvatarFallback className="bg-gray-500 text-white">
                         {currentUser && `${currentUser.firstName[0]}${currentUser.lastName[0]}`}
@@ -74,10 +74,10 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
                 </Avatar>
                 <div className="flex-1 relative">
                     <Input
-                        placeholder="Add a comment..."
+                        placeholder="Thêm bình luận..."
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
-                        className="w-full rounded-full border border-gray-300 hover:border-gray-400 focus:border-gray-400 bg-white px-4 py-3 pr-32"
+                        className="w-full !rounded-full border border-gray-500 hover:border-gray-400 focus:border-gray-400 bg-white px-4 py-2 pr-32 placeholder:text-sm placeholder:text-gray-500"
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                         <div className="relative">
@@ -109,7 +109,7 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
                             <Button
                                 type="submit"
                                 size="sm"
-                                className="h-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 text-sm font-semibold"
+                                className="h-7 rounded-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 text-sm font-semibold"
                             >
                                 Comment
                             </Button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, SquarePen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { memo, useMemo } from "react";
@@ -30,14 +30,14 @@ const ChatSideBarHeader = () => {
   return (
     <div className="flex flex-col border-b">
       <div className="flex justify-between p-4 items-center">
-        <h1 className="text-xl font-semibold">Messaging</h1>
+        <h1 className="text-xl font-semibold">Tin nhắn</h1>
         <Button
           variant="ghost"
           size="icon"
           className="h-8 w-8"
           onClick={() => router.push(`/chat/new`)}
         >
-          <Plus className="h-5 w-5" />
+          <SquarePen className="size-6" />
         </Button>
       </div>
 
