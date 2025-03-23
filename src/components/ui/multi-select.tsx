@@ -279,13 +279,13 @@ export const MultiSelect = React.forwardRef<
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                    className="w-auto p-0"
+                    className="w-auto p-0 bg-white"
                     align="start"
                     onEscapeKeyDown={() => setIsPopoverOpen(false)}
                 >
                     <Command>
                         <CommandInput
-                            placeholder="Search..."
+                            placeholder="Tìm kiếm..."
                             onKeyDown={handleInputKeyDown}
                         />
                         <CommandList>
@@ -338,7 +338,7 @@ export const MultiSelect = React.forwardRef<
                                         onSelect={() => setIsPopoverOpen(false)}
                                         className="flex-1 justify-center cursor-pointer max-w-full"
                                     >
-                                        Close
+                                        Đóng
                                     </CommandItem>
                                 </div>
                             </CommandGroup>

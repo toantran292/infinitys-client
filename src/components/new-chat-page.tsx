@@ -39,13 +39,13 @@ export const NewChatPage = () => {
 
     return (
         <div className="bg-white flex flex-col w-full h-full">
-            <h1 className="text-xl font-semibold p-4 border-b border-gray-100">New message</h1>
+            <h1 className="text-xl font-semibold p-4 border-b border-gray-100">Tạo tin nhắn mới</h1>
             <div className="p-4 border-b border-gray-200">
                 <MultiSelect
                     options={friendOptions}
                     onValueChange={handleSelectUsers}
-                    placeholder="Type a name or multiple names"
-                    className="border-0 shadow-none"
+                    placeholder="Nhập tên hoặc nhiều tên"
+                    className="border-0 shadow-none bg-white z-[100]"
                     disabled={isFetchingFriends}
                 />
                 {isFetchingFriends && (
@@ -58,10 +58,10 @@ export const NewChatPage = () => {
                 <ChatList messages={groupChatMessage} />
             ) : (
                 <div className="flex items-center justify-center p-4 flex-1">
-                    <p>No messages yet</p>
+                    <p>Chưa có tin nhắn</p>
                 </div>
             )}
-            <Button onClick={handleAccessGroupChat} disabled={isCreatingGroup}>{group?.id ? "Go to this Chat" : "Create a new Chat"}</Button>
+            <Button onClick={handleAccessGroupChat} disabled={isCreatingGroup} className="rounded-none text-white">{group?.id ? "Đi đến đoạn hội thoại này" : "Tạo mới"}</Button>
         </div>
     );
 };
