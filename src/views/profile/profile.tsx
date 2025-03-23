@@ -2,9 +2,10 @@ import { ProtectedRouteLayout } from "@/components/layouts";
 import { useQuery } from "@tanstack/react-query";
 import { Loader } from "@/components/ui/Loader";
 import axiosInstance from "@/lib/axios";
-import PostList from "@/components/ui/PostList";
+import { PostList } from "@/views/profile/components/post-list";
 import ArtDecordProfileCard from "./components/art-decord-profile-card";
 import { Profile } from "@/types/job";
+import { Button } from "@/components/ui/button";
 
 interface ProfilePageProps {
   userId: string;
@@ -39,7 +40,7 @@ export const ProfileComponent = ({ userId }: ProfilePageProps) => {
           <p className="text-center text-red-500 mb-4">Lỗi khi tải dữ liệu</p>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,_744px)_minmax(0,_360px)] gap-6 mx-auto max-w-[1128px]">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,_744px)_minmax(0,_360px)] gap-6 mx-auto max-w-[1128px] min-w-[1600px]">
           {/* Cột trái - Thông tin chính */}
           <div className="space-y-6">
             {/* Card thông tin cá nhân */}
@@ -63,7 +64,7 @@ export const ProfileComponent = ({ userId }: ProfilePageProps) => {
               <div className="p-6 border-b">
                 <h2 className="text-xl font-semibold">Bài viết</h2>
               </div>
-              <PostList data={profile?.posts ?? []} />
+              <PostList />
             </div>
           </div>
 

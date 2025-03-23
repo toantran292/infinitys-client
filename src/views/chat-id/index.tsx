@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/resizable";
 import ChatSidebar from "@/components/ui/chat/chat-sidebar";
 import ChatPage from "@/components/chat-page";
-import React, { useState } from "react";
+import React from "react";
 import { GroupChatProvider } from "@/providers/group-chat-provider";
 import NewChatPage from "@/components/new-chat-page";
 
@@ -13,26 +13,23 @@ import NewChatPage from "@/components/new-chat-page";
 export interface ChatIdViewProps {
   groupChatId?: string;
   defaultLayout?: number[] | undefined;
-  // defaultCollapsed?: boolean;
 }
 
 export const ChatIdView = ({
   groupChatId,
   defaultLayout = [50, 200]
-  // defaultCollapsed = false,
 }: ChatIdViewProps) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <GroupChatProvider>
-      <ProtectedRouteLayout sectionClassName="bg-gray-50 h-full max-h-full">
+      <ProtectedRouteLayout sectionClassName="bg-gray-50 h-[calc(100vh-72px)] w-full overflow-hidden">
         <ResizablePanelGroup
           direction="horizontal"
-          className="h-full items-stretch max-h-full"
+          className="h-full w-full items-stretch"
         >
-          <ChatSidebar isCollapsed={isCollapsed} />
+          <ChatSidebar isCollapsed={false} />
           <ResizablePanel
-            className="max-h-full"
+            className="h-full w-full overflow-hidden"
             defaultSize={defaultLayout[1]}
             minSize={30}
           >
@@ -40,7 +37,11 @@ export const ChatIdView = ({
               <NewChatPage />
             ) : groupChatId ? (
               <ChatPage groupChatId={groupChatId} />
-            ) : null}
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                Chưa có tin nhắn
+              </div>
+            )}
           </ResizablePanel>
         </ResizablePanelGroup>
       </ProtectedRouteLayout>

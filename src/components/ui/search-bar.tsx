@@ -90,7 +90,7 @@ export const SearchBar = () => {
         type="search"
         value={searchValue}
       />
-      <SearchIcon className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3.5 size-5 text-neutral-300 transition-colors peer-focus:text-neutral-500 dark:text-neutral-700" />
+      <SearchIcon className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3.5 size-5 text-neutral-500 transition-colors peer-focus:text-neutral-500 dark:text-neutral-700" />
     </label>
   );
 };
