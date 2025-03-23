@@ -16,6 +16,9 @@ interface Post {
     author: Profile;
     comment_count: number;
     react_count: number;
+    images: Array<{
+        url: string;
+    }>;
 }
 
 interface PostCardProps {
@@ -100,9 +103,23 @@ export const PostCard = ({ post }: PostCardProps) => {
                 <PostContent content={post.content} />
             </div>
 
-            <div className="w-full h-full min-h-[300px]">
-                <img src="https://github.com/shadcn.png" alt="post" className="w-full object-cover" />
-            </div>
+            {post.images && post.images.length > 0 && (
+                <div className={`grid gap-1 ${post.images.length === 1 ? '' : 'grid-cols-2'}`}>
+                    {post.images.map((image, index) => (
+                        <div
+                            key={index}
+                            className={`relative ${post.images.length === 1 ? 'w-full h-[500px]' : 'h-[250px]'
+                                }`}
+                        >
+                            <img
+                                src={image.url}
+                                alt={`Post image ${index + 1}`}
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                    ))}
+                </div>
+            )}
 
             <div className="flex flex-col gap-2 p-4">
                 <div className="flex justify-between text-sm text-gray-500 px-2 border-b border-gray-200 pb-1">

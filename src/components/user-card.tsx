@@ -1,22 +1,23 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { FC } from "react";
-import { Profile } from "@/views/profile/profile";
 import Link from "next/link";
-import { useCreateGroupChat } from "@/views/chat-id/hooks";
-
+import { useCreateGroupChat, useGetGroupChatbyMembersIds } from "@/views/chat-id/hooks";
+import { useRouter } from "next/navigation";
 const textButton = {
   sent: "Hủy lời mởi",
   waiting: "Chấp nhận"
 };
 
 export const UserCard: FC<{
-  user: Profile;
+  user: any;
   onFriendRequest: () => void;
   onRejectFriendRequest: () => void;
   onRemoveFriend: () => void;
 }> = ({ user, onFriendRequest, onRejectFriendRequest, onRemoveFriend }) => {
+  const router = useRouter();
   const { createGroupChat, isPending } = useCreateGroupChat();
+  const { group } = useGetGroupChatbyMembersIds([user.id]);
 
   return (
     <div className="w-full p-6 bg-gray-50 space-y-8 border border-gray-100 rounded-2xl">
@@ -71,7 +72,13 @@ export const UserCard: FC<{
           variant="outline"
           className="w-full hover:bg-neutral-100"
           disabled={isPending}
-          onClick={() => createGroupChat([user.id])}
+          onClick={() => {
+            if (group) {
+              router.push(`/chat/${group.id}`);
+              return;
+            }
+            createGroupChat([user.id]);
+          }}
         >
           Nhắn tin
         </Button>

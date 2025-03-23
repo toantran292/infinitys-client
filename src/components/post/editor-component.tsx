@@ -3,10 +3,10 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Button } from '../ui/button';
 import EmojiPicker, { EmojiStyle, Theme } from 'emoji-picker-react';
-import { SmilePlus } from 'lucide-react';
-import { useState } from 'react';
+import { InstagramIcon, SmilePlus } from 'lucide-react';
+import { useState, useRef, RefObject } from 'react';
 
-const TiptapEditor = ({ content, setContent }: { content: string, setContent: (content: string) => void }) => {
+const TiptapEditor = ({ content, setContent, filesRef }: { content: string, setContent: (content: string) => void, filesRef: RefObject<File[]> }) => {
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -35,10 +35,29 @@ const TiptapEditor = ({ content, setContent }: { content: string, setContent: (c
     })
 
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [selectedImages, setSelectedImages] = useState<string[]>([]);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const onEmojiClick = (emoji: string) => {
         editor?.commands.insertContent(emoji);
     }
+
+    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (files && files.length > 0) {
+            const newImages = Array.from(files).map(file => URL.createObjectURL(file));
+            setSelectedImages(prev => [...prev, ...newImages]);
+            filesRef.current = [...filesRef.current, ...files];
+        }
+    };
+
+    const removeImage = (indexToRemove: number) => {
+        setSelectedImages(prev => {
+            URL.revokeObjectURL(prev[indexToRemove]);
+            return prev.filter((_, index) => index !== indexToRemove);
+        });
+        filesRef.current = filesRef.current.filter((_, index) => index !== indexToRemove);
+    };
 
     if (!editor) return null;
 
@@ -53,6 +72,22 @@ const TiptapEditor = ({ content, setContent }: { content: string, setContent: (c
                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                 >
                     <SmilePlus size={20} className="text-gray-500" />
+                </Button>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageUpload}
+                />
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-10 hover:bg-gray-100"
+                    onClick={() => fileInputRef.current?.click()}
+                >
+                    <InstagramIcon size={20} className="text-gray-500" />
                 </Button>
                 {showEmojiPicker && (
                     <div className="absolute bottom-full left-0 mb-2 z-50">
@@ -69,6 +104,26 @@ const TiptapEditor = ({ content, setContent }: { content: string, setContent: (c
                     </div>
                 )}
             </div>
+
+            {selectedImages.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {selectedImages.map((image, index) => (
+                        <div key={index} className="relative group">
+                            <img
+                                src={image}
+                                alt={`Preview ${index + 1}`}
+                                className="w-full h-48 object-cover rounded-lg"
+                            />
+                            <button
+                                onClick={() => removeImage(index)}
+                                className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-lg font-medium opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                                ×
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
