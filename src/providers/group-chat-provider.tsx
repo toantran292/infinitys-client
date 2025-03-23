@@ -29,6 +29,7 @@ export function GroupChatProvider({ children }: { children: React.ReactNode }) {
     // Lấy danh sách group chats
     const { groupChats, isLoading, refetchGroupChats } = useGetGroupChats(search);
 
+
     // Lấy thông tin chi tiết của group chat được chọn
     const { groupChat: currentGroupChat, isLoading: currentGroupChatLoading } = useGetGroupChat(selectedChat?.id);
 

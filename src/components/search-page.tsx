@@ -40,7 +40,7 @@ export const SearchPage = ({ q }: { q: string }) => {
   return (
     <ProtectedRouteLayout sectionClassName="mx-auto w-[760px] flex flex-col gap-4 py-4">
       <h1 className="text-center font-bold text-xl">Kết quả tìm kiếm</h1>
-      {data?.map((user: Profile) => (
+      {data?.items?.map((user: Profile) => (
         <UserCard
           key={user.id}
           user={user}

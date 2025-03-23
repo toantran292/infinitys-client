@@ -7,7 +7,8 @@ const ERROR_MESSAGES = {
   "error.passwordIncorrect": "Mật khẩu không chính xác",
   "error.emailNotVerified": "Email chưa được xác thực",
   "error.emailAlreadyVerified": "Email đã được xác thực",
-  "error.application_already_applied": "Bạn đã ứng tuyển vào công việc này"
+  "error.application_already_applied": "Bạn đã ứng tuyển vào công việc này",
+  "error.user_already_exists": "Tài khoản đã tồn tại"
 };
 
 export type ErrorMessage = {

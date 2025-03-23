@@ -19,12 +19,19 @@ export const useGetGroupChatMessage = (group_id?: string) => {
 };
 
 export const useGetGroupChats = (query?: string) => {
-  const { data: groupChats, isLoading, refetch: refetchGroupChats } = useQuery<GroupChat[]>({
+  const {
+    data,
+    isLoading,
+    refetch: refetchGroupChats
+  } = useQuery<{ items: GroupChat[] }>({
     queryKey: ["GROUP_CHATS", query],
-    queryFn: () => axiosInstance.get(`api/chats/groups`, { params: query ? { q: query } : {} }).then(({ data }) => data)
+    queryFn: () =>
+      axiosInstance
+        .get(`api/chats/groups`, { params: query ? { q: query } : {} })
+        .then(({ data }) => data)
   });
 
-  return { groupChats, isLoading, refetchGroupChats };
+  return { groupChats: data?.items, isLoading, refetchGroupChats };
 };
 
 export const useGetGroupChat = (group_id?: string) => {
@@ -34,7 +41,7 @@ export const useGetGroupChat = (group_id?: string) => {
       axiosInstance
         .get(`api/chats/groups/${group_id}`)
         .then(({ data }) => data),
-    enabled: Boolean(group_id)
+    enabled: Boolean(group_id) && group_id !== "undefined"
   });
 
   return { groupChat, isLoading };
@@ -133,9 +140,7 @@ export const useGetFriends = (userId?: string) => {
   const { data: friends, isLoading } = useQuery({
     queryKey: ["FRIENDS", userId],
     queryFn: () =>
-      axiosInstance
-        .get(`api/friends/${userId}`)
-        .then(({ data }) => data)
+      axiosInstance.get(`api/friends/${userId}`).then(({ data }) => data)
   });
 
   return { friends, isLoading };
@@ -144,7 +149,10 @@ export const useGetFriends = (userId?: string) => {
 export const useGetGroupChatbyMembersIds = (memberIds: string[] = []) => {
   const { data: group, isLoading } = useQuery({
     queryKey: ["GROUP_CHAT_BY_MEMBER_IDS", memberIds],
-    queryFn: () => axiosInstance.post(`api/chats/groups/search-by-members`, { memberIds }).then(({ data }) => data),
+    queryFn: () =>
+      axiosInstance
+        .post(`api/chats/groups/search-by-members`, { memberIds })
+        .then(({ data }) => data),
     enabled: memberIds.length > 0
   });
 

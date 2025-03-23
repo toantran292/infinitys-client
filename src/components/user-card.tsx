@@ -23,7 +23,7 @@ export const UserCard: FC<{
       <Link href={`/profile/${user.id}`}>
         <div className="flex gap-4 items-center">
           <Avatar className="w-20 h-20">
-            <AvatarImage src="https://github.com/shadcn.png" alt="avartar" />
+            <AvatarImage src={user.avatar?.url || "https://github.com/shadcn.png"} alt="avartar" />
           </Avatar>
 
           <div className="space-y-2">
