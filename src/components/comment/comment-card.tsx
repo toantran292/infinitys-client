@@ -24,7 +24,7 @@ export const CommentCard = ({ comment, postId }: { comment: Comment, postId: str
 
     const getTimeAgo = (date: string) => {
         const hours = Math.floor((new Date().getTime() - new Date(date).getTime()) / (1000 * 60 * 60));
-        return `${hours} hours ago`;
+        return `${hours} giờ trước`;
     };
 
     const { data: reactCommentStatus, isLoading: isLoadingReactCommentStatus } = useQuery<ReactStatus>({

@@ -8,6 +8,7 @@ import { CommentSection } from "@/components/comment/comment-list";
 import { Profile } from "../chat-page";
 import { PostContent } from './post-content';
 import Image from 'next/image';
+import { ImageViewerModal } from "./image-viewer-modal";
 
 interface Post {
     id: string;
@@ -30,6 +31,8 @@ export const PostCard = ({ post }: PostCardProps) => {
     const queryClient = useQueryClient();
     const [showComments, setShowComments] = useState(false);
     const [isLikeAnimating, setIsLikeAnimating] = useState(false);
+    const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const { data: reactStatus, isLoading: isLoadingReactStatus } = useQuery({
         queryKey: ['react', post.id],
@@ -81,6 +84,23 @@ export const PostCard = ({ post }: PostCardProps) => {
         },
     });
 
+    const handleImageClick = (index: number) => {
+        setCurrentImageIndex(index);
+        setIsImageViewerOpen(true);
+    };
+
+    const handleNextImage = () => {
+        if (currentImageIndex < post.images.length - 1) {
+            setCurrentImageIndex(currentImageIndex + 1);
+        }
+    };
+
+    const handlePrevImage = () => {
+        if (currentImageIndex > 0) {
+            setCurrentImageIndex(currentImageIndex - 1);
+        }
+    };
+
     if (isLoadingReactStatus) {
         return <div>Loading...</div>;
     }
@@ -109,7 +129,8 @@ export const PostCard = ({ post }: PostCardProps) => {
                     {post.images.map((image, index) => (
                         <div
                             key={index}
-                            className={`relative ${post.images.length === 1 ? 'w-full h-[500px]' : 'h-[250px]'}`}
+                            className={`relative ${post.images.length === 1 ? 'w-full h-[500px]' : 'h-[250px]'} cursor-pointer`}
+                            onClick={() => handleImageClick(index)}
                         >
                             <Image
                                 src={image.url}
@@ -122,6 +143,17 @@ export const PostCard = ({ post }: PostCardProps) => {
                 </div>
             )}
 
+            <ImageViewerModal
+                isOpen={isImageViewerOpen}
+                onClose={() => setIsImageViewerOpen(false)}
+                images={post.images}
+                currentImageIndex={currentImageIndex}
+                onNextImage={handleNextImage}
+                onPrevImage={handlePrevImage}
+                post={post}
+                getTimeAgo={getTimeAgo}
+            />
+
             <div className="flex flex-col gap-2 p-4">
                 <div className="flex justify-between text-sm text-gray-500 px-2 border-b border-gray-200 pb-1">
                     <div className="flex items-center gap-1">
@@ -130,7 +162,7 @@ export const PostCard = ({ post }: PostCardProps) => {
                         </div>
                         <span>{post.react_count}</span>
                     </div>
-                    <span>{post.comment_count} comments</span>
+                    <span>{post.comment_count} bình luận</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button
