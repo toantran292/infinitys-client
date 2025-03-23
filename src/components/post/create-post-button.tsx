@@ -6,28 +6,56 @@ import { Button } from "../ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import TiptapEditor from "./editor-component";
+import { UserUploadType } from "@/views/profile/hooks/use-user-upload";
+import { PostUploadType } from "./hooks/usePostUpload";
+import { usePostUpload } from "./hooks/usePostUpload";
+import { useS3Upload } from "@/hooks/use-s3-upload";
 
 const useCreatePost = () => {
     const queryClient = useQueryClient();
     const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
     const [content, setContent] = useState("");
+    const filesRef = useRef<File[]>([]);
+
+    // const { action: uploadAvatar } = usePostUpload({
+    //     postId: "",
+    //     type: PostUploadType.IMAGES,
+    // });
+
+    const { uploadMultipleToS3 } = useS3Upload({
+        type: PostUploadType.IMAGES,
+        prefix: "posts"
+    });
 
     const { mutate: createPost, ...remain } = useMutation({
-        mutationFn: (content: string) =>
-            axiosInstance.post(`api/posts`, {
-                content
-            }),
+        mutationFn: async (content: string) => {
+            let imageKeys: any[] = [];
+
+            if (filesRef.current && filesRef.current.length > 0) {
+                const results = await uploadMultipleToS3(filesRef.current);
+                imageKeys = results.map((result, index) => ({
+                    key: result.key,
+                    name: filesRef.current[index].name,
+                    content_type: filesRef.current[index].type,
+                    size: filesRef.current[index].size
+                }));
+            }
+
+            const { data: newPost } = await axiosInstance.post(`api/posts`, {
+                content,
+                images: imageKeys
+            });
+
+            return newPost;
+        },
         onSuccess: () => {
-            queryClient
-                .invalidateQueries({
-                    queryKey: ["posts"]
-                })
-                .catch(console.error);
+            queryClient.invalidateQueries({ queryKey: ["posts"] });
             setIsCreatePostOpen(false);
             toast.success("Đăng bài viết thành công");
             setContent("");
+            filesRef.current = [];
         },
         onError: (error: unknown) => {
             toast.error(`Error creating post: ${error}`);
@@ -40,13 +68,14 @@ const useCreatePost = () => {
         setIsCreatePostOpen,
         content,
         setContent,
+        filesRef,
         ...remain
     };
 };
 
 export function CreatePostButton() {
     const { user } = useAuth();
-    const { createPost, isPending, isCreatePostOpen, setIsCreatePostOpen, content, setContent } = useCreatePost();
+    const { createPost, isPending, isCreatePostOpen, setIsCreatePostOpen, content, setContent, filesRef } = useCreatePost();
 
     return (
         <Dialog open={isCreatePostOpen} onOpenChange={setIsCreatePostOpen}>
@@ -75,7 +104,7 @@ export function CreatePostButton() {
                     </div>
                 </DialogTitle>
 
-                <TiptapEditor content={content} setContent={setContent} />
+                <TiptapEditor content={content} setContent={setContent} filesRef={filesRef} />
 
                 <DialogFooter className="border-t border-gray-200">
                     <Button
