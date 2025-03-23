@@ -91,7 +91,7 @@ export const ImageViewerModal = ({
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            if (!isOpen) return;
+            if (!isOpen || !images) return;
 
             switch (event.key) {
                 case 'ArrowLeft':
@@ -112,14 +112,14 @@ export const ImageViewerModal = ({
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, currentImageIndex, images.length, onPrevImage, onNextImage, onClose]);
+    }, [isOpen, currentImageIndex, images?.length, onPrevImage, onNextImage, onClose]);
 
     return (
         <Dialog open={isOpen} onOpenChange={() => onClose()}>
             <DialogContent className="max-w-7xl h-[90vh] flex p-0 gap-0 overflow-hidden">
                 <VisuallyHidden>
                     <DialogTitle>
-                        Image Viewer - {currentImageIndex + 1} of {images.length}
+                        Image Viewer - {currentImageIndex + 1} of {images?.length}
                     </DialogTitle>
                 </VisuallyHidden>
 
@@ -133,7 +133,7 @@ export const ImageViewerModal = ({
                         }}
                     >
                         <CarouselContent className="-ml-0">
-                            {images.map((image, index) => (
+                            {images?.map((image, index) => (
                                 <CarouselItem key={index} className="pl-0 w-full h-[90vh]">
                                     <div className="relative w-full h-full flex items-center justify-center">
                                         <Image
@@ -147,7 +147,7 @@ export const ImageViewerModal = ({
                                 </CarouselItem>
                             ))}
                         </CarouselContent>
-                        {images.length > 1 && (
+                        {images?.length > 1 && (
                             <>
                                 <CarouselPrevious className="absolute left-4 h-10 w-10 rounded-full bg-black/50 hover:bg-black/70 border-none text-white" />
                                 <CarouselNext className="absolute right-4 h-10 w-10 rounded-full bg-black/50 hover:bg-black/70 border-none text-white" />

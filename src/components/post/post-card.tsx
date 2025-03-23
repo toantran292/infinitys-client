@@ -124,24 +124,35 @@ export const PostCard = ({ post }: PostCardProps) => {
                 <PostContent content={post.content} />
             </div>
 
-            {post.images && post.images.length > 0 && (
-                <div className={`grid gap-1 ${post.images.length === 1 ? '' : 'grid-cols-2'}`}>
-                    {post.images.map((image, index) => (
-                        <div
-                            key={index}
-                            className={`relative ${post.images.length === 1 ? 'w-full h-[500px]' : 'h-[250px]'} cursor-pointer`}
-                            onClick={() => handleImageClick(index)}
-                        >
-                            <Image
-                                src={image.url}
-                                alt={`Post image ${index + 1}`}
-                                fill
-                                className="object-cover"
-                            />
-                        </div>
-                    ))}
-                </div>
-            )}
+            <div className="h-[250px]">
+                {post.images && post.images.length > 0 ? (
+                    <div className={`grid gap-1 h-full ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                        {post.images.slice(0, Math.min(2, post.images.length)).map((image, index) => (
+                            <div
+                                key={index}
+                                className="relative h-full cursor-pointer"
+                                onClick={() => handleImageClick(index)}
+                            >
+                                <Image
+                                    src={image.url}
+                                    alt={`Post image ${index + 1}`}
+                                    fill
+                                    className="object-cover"
+                                />
+                                {index === 1 && post.images.length > 2 && (
+                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                        <span className="text-white text-2xl font-bold">
+                                            +{post.images.length - 2}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="h-full bg-gray-50"></div>
+                )}
+            </div>
 
             <ImageViewerModal
                 isOpen={isImageViewerOpen}

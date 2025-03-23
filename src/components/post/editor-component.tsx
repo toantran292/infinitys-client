@@ -63,8 +63,33 @@ const TiptapEditor = ({ content, setContent, filesRef }: { content: string, setC
 
     return (
         <div className="prose prose-sm max-w-none [&>h2]:text-lg [&>h2]:font-semibold [&>h2]:mb-4 [&>h3]:font-medium [&>h3]:mt-6 [&>h3]:mb-2 [&>p]:text-gray-600 [&>ul]:list-disc [&>ul]:pl-4 [&>ul]:space-y-2 [&>ul>li]:text-gray-600 text-xl">
-            <EditorContent editor={editor} placeholder='Bạn muốn chia sẻ điều gì?' />
-            <div className="relative">
+            <div className="max-h-[500px] overflow-y-auto">
+                <EditorContent editor={editor} placeholder='Bạn muốn chia sẻ điều gì?' />
+
+                {selectedImages.length > 0 && (
+                    <div className="mt-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-2">
+                            {selectedImages.map((image, index) => (
+                                <div key={index} className="relative group">
+                                    <img
+                                        src={image}
+                                        alt={`Preview ${index + 1}`}
+                                        className="w-full h-48 object-cover rounded-lg"
+                                    />
+                                    <button
+                                        onClick={() => removeImage(index)}
+                                        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-lg font-medium opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <div className="relative mt-4 border-t pt-4">
                 <Button
                     variant="ghost"
                     size="icon"
@@ -104,26 +129,6 @@ const TiptapEditor = ({ content, setContent, filesRef }: { content: string, setC
                     </div>
                 )}
             </div>
-
-            {selectedImages.length > 0 && (
-                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {selectedImages.map((image, index) => (
-                        <div key={index} className="relative group">
-                            <img
-                                src={image}
-                                alt={`Preview ${index + 1}`}
-                                className="w-full h-48 object-cover rounded-lg"
-                            />
-                            <button
-                                onClick={() => removeImage(index)}
-                                className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-lg font-medium opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                                ×
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            )}
         </div>
     );
 };
