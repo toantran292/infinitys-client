@@ -18,7 +18,7 @@ export const LeftSideInfo = () => {
                 <div className="px-3 pb-3">
                     <div className="flex justify-between items-end -mt-[30px] mb-2">
                         <Avatar className="h-[60px] w-[60px] border-2 border-white">
-                            <AvatarImage src={user?.avatar?.url} />
+                            <AvatarImage className="object-cover" src={user?.avatar?.url} />
                             <AvatarFallback className="text-xl bg-gray-500 text-white">
                                 {user?.firstName?.charAt(0)}
                             </AvatarFallback>

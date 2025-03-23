@@ -46,7 +46,7 @@ export function ChatList({ messages }: ChatListProps) {
               >
                 {!isSentByMe && (
                   <Avatar className="h-9 w-9 mt-5">
-                    <AvatarImage src={message.user.avatar?.url || ""} />
+                    <AvatarImage className="object-cover" src={message.user.avatar?.url || ""} />
                     <AvatarFallback className="bg-gray-500 text-white">{message.user?.firstName?.[0]}</AvatarFallback>
                   </Avatar>
                 )}

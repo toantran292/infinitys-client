@@ -24,7 +24,7 @@ export const CreatePost = () => {
         <div className="w-full bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
             <div className="flex items-center gap-2 mb-2">
                 <Avatar className="size-12 flex-shrink-0 bg-gray-500 text-white">
-                    <AvatarImage src={user?.avatar?.url} alt="avatar" />
+                    <AvatarImage className="object-cover" src={user?.avatar?.url} alt="avatar" />
                     <AvatarFallback>{user?.firstName.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <CreatePostButton />

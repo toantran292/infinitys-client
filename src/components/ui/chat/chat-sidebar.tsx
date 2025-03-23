@@ -83,7 +83,7 @@ const ChatSideBarBody = () => {
         >
           <div className="relative">
             <Avatar className="h-12 w-12">
-              <AvatarImage src={chat.avatar} />
+              <AvatarImage className="object-cover" src={chat.avatar} />
               <AvatarFallback className="bg-gray-500 text-white">{chat.name}</AvatarFallback>
             </Avatar>
             {chat.isOnline && (

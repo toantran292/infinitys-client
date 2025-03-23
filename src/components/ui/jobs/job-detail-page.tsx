@@ -377,7 +377,7 @@ function ApplicantsList({ jobId }: { jobId: string }) {
                         <td className="px-4 py-3">
                             <div className="flex items-center gap-3">
                                 <Avatar className="h-8 w-8">
-                                    <AvatarImage src={avatarUrl} />
+                                    <AvatarImage className="object-cover" src={avatarUrl} />
                                 </Avatar>
                                 <div>
                                     <p className="font-medium text-sm">{applicant.user.lastName} {applicant.user.firstName}</p>

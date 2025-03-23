@@ -89,7 +89,7 @@ export function CreatePostButton() {
                 <DialogTitle className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
                         <Avatar className="size-14 mr-3">
-                            <AvatarImage src={user?.avatar?.url || ""} />
+                            <AvatarImage className="object-cover" src={user?.avatar?.url || ""} />
                             <AvatarFallback className="bg-gray-500 text-white">
                                 {user?.firstName?.charAt(0)}
                             </AvatarFallback>

@@ -22,6 +22,7 @@ const ProfileAvatarComponent = ({ avatar }: { avatar: ProfileAvatar }) => {
   return (
     <Avatar className="w-20 h-20">
       <AvatarImage
+        className="object-cover"
         src={avatar?.url}
         alt="Avatar"
       />

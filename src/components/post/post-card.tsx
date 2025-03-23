@@ -7,6 +7,7 @@ import { useState } from "react";
 import { CommentSection } from "@/components/comment/comment-list";
 import { Profile } from "../chat-page";
 import { PostContent } from './post-content';
+import Image from 'next/image';
 
 interface Post {
     id: string;
@@ -90,8 +91,8 @@ export const PostCard = ({ post }: PostCardProps) => {
         <div className="border border-gray-200 rounded-lg w-full bg-white shadow-sm">
             <div className="p-4 space-y-4">
                 <div className="flex gap-2 items-center">
-                    <Avatar className="size-12">
-                        <AvatarImage src={post.author?.avatar?.url} />
+                    <Avatar className="h-12 w-12">
+                        <AvatarImage className="object-cover" src={post.author?.avatar?.url} />
                         <AvatarFallback className="bg-gray-500 text-white">{`${post.author.firstName[0]}${post.author.lastName[0]}`}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
@@ -108,13 +109,13 @@ export const PostCard = ({ post }: PostCardProps) => {
                     {post.images.map((image, index) => (
                         <div
                             key={index}
-                            className={`relative ${post.images.length === 1 ? 'w-full h-[500px]' : 'h-[250px]'
-                                }`}
+                            className={`relative ${post.images.length === 1 ? 'w-full h-[500px]' : 'h-[250px]'}`}
                         >
-                            <img
+                            <Image
                                 src={image.url}
                                 alt={`Post image ${index + 1}`}
-                                className="w-full h-full object-cover"
+                                fill
+                                className="object-cover"
                             />
                         </div>
                     ))}

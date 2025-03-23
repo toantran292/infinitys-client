@@ -67,6 +67,7 @@ export function PageList({ pages, onReapply, isLoading }: PageListProps) {
             <div className="flex items-center gap-3">
               <Avatar className="w-20 h-20">
                 <AvatarImage
+                  className="object-cover"
                   src={page.avatar?.url || "https://github.com/shadcn.png"}
                   alt="Avatar"
                 />

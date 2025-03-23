@@ -67,7 +67,7 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
         <div className="space-y-4">
             <form onSubmit={handleSubmitComment} className="flex items-center gap-3">
                 <Avatar className="size-10">
-                    <AvatarImage src={currentUser?.avatar?.url} />
+                    <AvatarImage className="object-cover" src={currentUser?.avatar?.url} />
                     <AvatarFallback className="bg-gray-500 text-white">
                         {currentUser && `${currentUser.firstName[0]}${currentUser.lastName[0]}`}
                     </AvatarFallback>

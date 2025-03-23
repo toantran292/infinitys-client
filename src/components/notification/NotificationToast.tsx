@@ -38,7 +38,7 @@ export const FriendRequestToast = ({ t, id, avatar, firstName, lastName, message
         >
             <div className="flex items-center gap-2" onClick={() => router.push(`/profile/${id}`)}>
                 <Avatar className="w-10 h-10">
-                    <AvatarImage src={avatar as string} alt="avartar" />
+                    <AvatarImage className="object-cover" src={avatar as string} alt="avartar" />
                 </Avatar>
                 <div>
                     <p className="font-bold">{firstName} {lastName}</p>
@@ -81,7 +81,7 @@ export const ReactToast = ({ reacter, target, t }: any) => {
         >
             <div className="flex items-center gap-2">
                 <Avatar className="w-10 h-10">
-                    <AvatarImage src={reacter.avatar as string} alt="avartar" />
+                    <AvatarImage className="object-cover" src={reacter.avatar as string} alt="avartar" />
                 </Avatar>
                 <div>
                     <p className="font-bold">{reacter.fullName}</p>
@@ -123,7 +123,7 @@ export const CommentToast = ({ commenter, content, t }: any) => {
         >
             <div className="flex items-center gap-2">
                 <Avatar className="w-10 h-10">
-                    <AvatarImage src={commenter.avatar as string} alt="avartar" />
+                    <AvatarImage className="object-cover" src={commenter.avatar as string} alt="avartar" />
                 </Avatar>
                 <div>
                     <p className="font-bold">{commenter.fullName}</p>

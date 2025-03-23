@@ -22,7 +22,7 @@ export function ProfileCard({ name, avatar, location, email, major }: ProfileCar
                 {/* Avatar */}
                 <div className="mb-3">
                     <Avatar className="w-20 h-20 border-4 border-white">
-                        <AvatarImage src={avatar} alt={name} />
+                        <AvatarImage className="object-cover" src={avatar} alt={name} />
                         <AvatarFallback className="text-2xl">{name.charAt(0)}</AvatarFallback>
                     </Avatar>
                 </div>

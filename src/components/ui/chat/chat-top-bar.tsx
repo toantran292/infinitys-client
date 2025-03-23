@@ -41,7 +41,7 @@ const ChatTopBar = () => {
   return (
     <div className="flex items-center gap-3 p-4 border-b bg-white">
       <Avatar className="h-12 w-12">
-        <AvatarImage src={isGroupChat ? "" : members[0]?.avatar?.url || ""} alt="avatar" />
+        <AvatarImage className="object-cover" src={isGroupChat ? "" : members[0]?.avatar?.url || ""} alt="avatar" />
         <AvatarFallback className="bg-gray-500 text-white">{members[0]?.fullName?.charAt(0)}</AvatarFallback>
       </Avatar>
       <div className="flex flex-col min-w-0">

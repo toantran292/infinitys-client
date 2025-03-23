@@ -87,7 +87,7 @@ export const CommentCard = ({ comment, postId }: { comment: Comment, postId: str
     return (
         <div key={comment.id} className="flex gap-2 group">
             <Avatar className="w-10 h-10 mt-1">
-                <AvatarImage src={comment.author?.avatar?.url} />
+                <AvatarImage className="object-cover" src={comment.author?.avatar?.url} />
                 <AvatarFallback className="bg-gray-500 text-white">
                     {`${comment.author.firstName[0]}${comment.author.lastName[0]}`}
                 </AvatarFallback>

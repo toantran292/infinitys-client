@@ -19,9 +19,9 @@ export function ProfileAvatarComponent({
     <div className="relative">
       <Avatar className="w-[144px] h-[144px] border-4 border-white">
         <AvatarImage
+          className="object-cover w-full h-full"
           src={avatar?.url || "https://github.com/shadcn.png"}
           alt="Avatar"
-          className="object-cover w-full h-full"
         />
         <AvatarFallback>{fallback}</AvatarFallback>
       </Avatar>
