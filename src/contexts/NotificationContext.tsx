@@ -1,6 +1,6 @@
 'use client';
 
-import { FriendRequestToast } from '@/components/notification/NotificationToast';
+import { FriendRequestToast, ReactToast, CommentToast } from '@/components/notification/NotificationToast';
 import axiosInstance from '@/lib/axios';
 import { useAuth } from '@/providers/auth-provider';
 import { Notification, NotificationWsResponse } from '@/types/notification';
@@ -85,6 +85,16 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
             case 'friend_request:accepted':
                 toast.custom((t) => (
                     <FriendRequestToast {...newNotification.meta} message="Đã chấp nhận lời mời kết bạn" t={t} />
+                ));
+                break;
+            case 'react:created':
+                toast.custom((t) => (
+                    <ReactToast {...newNotification.meta} t={t} />
+                ));
+                break;
+            case 'comment:created':
+                toast.custom((t) => (
+                    <CommentToast {...newNotification.meta} t={t} />
                 ));
                 break;
         }

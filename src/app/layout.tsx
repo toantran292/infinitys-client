@@ -28,14 +28,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-full flex flex-col overflow-x-hidden`}
       >
         <QueryClientProviderWrapper>
           <AuthProvider>
             <NotificationProvider>
-              {children}
+              <main className="flex-1 relative">
+                {children}
+              </main>
               <Toaster richColors closeButton />
             </NotificationProvider>
           </AuthProvider>
