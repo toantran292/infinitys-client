@@ -32,7 +32,7 @@ export const SearchPage = ({ q }: { q: string }) => {
 
   if (isLoading)
     return (
-      <div>
+      <div className="flex items-center justify-center h-screen">
         <Loader />
       </div>
     );

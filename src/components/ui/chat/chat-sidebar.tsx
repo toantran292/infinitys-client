@@ -66,12 +66,10 @@ const ChatSideBarBody = () => {
       id: chat.id,
       name: (notGroupChat ? chat.members?.[0]?.fullName : chat.name) || "Unnamed User",
       avatar: (notGroupChat ? chat.members?.[0]?.avatar?.url : null) || "",
-      lastMessage: chat.lastMessage?.content || "No messages",
+      lastMessage: chat.lastMessage?.content || "Chưa có tin nhắn",
       timestamp: new Date(chat.lastMessage?.createdAt || Date.now()),
     }
   }), [groupChats]);
-
-  console.log("chatPreviews - rerender");
 
   return (
     <div className="flex-1 overflow-y-auto">

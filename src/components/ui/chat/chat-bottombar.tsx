@@ -70,7 +70,7 @@ export default function ChatBottomBar({
             ref={inputRef}
             onKeyDown={handleKeyPress}
             onChange={handleInputChange}
-            placeholder="Write a message..."
+            placeholder="Nhập tin nhắn..."
           />
         </div>
         <AnimatePresence initial={false}>
