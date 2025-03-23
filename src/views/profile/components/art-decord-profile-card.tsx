@@ -19,7 +19,7 @@ interface ArtDecordProfileCardProps {
 }
 
 export const ArtDecordProfileCard = ({ data, isEditable = false }: ArtDecordProfileCardProps) => {
-    const { refetchUser } = useAuth();
+    const { refetchUser, user } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
 
     const { action: uploadAvatar } = useUserUpload({
@@ -73,10 +73,10 @@ export const ArtDecordProfileCard = ({ data, isEditable = false }: ArtDecordProf
                     <ProfileAvatarComponent
                         avatar={data.avatar}
                         fallback={data.fullName?.charAt(0)}
-                        canEdit={isEditable}
+                        canEdit={isEditable && user?.id === data.id}
                         onFileChange={handleAvatarUpload}
                     />
-                    {isEditable && (
+                    {isEditable && user?.id === data.id && (
                         <>
                             <Button
                                 variant="outline"
@@ -118,7 +118,7 @@ export const ArtDecordProfileCard = ({ data, isEditable = false }: ArtDecordProf
 
                         <div className="flex items-center gap-2 text-sm">
                             <span className="text-blue-600 hover:underline cursor-pointer font-bold">
-                                78 kết nối
+                                {data.total_connections} kết nối
                             </span>
                         </div>
                     </div>
@@ -145,17 +145,19 @@ export const ArtDecordProfileCard = ({ data, isEditable = false }: ArtDecordProf
 
 
                 {/* Action Buttons */}
-                <div className="mt-4 flex gap-2">
-                    <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold">
-                        {data.friend_status === "friend" ? "Bạn bè" : "Kết nối"}
-                    </Button>
-                    <Button variant="outline" className="flex-1 font-semibold">
-                        Nhắn tin
-                    </Button>
-                    <Button variant="outline" size="icon">
-                        <span className="font-semibold">···</span>
-                    </Button>
-                </div>
+                {user?.id !== data.id && (
+                    <div className="mt-4 flex gap-2">
+                        <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+                            {data.friend_status === "friend" ? "Bạn bè" : "Kết nối"}
+                        </Button>
+                        <Button variant="outline" className="flex-1 font-semibold">
+                            Nhắn tin
+                        </Button>
+                        <Button variant="outline" size="icon">
+                            <span className="font-semibold">···</span>
+                        </Button>
+                    </div>
+                )}
             </div>
         </div>
     );
