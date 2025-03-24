@@ -8,6 +8,8 @@ import { CommentSection } from "@/components/comment/comment-list";
 import { Profile } from "../chat-page";
 import { PostContent } from './post-content';
 import Image from 'next/image';
+import { ImageViewerModal } from "./image-viewer-modal";
+import { cx } from "class-variance-authority";
 
 interface Post {
     id: string;
@@ -20,16 +22,20 @@ interface Post {
     images: Array<{
         url: string;
     }>;
+    showAll?: boolean
 }
 
 interface PostCardProps {
     post: Post;
+    showAll?: boolean
 }
 
-export const PostCard = ({ post }: PostCardProps) => {
+export const PostCard = ({ post, showAll = false }: PostCardProps) => {
     const queryClient = useQueryClient();
     const [showComments, setShowComments] = useState(false);
     const [isLikeAnimating, setIsLikeAnimating] = useState(false);
+    const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const { data: reactStatus, isLoading: isLoadingReactStatus } = useQuery({
         queryKey: ['react', post.id],
@@ -81,6 +87,23 @@ export const PostCard = ({ post }: PostCardProps) => {
         },
     });
 
+    const handleImageClick = (index: number) => {
+        setCurrentImageIndex(index);
+        setIsImageViewerOpen(true);
+    };
+
+    const handleNextImage = () => {
+        if (currentImageIndex < post.images.length - 1) {
+            setCurrentImageIndex(currentImageIndex + 1);
+        }
+    };
+
+    const handlePrevImage = () => {
+        if (currentImageIndex > 0) {
+            setCurrentImageIndex(currentImageIndex - 1);
+        }
+    };
+
     if (isLoadingReactStatus) {
         return <div>Loading...</div>;
     }
@@ -88,7 +111,7 @@ export const PostCard = ({ post }: PostCardProps) => {
     const isReacted = reactStatus?.isActive;
 
     return (
-        <div className="border border-gray-200 rounded-lg w-full bg-white shadow-sm">
+        <div className="border border-gray-200 rounded-lg w-full bg-white shadow-sm h-full flex flex-col justify-between">
             <div className="p-4 space-y-4">
                 <div className="flex gap-2 items-center">
                     <Avatar className="h-12 w-12">
@@ -104,23 +127,61 @@ export const PostCard = ({ post }: PostCardProps) => {
                 <PostContent content={post.content} />
             </div>
 
-            {post.images && post.images.length > 0 && (
-                <div className={`grid gap-1 ${post.images.length === 1 ? '' : 'grid-cols-2'}`}>
-                    {post.images.map((image, index) => (
-                        <div
-                            key={index}
-                            className={`relative ${post.images.length === 1 ? 'w-full h-[500px]' : 'h-[250px]'}`}
-                        >
-                            <Image
-                                src={image.url}
-                                alt={`Post image ${index + 1}`}
-                                fill
-                                className="object-cover"
-                            />
-                        </div>
-                    ))}
-                </div>
-            )}
+            <div className={cx(
+                (!post?.images?.length && showAll) ? "h-0" :
+                    (showAll && post.images?.length === 1) ? "h-auto" :
+                        "h-[250px]"
+            )}>
+                {post.images && post.images.length > 0 ? (
+                    <div className={`grid gap-1 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} ${showAll && post.images.length === 1 ? 'h-auto' : 'h-full'}`}>
+                        {post.images.slice(0, Math.min(2, post.images.length)).map((image, index) => (
+                            <div
+                                key={index}
+                                className={`relative cursor-pointer ${showAll && post.images.length === 1 ? 'h-auto aspect-auto' : 'h-full'}`}
+                                onClick={() => handleImageClick(index)}
+                            >
+                                {showAll && post.images.length === 1 ? (
+                                    <Image
+                                        src={image.url}
+                                        alt={`Post image ${index + 1}`}
+                                        width={1000}
+                                        height={1000}
+                                        className="object-contain w-full"
+                                        style={{ maxHeight: '600px' }}
+                                    />
+                                ) : (
+                                    <Image
+                                        src={image.url}
+                                        alt={`Post image ${index + 1}`}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                )}
+                                {index === 1 && post.images.length > 2 && (
+                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                        <span className="text-white text-2xl font-bold">
+                                            +{post.images.length - 2}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="h-full"></div>
+                )}
+            </div>
+
+            <ImageViewerModal
+                isOpen={isImageViewerOpen}
+                onClose={() => setIsImageViewerOpen(false)}
+                images={post.images}
+                currentImageIndex={currentImageIndex}
+                onNextImage={handleNextImage}
+                onPrevImage={handlePrevImage}
+                post={post}
+                getTimeAgo={getTimeAgo}
+            />
 
             <div className="flex flex-col gap-2 p-4">
                 <div className="flex justify-between text-sm text-gray-500 px-2 border-b border-gray-200 pb-1">
@@ -130,7 +191,7 @@ export const PostCard = ({ post }: PostCardProps) => {
                         </div>
                         <span>{post.react_count}</span>
                     </div>
-                    <span>{post.comment_count} comments</span>
+                    <span>{post.comment_count} bình luận</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button
@@ -156,6 +217,6 @@ export const PostCard = ({ post }: PostCardProps) => {
                     </div>
                 )}
             </div>
-        </div >
+        </div>
     );
 } 

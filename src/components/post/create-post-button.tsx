@@ -19,11 +19,6 @@ const useCreatePost = () => {
     const [content, setContent] = useState("");
     const filesRef = useRef<File[]>([]);
 
-    // const { action: uploadAvatar } = usePostUpload({
-    //     postId: "",
-    //     type: PostUploadType.IMAGES,
-    // });
-
     const { uploadMultipleToS3 } = useS3Upload({
         type: PostUploadType.IMAGES,
         prefix: "posts"

@@ -21,6 +21,7 @@ interface Comment {
 
 interface CommentSectionProps {
     postId: string;
+    inputRef?: React.RefObject<HTMLTextAreaElement>;
 }
 
 const getComments = async (postId: string): Promise<Comment[]> => {
@@ -28,7 +29,7 @@ const getComments = async (postId: string): Promise<Comment[]> => {
     return response.data;
 };
 
-export const CommentSection = ({ postId }: CommentSectionProps) => {
+export const CommentSection = ({ postId, inputRef }: CommentSectionProps) => {
     const [newComment, setNewComment] = useState("");
     const queryClient = useQueryClient();
     const { user: currentUser } = useAuth();
@@ -78,6 +79,8 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         className="w-full !rounded-full border border-gray-500 hover:border-gray-400 focus:border-gray-400 bg-white px-4 py-2 pr-32 placeholder:text-sm placeholder:text-gray-500"
+                        // @ts-ignore
+                        ref={inputRef}
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                         <div className="relative">

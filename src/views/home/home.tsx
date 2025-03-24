@@ -46,7 +46,7 @@ export const HomeComponent = () => {
             ) : (
               <div className="space-y-4">
                 {posts?.map((post: any) => (
-                  <PostCard key={post.id} post={post} />
+                  <PostCard key={post.id} post={post} showAll={true} />
                 ))}
                 {posts?.length === 0 && (
                   <div className="text-center text-gray-500">

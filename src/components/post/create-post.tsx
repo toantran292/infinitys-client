@@ -1,6 +1,6 @@
 "use client";
 import { useAuth } from "@/providers/auth-provider";
-import { FileTextIcon, InstagramIcon, ScanTextIcon } from "lucide-react";
+import { InstagramIcon, ScanTextIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { CreatePostButton } from "./create-post-button";
 
