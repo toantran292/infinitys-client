@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Search, SquarePen } from "lucide-react";
+import { Search, SquarePen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { memo, useMemo } from "react";
@@ -8,7 +8,7 @@ import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useGroupChat } from "@/providers/group-chat-provider";
 import { Button } from "../button";
-
+import { vi } from "date-fns/locale";
 interface ChatSidebarProps {
   isCollapsed: boolean;
 }
@@ -46,7 +46,7 @@ const ChatSideBarHeader = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
           <input
             type="text"
-            placeholder="Search messages"
+            placeholder="Tìm kiếm"
             className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-md text-sm focus:outline-none"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -96,7 +96,7 @@ const ChatSideBarBody = () => {
                 {chat.name}
               </h3>
               <span className="text-xs text-gray-500">
-                {formatDistanceToNow(chat.timestamp, { addSuffix: true })}
+                {formatDistanceToNow(chat.timestamp, { addSuffix: true, locale: vi })}
               </span>
             </div>
             <p className={cn(
