@@ -17,7 +17,7 @@ export default function PagesComponent() {
 
   const { data, isLoading } = usePages(params);
 
-  const handleReapply = (id) => {
+  const handleReapply = (id: never) => {
     router.push(`/page/register?id=${id}`);
   };
 
@@ -37,7 +37,7 @@ export default function PagesComponent() {
           <PageList
             isLoading={isLoading}
             pages={data?.items || []}
-            onReapply={handleReapply}
+            onReapply={() => handleReapply}
           />
         </div>
 

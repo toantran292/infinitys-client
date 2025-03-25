@@ -11,18 +11,24 @@ interface ConnectionsParams {
 export function useConnections(params: ConnectionsParams) {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["connections", user?.id, params.search, params.page, params.limit],
+    queryKey: [
+      "connections",
+      user?.id,
+      params.search,
+      params.page,
+      params.limit
+    ],
     queryFn: () =>
       axiosInstance
         .get(`/api/friends/${user?.id}`, {
           params: {
-            page : params.page,
+            page: params.page,
             take: params.limit,
-            ...(params.search && { q: params.search }),
-          },
+            ...(params.search && { q: params.search })
+          }
         })
         .then((res) => res.data),
-    enabled: !!user?.id,
+    enabled: !!user?.id
   });
 }
 
@@ -31,8 +37,10 @@ export function useConnectionRequests() {
   return useQuery({
     queryKey: ["connections", user?.id, "requests"],
     queryFn: () =>
-      axiosInstance.get(`/api/friends/${user?.id}/requests`).then((res) => res.data),
-    enabled: !!user?.id,
+      axiosInstance
+        .get(`/api/friends/${user?.id}/requests`)
+        .then((res) => res.data),
+    enabled: !!user?.id
   });
 }
 
@@ -41,7 +49,9 @@ export function useConnectionSuggestions() {
   return useQuery({
     queryKey: ["connections", user?.id, "suggestions"],
     queryFn: () =>
-      axiosInstance.get(`/api/friends/${user?.id}/suggestions`).then((res) => res.data),
-    enabled: !!user?.id,
+      axiosInstance
+        .get(`/api/friends/${user?.id}/suggestions`)
+        .then((res) => res.data),
+    enabled: !!user?.id
   });
 }

@@ -84,8 +84,7 @@ const ManageInvitations = () => {
               const avatarUrl =
                 user.avatar?.length > 0
                   ? user.avatar[0].url
-                  : "http://www.w3.org/2000/svg";
-
+                  : "https://github.com/shadcn.png";
               return (
                 <li
                   key={user.id}
@@ -135,7 +134,7 @@ const ManageInvitations = () => {
                     <div className="text-gray-500 text-sm flex items-center space-x-2">
                       <span>Đã gửi</span>
                       <button
-                        className="border border-gray-400 text-gray-500 px-3 py-1 rounded-full text-sm hover:bg-gray-300 transition"
+                        className="border border-gray-500 text-gray-500 font-semibold px-4 py-1.5 rounded-full text-sm hover:bg-gray-500 hover:text-white transition"
                         onClick={() =>
                           friendRequest({
                             userId: user.id,

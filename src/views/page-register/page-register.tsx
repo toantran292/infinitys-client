@@ -17,7 +17,7 @@ export function PageRegisterComponent() {
   const [avatarFile, setAvatarFile] = useState<File | undefined>();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
-  const {page,getPageById} = usePages();
+  const { page, getPageById } = usePages();
   const [avatarData, setAvatarData] = useState<FileUploadResponse | null>(null);
 
   const { uploadToS3 } = useS3Upload({
@@ -35,7 +35,7 @@ export function PageRegisterComponent() {
     formState: { errors }
   } = useForm({
     defaultValues: {
-      name: page?.name || "",
+      name: "",
       url: "",
       address: "",
       email: "",
@@ -58,9 +58,7 @@ export function PageRegisterComponent() {
         content: page.content || ""
       });
       if (page?.avatar?.url) {
-        setAvatarData(
-          page.avatar.url
-        );
+        setAvatarData(page.avatar.url);
       }
     }
   }, [page, reset]);
@@ -207,7 +205,11 @@ export function PageRegisterComponent() {
 
           <div className="w-1/3 sticky top-6 self-start">
             <PagePreview
-              url={avatarFile instanceof File ? URL.createObjectURL(avatarFile) : avatarData || ""}
+              url={
+                avatarFile instanceof File
+                  ? URL.createObjectURL(avatarFile)
+                  : avatarData || ""
+              }
               name={watch("name")}
               content={watch("content")}
               email={watch("email")}

@@ -59,7 +59,7 @@ const ConnectionsComponent = () => {
               const avatarUrl =
                 conn.avatar?.length > 0
                   ? conn.avatar[0].url
-                  : "https://via.placeholder.com/50";
+                  : "https://github.com/shadcn.png";
 
               return (
                 <li
@@ -83,7 +83,7 @@ const ConnectionsComponent = () => {
                           {conn.firstName} {conn.lastName}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {conn.role || "Chưa cập nhật công việc"}
+                          {conn.email || "Chưa cập nhật email"}
                         </p>
                         <p className="text-xs text-gray-400">
                           Đã kết nối vào {formatDate(conn.createdAt)}

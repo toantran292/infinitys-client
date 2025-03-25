@@ -12,6 +12,7 @@ export type Page = {
   email: string;
   status: string;
   avatar?: { url: string };
+  createdAt: string;
 };
 
 type PageContextType = {
@@ -36,7 +37,7 @@ export const PageProvider = ({ children }: { children: React.ReactNode }) => {
     queryFn: async () => {
       const res = await axiosInstance.get("/api/pages");
       return res.data;
-    },
+    }
   });
 
   // Lấy trang cá nhân của user
@@ -45,7 +46,7 @@ export const PageProvider = ({ children }: { children: React.ReactNode }) => {
     queryFn: async () => {
       const res = await axiosInstance.get("/api/pages/me");
       return res.data;
-    },
+    }
   });
 
   // Lấy thông tin page theo ID
@@ -56,7 +57,7 @@ export const PageProvider = ({ children }: { children: React.ReactNode }) => {
       const res = await axiosInstance.get(`/api/pages/${selectedPageId}`);
       return res.data;
     },
-    enabled: !!selectedPageId,
+    enabled: !!selectedPageId
   });
 
   // Mutation để đăng ký trang
@@ -67,7 +68,7 @@ export const PageProvider = ({ children }: { children: React.ReactNode }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["pages"]); // Refresh lại danh sách trang
-    },
+    }
   });
 
   const registerPage = async (data: Page) => {
@@ -85,7 +86,15 @@ export const PageProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <PageContext.Provider
-      value={{ pages, myPages, page, isLoading, registerPage, getPageById, revalidatePages }}
+      value={{
+        pages,
+        myPages,
+        page,
+        isLoading,
+        registerPage,
+        getPageById,
+        revalidatePages
+      }}
     >
       {children}
     </PageContext.Provider>

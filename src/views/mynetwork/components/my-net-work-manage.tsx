@@ -3,30 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Users, LayoutGrid } from "lucide-react";
-import { useConnections } from "@/views/mynetwork/hooks/use-connections";
-import { useState } from "react";
-import { usePages } from "@/providers/page-provider";
+import { useAuth } from "@/providers/auth-provider";
 
 const MyNetworkManage = () => {
   const currentPath = usePathname();
-  const [params, setParams] = useState({
-    page: 1,
-    limit: 10,
-    search: ""
-  });
-  const { data: connetions = [] } = useConnections(params);
-  const { pages } = usePages();
+  const { user } = useAuth();
+  console.log("user:", user);
   const menuItems = [
     {
       icon: <Users className="w-5 h-5" />,
       label: "Kết nối",
-      count: connetions.length,
+      count: user?.total_connections || 0,
       path: "connections"
     },
     {
       icon: <LayoutGrid className="w-5 h-5" />,
       label: "Trang",
-      count: pages?.meta.itemCount,
+      count: user?.total_followings || 0,
       path: "pages"
     }
   ];

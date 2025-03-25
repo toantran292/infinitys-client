@@ -25,7 +25,7 @@ export const Header = () => {
     { label: "Bài tập", href: "/problems", icon: BookIcon },
     { label: "Việc làm", href: "/jobs", icon: BriefcaseIcon },
     { label: "Nhắn tin", href: "/chat", icon: MessageSquareIcon },
-    {label: "Mạng lưới", href: "/mynetwork", icon: Users},
+    { label: "Mạng lưới", href: "/mynetwork", icon: Users },
     {
       label: "Thông báo",
       href: "#",

@@ -17,6 +17,7 @@ import {
   PeopleTab as NewPeopleTab
 } from "./components/tabs";
 import { useAuth } from "@/providers/auth-provider";
+import FollowButton from "@/components/ui/FollowButton";
 
 export default function PagesIdComponent() {
   const { user } = useAuth();
@@ -30,7 +31,6 @@ export default function PagesIdComponent() {
       axiosInstance.get(`/api/pages/${id}`).then((res) => res.data),
     enabled: !!id
   });
-  console.log(page);
 
   const isAdmin = useMemo(() => {
     return page?.admin_user_id === user?.id;
@@ -63,9 +63,7 @@ export default function PagesIdComponent() {
         <PageHeader page={page}>
           {!isAdmin && (
             <div className="flex gap-2 mt-4">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                + Theo dõi
-              </Button>
+              <FollowButton pageId={page.id} isFollowing={page.isFollowing} />
               <Button variant="outline">Nhắn tin</Button>
             </div>
           )}

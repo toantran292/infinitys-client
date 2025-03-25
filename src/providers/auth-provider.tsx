@@ -37,6 +37,11 @@ type User = {
   avatar?: {
     url: string;
   };
+  followsPage: {
+    pageId: string;
+  };
+  total_followings: number;
+  total_connections: number;
 };
 
 type Context = {
