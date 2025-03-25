@@ -5,7 +5,6 @@ import axiosInstance from "@/lib/axios";
 import { PostList } from "@/views/profile/components/post-list";
 import ArtDecordProfileCard from "./components/art-decord-profile-card";
 import { Profile } from "@/types/job";
-import { Button } from "@/components/ui/button";
 
 interface ProfilePageProps {
   userId: string;
