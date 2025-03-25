@@ -1,18 +1,14 @@
-import { Profile } from "../profile";
 import { Button } from "@/components/ui/button";
-import { MapPin, Mail, Pencil, X } from "lucide-react";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { MapPin, Mail, Pencil } from "lucide-react";
 import Image from "next/image";
 import { UserUploadType, useUserUpload } from "../hooks/use-user-upload";
 import { ProfileAvatarComponent } from "./profile-avatar";
 import { toast } from "sonner";
 import { useAuth } from "@/providers/auth-provider";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { EditProfileDialog } from "./edit-profile-dialog";
-
+import { useCreateConversation } from "@/hooks/use-create-conversation";
+import { Profile } from "@/types/job";
 interface ArtDecordProfileCardProps {
     data: Profile;
     isEditable?: boolean;
@@ -20,6 +16,7 @@ interface ArtDecordProfileCardProps {
 
 export const ArtDecordProfileCard = ({ data, isEditable = false }: ArtDecordProfileCardProps) => {
     const { refetchUser, user } = useAuth();
+    const { createUserUser } = useCreateConversation();
     const [isEditing, setIsEditing] = useState(false);
 
     const { action: uploadAvatar } = useUserUpload({
@@ -50,6 +47,12 @@ export const ArtDecordProfileCard = ({ data, isEditable = false }: ArtDecordProf
         console.log('Updated data:', updatedData);
         setIsEditing(false);
     };
+
+    const handleCreateConversation = () => {
+        if (data.friend_status === "friend") {
+            createUserUser.mutate({ userId: data.id });
+        }
+    }
 
     return (
         <div className="w-full bg-white rounded-xl shadow-sm overflow-hidden">
@@ -147,10 +150,11 @@ export const ArtDecordProfileCard = ({ data, isEditable = false }: ArtDecordProf
                 {/* Action Buttons */}
                 {user?.id !== data.id && (
                     <div className="mt-4 flex gap-2">
-                        <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+                        <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                        >
                             {data.friend_status === "friend" ? "Bạn bè" : "Kết nối"}
                         </Button>
-                        <Button variant="outline" className="flex-1 font-semibold">
+                        <Button variant="outline" className="flex-1 font-semibold" onClick={handleCreateConversation}>
                             Nhắn tin
                         </Button>
                         <Button variant="outline" size="icon">

@@ -1,60 +1,79 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+'use client'
 
-interface ChatContextType {
+import { createContext, useContext, useEffect, useState } from "react";
+import { io, Socket } from "socket.io-client";
+
+type ChatContextType = {
     socket: Socket | null;
-    isConnected: boolean;
+    connect: (userId: string, accessToken: string) => void;
+    joinConversation: (conversationId: string) => void;
+    sendMessage: (payload: {
+        conversationId: string;
+        content: string;
+        pageId?: string;
+    }) => void;
+    onNewMessage: (callback: (data: any) => void) => void,
+    onConversationUpdate: (callback: (data: any) => void) => void,
 }
 
-const ChatContext = createContext<ChatContextType>({
-    socket: null,
-    isConnected: false,
-});
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:20250/chats';
 
-export const useChat = () => {
-    return useContext(ChatContext);
-};
+const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
-interface ChatProviderProps {
-    children: React.ReactNode;
-}
-
-export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
+export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     const [socket, setSocket] = useState<Socket | null>(null);
-    const [isConnected, setIsConnected] = useState(false);
 
-    const _handleClientEvent = (event: string) => {
+    const connect = (userId: string, token: string) => {
+        const s = io(SOCKET_URL, {
+            auth: {
+                userId,
+                token
+            }
+        })
+
+        setSocket(s);
+    }
+
+    const joinConversation = (conversationId: string) => {
+        socket?.emit('join_conversation', conversationId);
+    }
+
+    const sendMessage = (payload: {
+        conversationId: string;
+        content: string;
+        pageId?: string;
+    }) => {
+        socket?.emit('send_message', payload);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const onNewMessage = (callback: (data: any) => void) => {
+        socket?.on('new_message', callback);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const onConversationUpdate = (callback: (data: any) => void) => {
+        socket?.on('conversation_updated', callback);
     }
 
     useEffect(() => {
-        // Initialize socket connection
-        const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001', {
-            autoConnect: true,
-            withCredentials: true,
-        });
+        return (() => {
+            socket?.disconnect();
+        })
+    }, [socket]);
 
-        newSocket.on('connect', () => {
-            setIsConnected(true);
-        });
-
-        newSocket.on('disconnect', () => {
-            setIsConnected(false);
-        });
-
-        setSocket(newSocket);
-
-        // Cleanup on unmount
-        return () => {
-            newSocket.close();
-        };
-    }, []);
+    return (
+        <ChatContext.Provider value={{ socket, connect, joinConversation, sendMessage, onNewMessage, onConversationUpdate }}>
+            {children}
+        </ChatContext.Provider>
+    )
+}
 
 
+export const useChat = () => {
+    const context = useContext(ChatContext);
+    if (!context) throw new Error('useChat must be used within a ChatProvider')
 
-    const value = {
-        socket,
-        isConnected,
-    };
-
-    return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
-}; 
+    return context;
+}
