@@ -20,8 +20,13 @@ export function JobsTab({ pageId }: JobsTabProps) {
   }, [pageId]);
 
   const { data: response, isLoading } = useQuery<JobPostResponse>({
-    queryKey: ['page-jobs', pageId, currentPage],
-    queryFn: () => axiosInstance.get(`/api/recruitment-posts/page/${pageId}?page=${currentPage}&take=${take}`).then(res => res.data),
+    queryKey: ["page-jobs", pageId, currentPage],
+    queryFn: () =>
+      axiosInstance
+        .get(
+          `/api/recruitment-posts/page/${pageId}?page=${currentPage}&take=${take}`
+        )
+        .then((res) => res.data),
     enabled: !!pageId, // Auto fetch when pageId is available
     staleTime: 0, // Always fetch fresh data when tab is selected
     refetchOnMount: true // Refetch when component mounts (tab is selected)
@@ -63,7 +68,7 @@ export function JobsTab({ pageId }: JobsTabProps) {
 
     // Add dots after first page if needed
     if (startPage > 2) {
-      pageNumbers.push('...');
+      pageNumbers.push("...");
     }
 
     // Add middle pages
@@ -73,7 +78,7 @@ export function JobsTab({ pageId }: JobsTabProps) {
 
     // Add dots before last page if needed
     if (endPage < totalPages - 1) {
-      pageNumbers.push('...');
+      pageNumbers.push("...");
     }
 
     // Always show last page if there is more than one page
@@ -114,10 +119,10 @@ export function JobsTab({ pageId }: JobsTabProps) {
     <div className="bg-white p-6 rounded-lg shadow-md">
       <div className="space-y-4">
         {jobs.map((job) => {
-          const timeAgo = new Date(job.createdAt).toLocaleDateString('vi-VN', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
+          const timeAgo = new Date(job.createdAt).toLocaleDateString("vi-VN", {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
           });
 
           return (
@@ -125,13 +130,18 @@ export function JobsTab({ pageId }: JobsTabProps) {
               <div className="p-4 hover:bg-accent cursor-pointer flex gap-4 border rounded-lg">
                 <div className="flex-1">
                   <h3 className="font-medium text-primary">{job.title}</h3>
-                  <p className="text-sm text-muted-foreground">{job.location}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {job.location}
+                  </p>
                   <div className="flex items-center gap-2 mt-2">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${job.active
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-red-100 text-red-700'
-                      }`}>
-                      {job.active ? 'Đang tuyển' : 'Ngừng tuyển'}
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full ${
+                        job.active
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {job.active ? "Đang tuyển" : "Ngừng tuyển"}
                     </span>
                     <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
                       {job.workType}
@@ -139,7 +149,9 @@ export function JobsTab({ pageId }: JobsTabProps) {
                     <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
                       {job.jobType}
                     </span>
-                    <span className="text-xs text-muted-foreground">• {timeAgo}</span>
+                    <span className="text-xs text-muted-foreground">
+                      • {timeAgo}
+                    </span>
                   </div>
                 </div>
                 <Button variant="outline" className="self-center">
@@ -156,9 +168,15 @@ export function JobsTab({ pageId }: JobsTabProps) {
             <p className="text-sm text-gray-700">
               {total > 0 ? (
                 <>
-                  Hiển thị <span className="font-medium">{(currentPage - 1) * take + 1}</span> đến{" "}
-                  <span className="font-medium">{Math.min(currentPage * take, total)}</span> trong{" "}
-                  <span className="font-medium">{total}</span> kết quả
+                  Hiển thị{" "}
+                  <span className="font-medium">
+                    {(currentPage - 1) * take + 1}
+                  </span>{" "}
+                  đến{" "}
+                  <span className="font-medium">
+                    {Math.min(currentPage * take, total)}
+                  </span>{" "}
+                  trong <span className="font-medium">{total}</span> kết quả
                 </>
               ) : (
                 "Không có kết quả nào"
@@ -175,8 +193,8 @@ export function JobsTab({ pageId }: JobsTabProps) {
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <div className="flex items-center gap-1">
-              {getPageNumbers().map((pageNumber, index) => (
-                pageNumber === '...' ? (
+              {getPageNumbers().map((pageNumber, index) =>
+                pageNumber === "..." ? (
                   <span key={`dots-${index}`} className="px-2">
                     {pageNumber}
                   </span>
@@ -191,7 +209,7 @@ export function JobsTab({ pageId }: JobsTabProps) {
                     {pageNumber}
                   </Button>
                 )
-              ))}
+              )}
             </div>
             <Button
               variant="outline"

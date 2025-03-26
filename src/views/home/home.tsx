@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { ProtectedRouteLayout } from "@/components/layouts";
 import CreatePost from "@/components/post/create-post";
@@ -10,13 +10,17 @@ import { LeftSideInfo } from "@/components/home/LeftSideInfo";
 import { StatsCard } from "@/components/home/StatsCard";
 
 const getNewsfeed = async () => {
-  const response = await axiosInstance.get('api/posts/newsfeed');
+  const response = await axiosInstance.get("api/posts/newsfeed");
   return response.data;
 };
 
 export const HomeComponent = () => {
-  const { data: posts, isLoading, error } = useQuery({
-    queryKey: ['posts'],
+  const {
+    data: posts,
+    isLoading,
+    error
+  } = useQuery({
+    queryKey: ["posts"],
     queryFn: getNewsfeed
   });
 

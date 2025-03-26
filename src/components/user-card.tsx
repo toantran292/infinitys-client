@@ -2,7 +2,10 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { FC } from "react";
 import Link from "next/link";
-import { useCreateGroupChat, useGetGroupChatbyMembersIds } from "@/views/chat-id/hooks";
+import {
+  useCreateGroupChat,
+  useGetGroupChatbyMembersIds
+} from "@/views/chat-id/hooks";
 import { useRouter } from "next/navigation";
 const textButton = {
   sent: "Hủy lời mởi",
@@ -24,7 +27,11 @@ export const UserCard: FC<{
       <Link href={`/profile/${user.id}`}>
         <div className="flex gap-4 items-center">
           <Avatar className="w-20 h-20">
-            <AvatarImage className="object-cover" src={user.avatar?.url || "https://github.com/shadcn.png"} alt="avartar" />
+            <AvatarImage
+              className="object-cover"
+              src={user.avatar?.url || "https://github.com/shadcn.png"}
+              alt="avartar"
+            />
           </Avatar>
 
           <div className="space-y-2">
@@ -37,16 +44,16 @@ export const UserCard: FC<{
       <div className="flex gap-2 w-full">
         {(["sent", "waiting"].includes(user.friend_status ?? "") ||
           !user.friend_status) && (
-            <Button
-              variant="default"
-              className="w-full bg-neutral-500 text-white hover:bg-neutral-600"
-              onClick={onFriendRequest}
-            >
-              {!user.friend_status
-                ? "Kết bạn"
-                : textButton[user.friend_status as "sent" | "waiting"]}
-            </Button>
-          )}
+          <Button
+            variant="default"
+            className="w-full bg-neutral-500 text-white hover:bg-neutral-600"
+            onClick={onFriendRequest}
+          >
+            {!user.friend_status
+              ? "Kết bạn"
+              : textButton[user.friend_status as "sent" | "waiting"]}
+          </Button>
+        )}
 
         {user.friend_status === "waiting" && (
           <Button
@@ -82,7 +89,6 @@ export const UserCard: FC<{
         >
           Nhắn tin
         </Button>
-
       </div>
     </div>
   );

@@ -22,7 +22,8 @@ export function ChatList({ messages }: ChatListProps) {
       <ChatMessageList>
         <AnimatePresence>
           {messages?.map((message, index) => {
-            const isSentByMe = getMessageVariant(user?.id, message.user.id) === "sent";
+            const isSentByMe =
+              getMessageVariant(user?.id, message.user.id) === "sent";
             return (
               <motion.div
                 key={message.id || index}
@@ -46,8 +47,13 @@ export function ChatList({ messages }: ChatListProps) {
               >
                 {!isSentByMe && (
                   <Avatar className="h-9 w-9 mt-5">
-                    <AvatarImage className="object-cover" src={message.user.avatar?.url || ""} />
-                    <AvatarFallback className="bg-gray-500 text-white">{message.user?.firstName?.[0]}</AvatarFallback>
+                    <AvatarImage
+                      className="object-cover"
+                      src={message.user.avatar?.url || ""}
+                    />
+                    <AvatarFallback className="bg-gray-500 text-white">
+                      {message.user?.firstName?.[0]}
+                    </AvatarFallback>
                   </Avatar>
                 )}
                 <div
@@ -57,7 +63,9 @@ export function ChatList({ messages }: ChatListProps) {
                   )}
                 >
                   {!isSentByMe && (
-                    <span className="text-xs text-gray-600 mb-1">{message.user.firstName} {message.user.lastName}</span>
+                    <span className="text-xs text-gray-600 mb-1">
+                      {message.user.firstName} {message.user.lastName}
+                    </span>
                   )}
                   <div
                     className={cn(
@@ -71,7 +79,7 @@ export function ChatList({ messages }: ChatListProps) {
                   </div>
                   {message.createdAt && (
                     <span className="text-[11px] text-gray-500 mt-1">
-                      {format(new Date(message.createdAt), 'h:mm aa')}
+                      {format(new Date(message.createdAt), "h:mm aa")}
                     </span>
                   )}
                 </div>

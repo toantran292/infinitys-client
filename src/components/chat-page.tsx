@@ -6,7 +6,10 @@ import ChatBottomBar from "@/components/ui/chat/chat-bottombar";
 import { memo, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "@/providers/auth-provider";
-import { useGetGroupChatMessage, useGetGroupChats } from "@/views/chat-id/hooks";
+import {
+  useGetGroupChatMessage,
+  useGetGroupChats
+} from "@/views/chat-id/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGroupChat } from "@/providers/group-chat-provider";
 export interface Profile {
@@ -90,7 +93,7 @@ const ChatPage = ({ groupChatId }: ChatPageProps) => {
       setMessages((prev) => [...prev, data]);
     });
 
-    newSocket.on("joined_room", () => { });
+    newSocket.on("joined_room", () => {});
 
     newSocket.on("notifications", (data) => {
       console.log({ notification_data: data });

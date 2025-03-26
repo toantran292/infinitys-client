@@ -1,14 +1,10 @@
 import { ProtectedRouteLayout } from "@/components/layouts";
-import {
-  ResizablePanel,
-  ResizablePanelGroup
-} from "@/components/ui/resizable";
+import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import ChatSidebar from "@/components/ui/chat/chat-sidebar";
 import ChatPage from "@/components/chat-page";
 import React from "react";
 import { GroupChatProvider } from "@/providers/group-chat-provider";
 import NewChatPage from "@/components/new-chat-page";
-
 
 export interface ChatIdViewProps {
   groupChatId?: string;
@@ -19,7 +15,6 @@ export const ChatIdView = ({
   groupChatId,
   defaultLayout = [50, 200]
 }: ChatIdViewProps) => {
-
   return (
     <GroupChatProvider>
       <ProtectedRouteLayout sectionClassName="bg-gray-50 h-[calc(100vh-72px)] w-full overflow-hidden">

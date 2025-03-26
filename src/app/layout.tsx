@@ -36,9 +36,7 @@ export default function RootLayout({
           <AuthProvider>
             <NotificationProvider>
               <ChatProvider>
-                <main className="flex-1 relative">
-                  {children}
-                </main>
+                <main className="flex-1 relative">{children}</main>
               </ChatProvider>
               <Toaster richColors closeButton />
             </NotificationProvider>

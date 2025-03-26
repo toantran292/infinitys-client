@@ -1,7 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious
+} from "@/components/ui/carousel";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
 import { useRouter } from "next/navigation";
@@ -20,7 +26,7 @@ interface Post {
 }
 
 const getPosts = async (): Promise<Post[]> => {
-  const response = await axiosInstance.get('api/posts/me');
+  const response = await axiosInstance.get("api/posts/me");
   return response.data;
 };
 
@@ -30,14 +36,17 @@ interface PostListProps {
 
 export const PostList = ({ showAll = false }: PostListProps) => {
   const router = useRouter();
-  const { data: posts, isLoading, error } = useQuery({
-    queryKey: ['posts'],
-    queryFn: getPosts,
+  const {
+    data: posts,
+    isLoading,
+    error
+  } = useQuery({
+    queryKey: ["posts"],
+    queryFn: getPosts
   });
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading posts</div>;
-
 
   if (showAll) {
     return (
@@ -55,7 +64,7 @@ export const PostList = ({ showAll = false }: PostListProps) => {
         className="w-full max-w-[850px] mx-auto relative"
         opts={{
           align: "start",
-          slidesToScroll: 1,
+          slidesToScroll: 1
         }}
       >
         <CarouselContent className="-ml-2 md:-ml-4">
@@ -72,10 +81,10 @@ export const PostList = ({ showAll = false }: PostListProps) => {
       <Button
         variant="outline"
         className="w-full mt-2 border-gray-200"
-        onClick={() => router.push('/activity')}
+        onClick={() => router.push("/activity")}
       >
         Hiển thị tất cả bài viết
       </Button>
     </div>
   );
-}
+};

@@ -3,6 +3,7 @@ export type Conversation = {
   name: string;
   createdAt: string;
   updatedAt: string;
+  isGroup: boolean;
   isUnread: boolean;
   lastMessage: {
     content: string;
@@ -11,7 +12,7 @@ export type Conversation = {
   participants: {
     user?: {
       id: string;
-      name: string;
+      fullName: string;
       avatar: {
         url: string;
       };
@@ -23,5 +24,5 @@ export type Conversation = {
         url: string;
       };
     };
-  };
+  }[];
 };

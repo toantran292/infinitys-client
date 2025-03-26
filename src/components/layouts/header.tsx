@@ -1,11 +1,17 @@
 "use client";
 import { UserMenu } from "@/components/layouts/user-menu";
 import { SearchBar } from "@/components/ui/search-bar";
-import { BellIcon, BookIcon, HomeIcon, MessageSquareIcon, BriefcaseIcon } from "lucide-react";
+import {
+  BellIcon,
+  BookIcon,
+  HomeIcon,
+  MessageSquareIcon,
+  BriefcaseIcon
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { NotificationBell } from '@/components/notification';
-import { useNotification } from '@/contexts/NotificationContext';
+import { NotificationBell } from "@/components/notification";
+import { useNotification } from "@/contexts/NotificationContext";
 import Link from "next/link";
 
 export const Header = () => {
@@ -24,7 +30,12 @@ export const Header = () => {
       icon: BellIcon,
       onClick: () => setIsOpenNotification(!isOpenNotification),
       badge: unreadCount > 0 ? unreadCount : null,
-      component: <NotificationBell isOpen={isOpenNotification} setIsOpen={setIsOpenNotification} />
+      component: (
+        <NotificationBell
+          isOpen={isOpenNotification}
+          setIsOpen={setIsOpenNotification}
+        />
+      )
     }
   ];
 
@@ -47,10 +58,7 @@ export const Header = () => {
           {dataButtons.map((button, index) => {
             const Icon = button.icon;
             return (
-              <div
-                key={button.label}
-                className="relative"
-              >
+              <div key={button.label} className="relative">
                 {button.href !== "#" ? (
                   <Link href={button.href}>
                     <button
