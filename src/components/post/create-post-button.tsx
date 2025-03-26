@@ -8,9 +8,7 @@ import axiosInstance from "@/lib/axios";
 import { toast } from "sonner";
 import { useState, useRef } from "react";
 import TiptapEditor from "./editor-component";
-import { UserUploadType } from "@/views/profile/hooks/use-user-upload";
 import { PostUploadType } from "./hooks/usePostUpload";
-import { usePostUpload } from "./hooks/usePostUpload";
 import { useS3Upload } from "@/hooks/use-s3-upload";
 
 const useCreatePost = () => {

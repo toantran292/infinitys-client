@@ -44,6 +44,7 @@ const TiptapEditor = ({ content, setContent, filesRef }: { content: string, setC
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
+        console.log(files);
         if (files && files.length > 0) {
             const newImages = Array.from(files).map(file => URL.createObjectURL(file));
             setSelectedImages(prev => [...prev, ...newImages]);
