@@ -2,14 +2,11 @@ import { useRouter } from "next/navigation";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Check, X } from "lucide-react";
-import {
-  useRejectFriendRequest,
-  useFriendRequest
-} from "@/views/chat-id/hooks";
 import { toast } from "sonner";
+import useFriend from "@/hooks/use-friend";
 
 interface FriendRequestToastProps {
-  t: any;
+  t: typeof toast;
   id: string;
   avatar: string;
   firstName: string;
@@ -29,19 +26,25 @@ export const FriendRequestToast = ({
 }: FriendRequestToastProps) => {
   const router = useRouter();
 
-  const { friendRequest } = useFriendRequest({
-    onSuccess: () => {
-      toast.success("Đã gửi lời mời kết bạn");
-      toast.dismiss(t);
-    }
-  });
+  const { acceptFriendRequest, cancelFriendRequest } = useFriend();
 
-  const { rejectFriendRequest } = useRejectFriendRequest({
-    onSuccess: () => {
-      toast.success("Đã từ chối lời mời kết bạn");
-      toast.dismiss(t);
-    }
-  });
+  const handleAcceptFriendRequest = () => {
+    acceptFriendRequest.mutate({ userId: id }, {
+      onSuccess: () => {
+        toast.success("Đã gửi lời mời kết bạn");
+        toast.dismiss(t);
+      }
+    });
+  }
+
+  const handleCancelFriendRequest = () => {
+    cancelFriendRequest.mutate({ userId: id }, {
+      onSuccess: () => {
+        toast.success("Đã hủy lời mời kết bạn");
+        toast.dismiss(t);
+      }
+    });
+  }
 
   return (
     <div className="flex flex-col gap-2 bg-white p-4 rounded-lg shadow-md w-[356px] min-w-[356px] cursor-pointer">
@@ -68,9 +71,7 @@ export const FriendRequestToast = ({
           <Button
             className="flex-1 bg-[#0a66c2] text-white hover:bg-[#004182] hover:text-white"
             variant="outline"
-            onClick={() => {
-              friendRequest({ userId: id, friend_status: "waiting" });
-            }}
+            onClick={handleAcceptFriendRequest}
           >
             <Check className="w-4 h-4" />
             <span className="ml-2">Chấp nhận</span>
@@ -78,20 +79,19 @@ export const FriendRequestToast = ({
           <Button
             className="flex-1 bg-white text-[#666666] border-[#666666] hover:bg-gray-100"
             variant="outline"
-            onClick={() => {
-              rejectFriendRequest({ userId: id });
-            }}
+            onClick={handleCancelFriendRequest}
           >
             <X className="w-4 h-4" />
             <span className="ml-2">Từ chối</span>
           </Button>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 
-export const ReactToast = ({ reacter, target, t }: any) => {
+export const ReactToast = ({ reacter, target, t }: { reacter: any, target: any, t: typeof toast }) => {
   const router = useRouter();
   return (
     <div className="flex flex-col gap-2 bg-white p-4 rounded-lg shadow-md w-[356px] min-w-[356px] cursor-pointer">
@@ -140,7 +140,7 @@ export const ReactToast = ({ reacter, target, t }: any) => {
   );
 };
 
-export const CommentToast = ({ commenter, content, t }: any) => {
+export const CommentToast = ({ commenter, content, t }: { commenter: any, content: string, t: typeof toast }) => {
   return (
     <div className="flex flex-col gap-2 bg-white p-4 rounded-lg shadow-md w-[356px] min-w-[356px] cursor-pointer">
       <div className="flex items-center gap-2">

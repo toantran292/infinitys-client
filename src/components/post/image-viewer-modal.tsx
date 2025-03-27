@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, ThumbsUp, MessageCircle } from "lucide-react";
@@ -26,6 +27,9 @@ interface ImageViewerModalProps {
   onPrevImage: () => void;
   post: any;
   getTimeAgo: (date: string) => string;
+  onLikePost: () => void;
+  onSubmitComment: () => void;
+  reactStatus: any;
 }
 
 export const ImageViewerModal = ({
@@ -36,66 +40,13 @@ export const ImageViewerModal = ({
   onNextImage,
   onPrevImage,
   post,
-  getTimeAgo
+  getTimeAgo,
+  onLikePost = () => undefined,
+  onSubmitComment = () => undefined,
+  reactStatus
 }: ImageViewerModalProps) => {
-  const [showComments, setShowComments] = useState(false);
-  const [isLikeAnimating, setIsLikeAnimating] = useState(false);
   const queryClient = useQueryClient();
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
-
-  const { data: reactStatus } = useQuery({
-    queryKey: ["react", post.id],
-    queryFn: async () => {
-      const response = await axiosInstance.post(`/api/reacts/${post.id}`, {
-        targetId: post.id,
-        targetType: "posts"
-      });
-      return response.data;
-    }
-  });
-
-  const { mutate: likePost } = useMutation({
-    mutationFn: async () => {
-      await axiosInstance.post(`/api/reacts`, {
-        targetId: post.id,
-        targetType: "posts"
-      });
-    },
-    onSuccess: () => {
-      setIsLikeAnimating(true);
-      setTimeout(() => setIsLikeAnimating(false), 1000);
-
-      queryClient.setQueryData(["posts"], (oldData: any[] | undefined) => {
-        if (!oldData) return oldData;
-        return oldData.map((p) => {
-          if (p.id === post.id) {
-            return {
-              ...p,
-              is_reacted: !reactStatus?.isActive,
-              react_count: reactStatus?.isActive
-                ? p.react_count - 1
-                : p.react_count + 1
-            };
-          }
-          return p;
-        });
-      });
-
-      queryClient.setQueryData(["react", post.id], (old: any) => ({
-        isActive: !old?.isActive
-      }));
-
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
-      queryClient.invalidateQueries({ queryKey: ["react", post.id] });
-    }
-  });
-
-  const handleCommentClick = () => {
-    setShowComments(true);
-    setTimeout(() => {
-      commentInputRef.current?.focus();
-    }, 0);
-  };
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -123,7 +74,7 @@ export const ImageViewerModal = ({
   }, [
     isOpen,
     currentImageIndex,
-    images?.length,
+    images,
     onPrevImage,
     onNextImage,
     onClose
@@ -212,7 +163,7 @@ export const ImageViewerModal = ({
                 <Button
                   className={`text-sm flex items-center gap-1 flex-1 ${reactStatus?.isActive ? "bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700" : ""}`}
                   variant="ghost"
-                  onClick={() => likePost()}
+                  onClick={() => onLikePost()}
                 >
                   <ThumbsUp
                     size={16}
@@ -223,7 +174,6 @@ export const ImageViewerModal = ({
                 <Button
                   className="text-sm flex items-center gap-1 flex-1"
                   variant="ghost"
-                  onClick={handleCommentClick}
                 >
                   <MessageCircle size={16} />
                   Bình luận
@@ -237,6 +187,7 @@ export const ImageViewerModal = ({
                 inputRef={
                   commentInputRef as React.RefObject<HTMLTextAreaElement>
                 }
+                onSubmitComment={onSubmitComment}
               />
             </div>
           </div>

@@ -12,6 +12,7 @@ export const PostContent = ({ content }: PostContentProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [StarterKit],
     content: content,
     editable: false

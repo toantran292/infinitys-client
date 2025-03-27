@@ -1,5 +1,5 @@
 "use client";
-import { SearchPage } from "@/components/search-page";
+import { SearchPage } from "@/views/search/search-page";
 import { useSearchParams } from "next/navigation";
 
 export default function Page() {

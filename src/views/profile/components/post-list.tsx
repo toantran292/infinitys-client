@@ -10,10 +10,10 @@ import {
 } from "@/components/ui/carousel";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { PostCard } from "@/components/post/post-card";
 import { Profile } from "../types";
-
+import { useAuth } from "@/providers/auth-provider";
 interface Post {
   id: string;
   content: string;
@@ -25,8 +25,8 @@ interface Post {
   is_reacted: boolean;
 }
 
-const getPosts = async (): Promise<Post[]> => {
-  const response = await axiosInstance.get("api/posts/me");
+const getPosts = async (id: string | undefined): Promise<Post[]> => {
+  const response = await axiosInstance.get(`api/posts/user/${id}`);
   return response.data;
 };
 
@@ -35,6 +35,7 @@ interface PostListProps {
 }
 
 export const PostList = ({ showAll = false }: PostListProps) => {
+  const { id } = useParams();
   const router = useRouter();
   const {
     data: posts,
@@ -42,7 +43,9 @@ export const PostList = ({ showAll = false }: PostListProps) => {
     error
   } = useQuery({
     queryKey: ["posts"],
-    queryFn: getPosts
+    queryFn: () => getPosts(id as string),
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000
   });
 
   if (isLoading) return <div>Loading...</div>;

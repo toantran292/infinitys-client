@@ -1,22 +1,22 @@
-import { useState, useEffect, useRef } from "react";
-import ConversationList from "./ConversationList";
-import ConversationCurrent from "./ConversationCurrent";
-import { Conversation } from "@/types/conversation";
+import { useEffect, useRef } from "react";
 import { useAuth } from "@/providers/auth-provider";
 import { useChat } from "@/contexts/ChatContext";
 import { ResizablePanelGroup } from "@/components/ui/resizable";
+import ConversationList from "./ConversationList";
+import ConversationCurrent from "./ConversationCurrent";
+import { useParams, useRouter } from "next/navigation";
+import ConversationNew from "./ConversationNew";
 
 type Props = {
-  isPageView?: boolean;
-  pageId?: string;
+  isChatNew?: boolean;
 };
 
-export default function ChatLayout({ isPageView = false, pageId }: Props) {
+export default function ChatLayout({ isChatNew = false }: Props) {
+  const { id: conversationId, pageId } = useParams();
   const { user, accessToken } = useAuth();
-  const { connect, socket, joinConversation } = useChat();
-  const [activeConversation, setActiveConversation] =
-    useState<Conversation | null>(null);
+  const { connect, socket } = useChat();
   const isConnecting = useRef(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (!socket && user && accessToken && !isConnecting.current) {
@@ -29,18 +29,6 @@ export default function ChatLayout({ isPageView = false, pageId }: Props) {
     };
   }, [user, accessToken, connect, socket]);
 
-  useEffect(() => {
-    if (activeConversation && socket) {
-      joinConversation(activeConversation.id);
-
-      socket.emit("mark_as_read", {
-        conversationId: activeConversation.id,
-        userId: user?.id,
-        messageId: activeConversation?.lastMessage?.id
-      });
-    }
-  }, [socket, activeConversation, joinConversation, user?.id]);
-
   return (
     <ResizablePanelGroup
       direction="horizontal"
@@ -50,21 +38,22 @@ export default function ChatLayout({ isPageView = false, pageId }: Props) {
         {/* Sidebar */}
         <div className="w-80 border-r">
           <ConversationList
-            isPageView={isPageView}
-            pageId={pageId}
-            activeConversationId={activeConversation?.id}
-            onSelect={(conversation) => setActiveConversation(conversation)}
+            isPageView={pageId ? true : false}
+            pageId={pageId as string}
+            onSelect={(conversation) => {
+              router.push(`/${pageId ? `page-chat/${pageId}/` : "chat"}/${conversation.id}`);
+            }}
           />
         </div>
 
         {/* Chat Window */}
         <div className="flex-1 flex flex-col">
-          {activeConversation ? (
+          {isChatNew ? (
+            <ConversationNew />
+          ) : conversationId ? (
             <ConversationCurrent
-              isPageView={isPageView}
-              conversation={activeConversation}
-              conversationId={activeConversation.id}
-              pageId={pageId}
+              isPageView={pageId ? true : false}
+              pageId={pageId as string}
             />
           ) : (
             <div className="flex items-center justify-center h-full text-gray-400">

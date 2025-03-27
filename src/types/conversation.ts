@@ -6,6 +6,7 @@ export type Conversation = {
   isGroup: boolean;
   isUnread: boolean;
   lastMessage: {
+    id: string;
     content: string;
     createdAt: string;
   };

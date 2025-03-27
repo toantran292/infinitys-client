@@ -3,12 +3,15 @@ import { useChat } from "@/contexts/ChatContext";
 import axiosInstance from "@/lib/axios";
 import { useAuth } from "@/providers/auth-provider";
 import { Conversation } from "@/types/conversation";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useCallback } from "react";
+import { useInfiniteQuery, useQueryClient, useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useCallback, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, SquarePen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn, toVietnamDate } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export const useConversations = ({
   pageId,
@@ -44,6 +47,20 @@ export const useConversations = ({
   });
 };
 
+const useSearch = (query: string) => {
+  return useQuery({
+    queryKey: ['conversations', 'search', query],
+    queryFn: async () => {
+      if (!query) return null;
+      const res = await axiosInstance.get(`api/chats/search`, {
+        params: { q: query }
+      });
+      return res.data;
+    },
+    enabled: !!query
+  });
+};
+
 type Props = {
   isPageView?: boolean;
   pageId?: string;
@@ -51,7 +68,15 @@ type Props = {
   onSelect: (conversation: Conversation) => void;
 };
 
-const ConversationListHeader = (props: Props) => {
+const ConversationListHeader = ({ onSearch }: { onSearch: (value: string) => void }) => {
+  const router = useRouter();
+  const [input, setInput] = useState("");
+  const debouncedSearch = useDebounce(input, 300);
+
+  useEffect(() => {
+    onSearch(debouncedSearch);
+  }, [debouncedSearch, onSearch]);
+
   return (
     <div className="flex flex-col border-b">
       <div className="flex justify-between p-4 items-center">
@@ -60,7 +85,7 @@ const ConversationListHeader = (props: Props) => {
           variant="ghost"
           size="icon"
           className="h-8 w-8"
-          // onClick={() => router.push(`/chat/new`)}
+          onClick={() => router.push(`/chat/new`)}
         >
           <SquarePen className="size-6" />
         </Button>
@@ -73,8 +98,8 @@ const ConversationListHeader = (props: Props) => {
             type="text"
             placeholder="Tìm kiếm"
             className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-md text-sm focus:outline-none"
-            // value={search}
-            // onChange={(e) => setSearch(e.target.value)}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
           />
         </div>
       </div>
@@ -85,20 +110,33 @@ const ConversationListHeader = (props: Props) => {
 const ConversationListBody = (props: any) => {
   const {
     conversations,
-    activeConversationId,
     handleSelectConversation,
     isFetchingNextPage
   } = props;
+  const { id: conversationId } = useParams();
   const { user } = useAuth();
   const renderConversationItem = useCallback(
-    (conversation: any) => {
-      const participant = conversation.participants.find(
-        (p: any) => !p.user || p.user.id !== user?.id
-      );
-      const name =
-        participant?.page?.name || participant?.user?.fullName || "Unknown";
-      const avatar =
-        participant?.page?.avatarUrl || participant?.user?.avatar?.url;
+    (conversation: Conversation) => {
+      let name = "";
+      let avatar = "";
+
+      if (conversation.isGroup) {
+        if (conversation.name) {
+          name = conversation.name;
+        } else {
+          const participants = conversation.participants.sort((a: any, b: any) => b.user.createdAt - a.user.createdAt);
+          name = participants.slice(0, 3).map((p: any) => p.user.firstName).join(", ");
+          if (participants.length > 3) {
+            name += `, ...`;
+          }
+        }
+      } else {
+        const participant = conversation.participants.find(
+          (p: any) => !p.user || p.user.id !== user?.id
+        );
+        name = participant?.page?.name || participant?.user?.fullName || "Unknown";
+        avatar = participant?.page?.avatar?.url || participant?.user?.avatar?.url || "";
+      }
 
       return (
         <div
@@ -106,7 +144,7 @@ const ConversationListBody = (props: any) => {
           className={`flex items-center gap-3 p-3 cursor-pointer border-b 
                     hover:bg-gray-100 transition-colors relative
                     ${conversation.isUnread ? "bg-blue-50" : ""}
-                    ${activeConversationId === conversation.id ? "bg-gray-100" : ""}`}
+                    ${conversationId === conversation.id ? "bg-gray-100" : ""}`}
           onClick={() => handleSelectConversation(conversation)}
         >
           <div className="relative">
@@ -143,7 +181,7 @@ const ConversationListBody = (props: any) => {
         </div>
       );
     },
-    [user?.id, handleSelectConversation, activeConversationId]
+    [user?.id, handleSelectConversation, conversationId]
   );
   return (
     <div className="flex-1 overflow-y-auto">
@@ -158,18 +196,23 @@ const ConversationListBody = (props: any) => {
 export default function ConversationList({
   isPageView,
   pageId,
-  activeConversationId,
   onSelect
 }: Props) {
+  const { id: conversationId } = useParams();
   const queryClient = useQueryClient();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useConversations({ isPageView, pageId });
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data: searchResults, isLoading: isSearching } = useSearch(searchQuery);
+
   // Memoize conversations để tránh re-render không cần thiết
-  const conversations = useMemo(
-    () => data?.pages.flatMap((page) => page.items) ?? [],
-    [data?.pages]
-  );
+  const conversations = useMemo(() => {
+    if (searchQuery && searchResults) {
+      return searchResults;
+    }
+    return data?.pages.flatMap((page) => page.items) ?? [];
+  }, [data?.pages, searchQuery, searchResults]);
 
   const { onConversationUpdate } = useChat();
 
@@ -200,7 +243,7 @@ export default function ConversationList({
                 ...existingConv,
                 lastMessage: updated.lastMessage,
                 updatedAt: updated.updatedAt,
-                isUnread: activeConversationId !== updated.conversationId
+                isUnread: conversationId !== updated.conversationId
               };
             }
             return {
@@ -216,7 +259,7 @@ export default function ConversationList({
             id: updated.conversationId,
             lastMessage: updated.lastMessage,
             updatedAt: updated.updatedAt,
-            isUnread: activeConversationId !== updated.conversationId,
+            isUnread: conversationId !== updated.conversationId,
             participants: []
           };
 
@@ -245,7 +288,7 @@ export default function ConversationList({
     queryClient,
     pageId,
     isPageView,
-    activeConversationId
+    conversationId
   ]);
 
   // Xử lý infinite scroll
@@ -291,13 +334,24 @@ export default function ConversationList({
 
   return (
     <div className="w-full h-full overflow-y-auto" onScroll={handleScroll}>
-      <ConversationListHeader />
-      <ConversationListBody
-        conversations={conversations}
-        activeConversationId={activeConversationId}
-        handleSelectConversation={handleSelectConversation}
-        isFetchingNextPage={isFetchingNextPage}
-      />
+      <ConversationListHeader onSearch={setSearchQuery} />
+      {isSearching ? (
+        <div className="flex items-center justify-center p-4 text-gray-500">
+          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+          Đang tìm kiếm...
+        </div>
+      ) : (
+        <ConversationListBody
+          conversations={conversations}
+          handleSelectConversation={handleSelectConversation}
+          isFetchingNextPage={!searchQuery && isFetchingNextPage}
+        />
+      )}
+      {searchQuery && conversations.length === 0 && !isSearching && (
+        <div className="text-center py-4 text-gray-500">
+          Không tìm thấy kết quả
+        </div>
+      )}
     </div>
   );
 }

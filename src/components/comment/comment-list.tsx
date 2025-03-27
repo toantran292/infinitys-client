@@ -22,6 +22,7 @@ interface Comment {
 interface CommentSectionProps {
   postId: string;
   inputRef?: React.RefObject<HTMLTextAreaElement>;
+  onSubmitComment?: () => void;
 }
 
 const getComments = async (postId: string): Promise<Comment[]> => {
@@ -29,7 +30,7 @@ const getComments = async (postId: string): Promise<Comment[]> => {
   return response.data;
 };
 
-export const CommentSection = ({ postId, inputRef }: CommentSectionProps) => {
+export const CommentSection = ({ postId, inputRef, onSubmitComment = () => undefined }: CommentSectionProps) => {
   const [newComment, setNewComment] = useState("");
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
@@ -49,7 +50,7 @@ export const CommentSection = ({ postId, inputRef }: CommentSectionProps) => {
     onSuccess: () => {
       setNewComment("");
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      onSubmitComment();
     }
   });
 
