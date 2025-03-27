@@ -64,17 +64,16 @@ export function useS3Upload({
   ): Promise<PresignedUrlResponse[]> => {
     const actualPrefix = _prefix || prefix;
     try {
-      const fileInfos = files.map(file => ({
+      const fileInfos = files.map((file) => ({
         type,
         suffix: `${actualPrefix}/${Date.now()}-${String(file.name).trim().replace(/\s+/g, "-")}`
       }));
 
       console.log({ fileInfos });
 
-      const { data: presignedDataArray } = await axiosInstance.post<PresignedUrlResponse[]>(
-        `api/assets/presign-links`,
-        fileInfos
-      );
+      const { data: presignedDataArray } = await axiosInstance.post<
+        PresignedUrlResponse[]
+      >(`api/assets/presign-links`, fileInfos);
 
       if (!presignedDataArray?.length) {
         throw new S3UploadError("Không lấy được pre-signed URLs");
@@ -86,19 +85,17 @@ export function useS3Upload({
           method: "PUT",
           body: file,
           headers: {
-            "Content-Type": file.type,
+            "Content-Type": file.type
           },
-          credentials: 'omit'
+          credentials: "omit"
         });
       });
 
       const responses = await Promise.all(uploadPromises);
 
-      const failedUploads = responses.filter(response => !response.ok);
+      const failedUploads = responses.filter((response) => !response.ok);
       if (failedUploads.length > 0) {
-        throw new S3UploadError(
-          `${failedUploads.length} file upload thất bại`
-        );
+        throw new S3UploadError(`${failedUploads.length} file upload thất bại`);
       }
 
       onSuccess?.(presignedDataArray);

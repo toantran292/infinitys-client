@@ -4,8 +4,8 @@ import "./globals.css";
 import { QueryClientProviderWrapper } from "@/providers/query-client";
 import { AuthProvider } from "@/providers/auth-provider";
 import { Toaster } from "sonner";
-import { GroupChatProvider } from '@/providers/group-chat-provider';
 import { NotificationProvider } from "@/contexts/NotificationContext";
+import { ChatProvider } from "@/contexts/ChatContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,9 +35,9 @@ export default function RootLayout({
         <QueryClientProviderWrapper>
           <AuthProvider>
             <NotificationProvider>
-              <main className="flex-1 relative">
-                {children}
-              </main>
+              <ChatProvider>
+                <main className="flex-1 relative">{children}</main>
+              </ChatProvider>
               <Toaster richColors closeButton />
             </NotificationProvider>
           </AuthProvider>

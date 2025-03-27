@@ -1,7 +1,7 @@
 "use client";
 
-import { ChatIdView } from "@/views/chat-id";
+import ChatComponent from "@/views/chat/chat";
 
 export default function Page() {
-  return <ChatIdView />;
+  return <ChatComponent />;
 }

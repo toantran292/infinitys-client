@@ -1,3 +1,5 @@
+import { FriendStatus } from "./friend";
+
 export interface Avatar {
   id: string;
   url: string;
@@ -78,9 +80,10 @@ export interface Profile {
   desiredJobPosition?: string;
   fullName: string;
   posts: Post[];
-  friend_status: null | "sent" | "waiting" | "friend";
+  friendStatus: FriendStatus | null;
   avatar: Avatar;
   connections?: number;
+  totalConnections?: number;
 }
 
 export interface ApiResponse<T> {

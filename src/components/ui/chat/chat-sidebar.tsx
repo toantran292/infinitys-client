@@ -53,23 +53,29 @@ const ChatSideBarHeader = () => {
           />
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 
 const ChatSideBarBody = () => {
   const router = useRouter();
   const { groupChats } = useGroupChat();
-  const chatPreviews: ChatPreview[] = useMemo(() => (groupChats || []).map((chat) => {
-    const notGroupChat = chat.members?.length === 1;
-    return {
-      id: chat.id,
-      name: (notGroupChat ? chat.members?.[0]?.fullName : chat.name) || "Unnamed User",
-      avatar: (notGroupChat ? chat.members?.[0]?.avatar?.url : null) || "",
-      lastMessage: chat.lastMessage?.content || "No messages",
-      timestamp: new Date(chat.lastMessage?.createdAt || Date.now()),
-    }
-  }), [groupChats]);
+  const chatPreviews: ChatPreview[] = useMemo(
+    () =>
+      (groupChats || []).map((chat) => {
+        const notGroupChat = chat.members?.length === 1;
+        return {
+          id: chat.id,
+          name:
+            (notGroupChat ? chat.members?.[0]?.fullName : chat.name) ||
+            "Unnamed User",
+          avatar: (notGroupChat ? chat.members?.[0]?.avatar?.url : null) || "",
+          lastMessage: chat.lastMessage?.content || "No messages",
+          timestamp: new Date(chat.lastMessage?.createdAt || Date.now())
+        };
+      }),
+    [groupChats]
+  );
 
   console.log("chatPreviews - rerender");
 
@@ -84,7 +90,9 @@ const ChatSideBarBody = () => {
           <div className="relative">
             <Avatar className="h-12 w-12">
               <AvatarImage className="object-cover" src={chat.avatar} />
-              <AvatarFallback className="bg-gray-500 text-white">{chat.name}</AvatarFallback>
+              <AvatarFallback className="bg-gray-500 text-white">
+                {chat.name}
+              </AvatarFallback>
             </Avatar>
             {chat.isOnline && (
               <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white" />
@@ -96,13 +104,18 @@ const ChatSideBarBody = () => {
                 {chat.name}
               </h3>
               <span className="text-xs text-gray-500">
-                {formatDistanceToNow(chat.timestamp, { addSuffix: true, locale: vi })}
+                {formatDistanceToNow(chat.timestamp, {
+                  addSuffix: true,
+                  locale: vi
+                })}
               </span>
             </div>
-            <p className={cn(
-              "text-sm truncate",
-              chat.unread ? "text-gray-900 font-medium" : "text-gray-500"
-            )}>
+            <p
+              className={cn(
+                "text-sm truncate",
+                chat.unread ? "text-gray-900 font-medium" : "text-gray-500"
+              )}
+            >
               {chat.lastMessage}
             </p>
           </div>

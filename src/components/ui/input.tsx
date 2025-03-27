@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> { }
+  extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, ...props }, ref) => {
@@ -19,7 +19,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = "Input";
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> { }
+  extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 const InputForm = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, ...props }, ref) => {
@@ -39,4 +39,4 @@ const InputForm = React.forwardRef<HTMLInputElement, InputProps>(
 
 InputForm.displayName = "InputForm";
 
-export { Input, InputForm }; 
+export { Input, InputForm };

@@ -1,24 +1,56 @@
-'use client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 
 import { ProtectedRouteLayout } from "@/components/layouts";
 import CreatePost from "@/components/post/create-post";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
 import { PostCard } from "@/components/post/post-card";
 import { Loader } from "@/components/ui/Loader";
 import { LeftSideInfo } from "@/components/home/LeftSideInfo";
 import { StatsCard } from "@/components/home/StatsCard";
+import { useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
 
-const getNewsfeed = async () => {
-  const response = await axiosInstance.get('api/posts/newsfeed');
+const getNewsfeed = async ({ pageParam = null }) => {
+  const response = await axiosInstance.get("api/newsfeed", {
+    params: {
+      limit: 5,
+      lastId: pageParam
+    }
+  });
   return response.data;
 };
 
 export const HomeComponent = () => {
-  const { data: posts, isLoading, error } = useQuery({
-    queryKey: ['posts'],
-    queryFn: getNewsfeed
+  const { ref, inView } = useInView();
+
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteQuery({
+    queryKey: ["newfeeds"],
+    queryFn: getNewsfeed,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.hasMore) return undefined; // Nếu số lượng items < 5 thì không còn page tiếp theo
+      return lastPage.nextCursor; // Lấy id của post cuối cùng làm lastId
+    },
+    initialPageParam: null,
+    staleTime: 0
   });
+
+  // Tự động fetch page tiếp theo khi scroll đến cuối
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const allPosts = data?.pages.flatMap(page => page.items) ?? [];
 
   return (
     <ProtectedRouteLayout>
@@ -45,12 +77,30 @@ export const HomeComponent = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {posts?.map((post: any) => (
+                {allPosts.map((post: any) => (
                   <PostCard key={post.id} post={post} showAll={true} />
                 ))}
-                {posts?.length === 0 && (
+
+                {/* Loading indicator cho infinite scroll */}
+                <div ref={ref} className="py-4">
+                  {isFetchingNextPage && (
+                    <div className="flex justify-center">
+                      <Loader />
+                    </div>
+                  )}
+                </div>
+
+                {/* Hiển thị khi không có bài viết */}
+                {allPosts.length === 0 && (
                   <div className="text-center text-gray-500">
                     Chưa có bài viết nào từ bạn bè
+                  </div>
+                )}
+
+                {/* Hiển thị khi đã load hết bài viết */}
+                {!hasNextPage && allPosts.length > 0 && (
+                  <div className="text-center text-gray-500 py-4">
+                    Đã hiển thị tất cả bài viết
                   </div>
                 )}
               </div>

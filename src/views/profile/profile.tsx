@@ -50,12 +50,18 @@ export const ProfileComponent = ({ userId }: ProfilePageProps) => {
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">Giới thiệu</h2>
                 <button className="p-2 hover:bg-gray-100 rounded-full">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path d="M21.13 2.86a3 3 0 00-4.17 0l-13 13L2 22l6.19-2L21.13 7a3 3 0 000-4.16zM6.77 19.14l-2.52.83.83-2.52 10.05-10.05 1.68 1.69L6.77 19.14z" />
                   </svg>
                 </button>
               </div>
-              <p className="text-gray-600">{profile.desiredJobPosition || "Software Engineer"}</p>
+              <p className="text-gray-600">
+                {profile.desiredJobPosition || "Software Engineer"}
+              </p>
             </div>
 
             {/* Bài viết */}
@@ -77,7 +83,11 @@ export const ProfileComponent = ({ userId }: ProfilePageProps) => {
                   <p className="text-gray-600">Tiếng Anh</p>
                 </div>
                 <button className="p-2 hover:bg-gray-100 rounded-full">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path d="M21.13 2.86a3 3 0 00-4.17 0l-13 13L2 22l6.19-2L21.13 7a3 3 0 000-4.16zM6.77 19.14l-2.52.83.83-2.52 10.05-10.05 1.68 1.69L6.77 19.14z" />
                   </svg>
                 </button>
@@ -88,11 +98,19 @@ export const ProfileComponent = ({ userId }: ProfilePageProps) => {
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-lg font-semibold">Hồ sơ công khai và URL</h2>
-                  <p className="text-gray-600 break-all">www.linkedin.com/in/{profile.id}</p>
+                  <h2 className="text-lg font-semibold">
+                    Hồ sơ công khai và URL
+                  </h2>
+                  <p className="text-gray-600 break-all">
+                    www.linkedin.com/in/{profile.id}
+                  </p>
                 </div>
                 <button className="p-2 hover:bg-gray-100 rounded-full">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path d="M21.13 2.86a3 3 0 00-4.17 0l-13 13L2 22l6.19-2L21.13 7a3 3 0 000-4.16zM6.77 19.14l-2.52.83.83-2.52 10.05-10.05 1.68 1.69L6.77 19.14z" />
                   </svg>
                 </button>

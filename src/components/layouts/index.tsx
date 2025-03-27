@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Header from "@/components/layouts/header";
 import { FC, PropsWithChildren } from "react";
@@ -28,10 +28,7 @@ const Layout: FC<LayoutProps> = ({ children, sectionClassName }) => {
   );
 };
 
-const FullWidthLayout: FC<LayoutProps> = ({
-  children,
-  sectionClassName
-}) => {
+const FullWidthLayout: FC<LayoutProps> = ({ children, sectionClassName }) => {
   return (
     <div className="min-h-screen bg-[#f4f2ee]">
       {/* Header cố định */}
@@ -43,13 +40,11 @@ const FullWidthLayout: FC<LayoutProps> = ({
 
       {/* Main content với padding-top để tránh header */}
       <main className="pt-[72px] min-h-screen">
-        <div className={`${sectionClassName}`}>
-          {children}
-        </div>
+        <div className={`${sectionClassName}`}>{children}</div>
       </main>
     </div>
   );
-}
+};
 
 export const ProtectedRouteLayout: FC<LayoutProps> = ({
   children,
@@ -68,7 +63,9 @@ export const FullWidthProtectedRouteLayout: FC<LayoutProps> = ({
 }) => {
   return (
     <ProtectedRoute>
-      <FullWidthLayout sectionClassName={sectionClassName}>{children}</FullWidthLayout>
+      <FullWidthLayout sectionClassName={sectionClassName}>
+        {children}
+      </FullWidthLayout>
     </ProtectedRoute>
   );
-}
+};

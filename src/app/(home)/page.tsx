@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { HomeComponent } from "@/views/home/home";
 

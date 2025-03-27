@@ -3,7 +3,7 @@ import React, { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChatInput } from "@/components/ui/chat/chat-input";
 import { Button } from "@/components/ui/button";
-import EmojiPicker, { Theme, EmojiStyle } from 'emoji-picker-react';
+import EmojiPicker, { Theme, EmojiStyle } from "emoji-picker-react";
 
 interface ChatBottombarProps {
   sendMessage: (newMessage: string) => void;
@@ -33,7 +33,7 @@ export default function ChatBottomBar({
   };
 
   const onEmojiClick = (emojiObject: any) => {
-    setMessage(prev => prev + emojiObject.emoji);
+    setMessage((prev) => prev + emojiObject.emoji);
     setShowEmojiPicker(false);
   };
 

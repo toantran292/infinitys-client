@@ -1,4 +1,3 @@
-
 import React from "react";
 import type { FC } from "react";
 import { cx } from "../../utils";
@@ -14,13 +13,13 @@ interface ModalProps {
 }
 
 export const Modal: FC<ModalProps> = ({
-                                        opened,
-                                        onClose,
-                                        children,
-                                        panelClassName,
-                                        zIndex = 50,
-                                        backdropClassName
-                                      }) => {
+  opened,
+  onClose,
+  children,
+  panelClassName,
+  zIndex = 50,
+  backdropClassName
+}) => {
   return (
     <Dialog
       className="relative"
