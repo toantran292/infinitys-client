@@ -25,7 +25,7 @@ export function PageHeader({ page, children }: PageHeaderProps) {
         <div className="absolute -bottom-10 left-6 bg-white p-2 rounded-full border border-gray-200">
           <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center">
             <img
-              src={page.avatar?.url || "/default-avatar.png"}
+              src={page.avatar?.url || "https://github.com/shadcn.png"}
               alt={page.name}
               className="w-full h-full rounded-full object-cover"
             />
