@@ -3,7 +3,11 @@ import { useChat } from "@/contexts/ChatContext";
 import axiosInstance from "@/lib/axios";
 import { useAuth } from "@/providers/auth-provider";
 import { Conversation } from "@/types/conversation";
-import { useInfiniteQuery, useQueryClient, useQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useQueryClient,
+  useQuery
+} from "@tanstack/react-query";
 import { useEffect, useMemo, useCallback, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, SquarePen } from "lucide-react";
@@ -47,7 +51,7 @@ export const useConversations = ({
 
 const useSearch = (query: string) => {
   return useQuery({
-    queryKey: ['conversations', 'search', query],
+    queryKey: ["conversations", "search", query],
     queryFn: async () => {
       if (!query) return null;
       const res = await axiosInstance.get(`api/chats/search`, {
@@ -64,7 +68,11 @@ type Props = {
   onSelect: (conversation: Conversation) => void;
 };
 
-const ConversationListHeader = ({ onSearch }: { onSearch: (value: string) => void }) => {
+const ConversationListHeader = ({
+  onSearch
+}: {
+  onSearch: (value: string) => void;
+}) => {
   const { pageId } = useParams();
   const router = useRouter();
   const [input, setInput] = useState("");
@@ -77,7 +85,9 @@ const ConversationListHeader = ({ onSearch }: { onSearch: (value: string) => voi
   return (
     <div className="flex flex-col border-b">
       <div className="flex justify-between p-4 items-center">
-        <h1 className="text-xl font-semibold">Tin nhắn {pageId ? "trang" : "người dùng"}</h1>
+        <h1 className="text-xl font-semibold">
+          Tin nhắn {pageId ? "trang" : "người dùng"}
+        </h1>
         <Button
           variant="ghost"
           size="icon"
@@ -105,11 +115,7 @@ const ConversationListHeader = ({ onSearch }: { onSearch: (value: string) => voi
 };
 
 const ConversationListBody = (props: any) => {
-  const {
-    conversations,
-    handleSelectConversation,
-    isFetchingNextPage
-  } = props;
+  const { conversations, handleSelectConversation, isFetchingNextPage } = props;
   const { id: conversationId, pageId } = useParams();
   const { user } = useAuth();
   const renderConversationItem = useCallback(
@@ -121,19 +127,28 @@ const ConversationListBody = (props: any) => {
         if (conversation.name) {
           name = conversation.name;
         } else {
-          const participants = conversation.participants.sort((a: any, b: any) => b.user.createdAt - a.user.createdAt);
-          name = participants.slice(0, 3).map((p: any) => p.user.firstName).join(", ");
+          const participants = conversation.participants.sort(
+            (a: any, b: any) => b.user.createdAt - a.user.createdAt
+          );
+          name = participants
+            .slice(0, 3)
+            .map((p: any) => p.user.firstName)
+            .join(", ");
           if (participants.length > 3) {
             name += `, ...`;
           }
         }
       } else {
-        const participant = conversation.participants.find(
-          (p: any) => pageId ? p.user : (!p.user || p.user.id !== user?.id)
+        const participant = conversation.participants.find((p: any) =>
+          pageId ? p.user : !p.user || p.user.id !== user?.id
         );
         console.log({ participant, participants: conversation.participants });
-        name = participant?.page?.name || participant?.user?.fullName || "Unknown";
-        avatar = participant?.page?.avatar?.url || participant?.user?.avatar?.url || "";
+        name =
+          participant?.page?.name || participant?.user?.fullName || "Unknown";
+        avatar =
+          participant?.page?.avatar?.url ||
+          participant?.user?.avatar?.url ||
+          "";
       }
 
       return (
@@ -191,16 +206,16 @@ const ConversationListBody = (props: any) => {
   );
 };
 
-export default function ConversationList({
-  onSelect
-}: Props) {
+export default function ConversationList({ onSelect }: Props) {
   const { id: conversationId, pageId } = useParams();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useConversations({ pageId: pageId as string });
 
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: searchResults, isLoading: isSearching } = useSearch(searchQuery);
+  const { data: searchResults, isLoading: isSearching } =
+    useSearch(searchQuery);
 
   // Memoize conversations để tránh re-render không cần thiết
   const conversations = useMemo(() => {
@@ -224,57 +239,67 @@ export default function ConversationList({
     }) => {
       if (!isSubscribed) return;
 
-      queryClient.setQueryData(
-        ["conversations", pageId],
-        (old: any) => {
-          if (!old?.pages) return old;
-          console.log({ pageId, updated });
-          if (pageId && updated.pageChatId !== pageId) return old;
+      queryClient.setQueryData(["conversations", pageId], (old: any) => {
+        if (!old?.pages) return old;
+        console.log({ pageId, updated });
+        if (pageId && updated.pageChatId !== pageId) return old;
 
-          // Tìm và xóa conversation cũ khỏi tất cả các pages
-          let foundConversation: any = null;
-          const pagesWithoutUpdated = old.pages.map((page: any) => {
-            const existingConv = page.items.find(
-              (conv: any) => conv.id === updated.conversationId
-            );
-            if (existingConv) {
-              foundConversation = {
-                ...existingConv,
-                lastMessage: updated.lastMessage,
-                updatedAt: updated.updatedAt,
-                isUnread: conversationId !== updated.conversationId
-              };
-            }
-            return {
-              ...page,
-              items: page.items.filter(
-                (conv: any) => conv.id !== updated.conversationId
-              )
+        // Tìm và xóa conversation cũ khỏi tất cả các pages
+        let foundConversation: any = null;
+        const pagesWithoutUpdated = old.pages.map((page: any) => {
+          const existingConv = page.items.find(
+            (conv: any) => conv.id === updated.conversationId
+          );
+          if (existingConv) {
+            foundConversation = {
+              ...existingConv,
+              lastMessage: updated.lastMessage,
+              updatedAt: updated.updatedAt,
+              isUnread: conversationId !== updated.conversationId
             };
-          });
-
-          // Nếu không tìm thấy conversation cũ, tạo mới
-          const updatedConversation = foundConversation || {
-            id: updated.conversationId,
-            lastMessage: updated.lastMessage,
-            updatedAt: updated.updatedAt,
-            isUnread: conversationId !== updated.conversationId,
-            participants: []
-          };
-
-          // Thêm conversation vào đầu page đầu tiên
+          }
           return {
-            ...old,
-            pages: [
-              {
-                ...pagesWithoutUpdated[0],
-                items: [updatedConversation, ...pagesWithoutUpdated[0].items]
-              },
-              ...pagesWithoutUpdated.slice(1)
-            ]
+            ...page,
+            items: page.items.filter(
+              (conv: any) => conv.id !== updated.conversationId
+            )
           };
+        });
+
+        if (updated.pageChatId) {
+          if (foundConversation) {
+            if (
+              !foundConversation.participants.some(
+                (p: any) => p.user?.id === user?.id
+              ) &&
+              !pageId
+            ) {
+              return old;
+            }
+          }
         }
-      );
+
+        // Nếu không tìm thấy conversation cũ, tạo mới
+        const updatedConversation = foundConversation || {
+          id: updated.conversationId,
+          lastMessage: updated.lastMessage,
+          updatedAt: updated.updatedAt,
+          isUnread: conversationId !== updated.conversationId,
+          participants: []
+        };
+
+        // Thêm conversation vào đầu page đầu tiên
+        return {
+          ...old,
+          pages: [
+            {
+              ...pagesWithoutUpdated[0],
+              items: [updatedConversation, ...pagesWithoutUpdated[0].items]
+            },
+            ...pagesWithoutUpdated.slice(1)
+          ]
+        };
+      });
     };
 
     onConversationUpdate(handleConversationUpdate);
@@ -282,12 +307,7 @@ export default function ConversationList({
     return () => {
       isSubscribed = false;
     };
-  }, [
-    onConversationUpdate,
-    queryClient,
-    pageId,
-    conversationId
-  ]);
+  }, [onConversationUpdate, queryClient, pageId, conversationId]);
 
   // Xử lý infinite scroll
   const handleScroll = useCallback(
@@ -306,24 +326,19 @@ export default function ConversationList({
   const handleSelectConversation = useCallback(
     (conversation: Conversation) => {
       // Update conversation unread status in cache
-      queryClient.setQueryData(
-        ["conversations", pageId],
-        (old: any) => {
-          if (!old?.pages) return old;
+      queryClient.setQueryData(["conversations", pageId], (old: any) => {
+        if (!old?.pages) return old;
 
-          return {
-            ...old,
-            pages: old.pages.map((page: any) => ({
-              ...page,
-              items: page.items.map((item: any) =>
-                item.id === conversation.id
-                  ? { ...item, isUnread: false }
-                  : item
-              )
-            }))
-          };
-        }
-      );
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => ({
+            ...page,
+            items: page.items.map((item: any) =>
+              item.id === conversation.id ? { ...item, isUnread: false } : item
+            )
+          }))
+        };
+      });
 
       onSelect(conversation);
     },
