@@ -1,23 +1,26 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera } from "lucide-react";
 import { ProfileAvatar } from "@/views/profile/profile";
+import { cn } from "@/lib/utils";
 
 interface ProfileAvatarProps {
   avatar: ProfileAvatar;
   fallback?: string;
   canEdit?: boolean;
   onFileChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  className?: string;
 }
 
 export function ProfileAvatarComponent({
   avatar,
   fallback,
   canEdit,
-  onFileChange
+  onFileChange,
+  className
 }: ProfileAvatarProps) {
   return (
     <div className="relative">
-      <Avatar className="w-[144px] h-[144px] border-4 border-white">
+      <Avatar className={cn("w-[144px] h-[144px] border-4 border-white", className)}>
         <AvatarImage
           className="object-cover w-full h-full"
           src={avatar?.url || "https://github.com/shadcn.png"}

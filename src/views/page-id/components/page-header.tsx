@@ -5,6 +5,11 @@ import { useState } from "react";
 import axiosInstance from "@/lib/axios";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { ProfileAvatarComponent } from "@/views/profile/components/profile-avatar";
+import {
+  PageUploadType,
+  usePageUpload
+} from "@/views/profile/hooks/use-page-upload";
 
 interface PageHeaderProps {
   page: {
@@ -21,6 +26,7 @@ interface PageHeaderProps {
 }
 
 export function PageHeader({ page, children, isAdmin }: PageHeaderProps) {
+  const [avatar, setAvatar] = useState(page.avatar);
   const [status, setStatus] = useState(page.status);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,6 +44,29 @@ export function PageHeader({ page, children, isAdmin }: PageHeaderProps) {
     }
   };
 
+  const { action: uploadAvatar } = usePageUpload({
+    pageId: page.id,
+    type: PageUploadType.AVATAR,
+    onSuccess: (data) => {
+      setAvatar(data.avatar);
+      toast.success("Ảnh đã được tải lên");
+    },
+    onError: (error) =>
+      toast.error("Lỗi khi tải ảnh lên", {
+        description: error.message
+      })
+  });
+
+  const handleAvatarUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      uploadAvatar(file);
+      event.target.value = "";
+    }
+  };
+
   return (
     <>
       <div className="relative">
@@ -52,14 +81,13 @@ export function PageHeader({ page, children, isAdmin }: PageHeaderProps) {
 
         <div className="absolute -bottom-10 left-6 bg-white p-2 rounded-full border border-gray-200">
           <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center">
-            <Avatar className="w-full h-full rounded-full object-cover">
-              <AvatarImage
-                src={page.avatar?.url || "/default-avatar.png"}
-                alt={page.name}
-                className="w-full h-full rounded-full object-cover"
-              />
-              <AvatarFallback>{page.name.charAt(0)}</AvatarFallback>
-            </Avatar>
+            <ProfileAvatarComponent
+              avatar={avatar}
+              fallback={page.name.charAt(0)}
+              canEdit={isAdmin}
+              onFileChange={handleAvatarUpload}
+              className="w-full h-full rounded-full object-cover"
+            />
           </div>
         </div>
       </div>
@@ -85,9 +113,7 @@ export function PageHeader({ page, children, isAdmin }: PageHeaderProps) {
                     Đang xử lý...
                   </span>
                 ) : (
-                  <span className="flex items-center gap-2">
-                    Đăng ký lại
-                  </span>
+                  <span className="flex items-center gap-2">Đăng ký lại</span>
                 )}
               </Button>
             )}
