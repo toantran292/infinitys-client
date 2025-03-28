@@ -1,5 +1,5 @@
-import JobsPageUI from "@/components/ui/jobs/job-page";
+import JobsComponent from "@/views/jobs/job";
 
 export default function JobsPage() {
-  return <JobsPageUI />;
+  return <JobsComponent />;
 }

@@ -403,7 +403,7 @@ export default function CreateJobForm() {
                     <Button
                       type="submit"
                       variant="outline"
-                      className="bg-primary hover:bg-primary/90 font-medium px-6"
+                      className="bg-primary hover:bg-primary/90 font-medium px-6 text-white"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? "Đang tạo..." : "Tạo"}

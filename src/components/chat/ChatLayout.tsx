@@ -41,7 +41,7 @@ export default function ChatLayout({ isChatNew = false }: Props) {
             isPageView={pageId ? true : false}
             pageId={pageId as string}
             onSelect={(conversation) => {
-              router.push(`/${pageId ? `page-chat/${pageId}/` : "chat"}/${conversation.id}`);
+              router.push(`/chat/${pageId ? `page/${pageId}/` : ""}${conversation.id}`);
             }}
           />
         </div>
@@ -51,10 +51,7 @@ export default function ChatLayout({ isChatNew = false }: Props) {
           {isChatNew ? (
             <ConversationNew />
           ) : conversationId ? (
-            <ConversationCurrent
-              isPageView={pageId ? true : false}
-              pageId={pageId as string}
-            />
+            <ConversationCurrent />
           ) : (
             <div className="flex items-center justify-center h-full text-gray-400">
               Chọn một cuộc trò chuyện để bắt đầu

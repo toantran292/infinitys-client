@@ -6,20 +6,15 @@ import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-quer
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useParams, useRouter } from "next/navigation";
-import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
+import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn, toVietnamDate } from "@/lib/utils";
-import { ChatInput } from "@/components/ui/chat/chat-input";
+import { ChatInput } from "@/components/chat/chat-input";
 import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
 import { Button } from "@/components/ui/button";
 import { SendHorizontal, SmilePlus, ThumbsUp } from "lucide-react";
 import { Conversation } from "@/types/conversation";
 import { ConversationSkeleton } from "./ConversationSkeleton";
-
-type Props = {
-  pageId?: string;
-  isPageView: boolean;
-};
 
 interface Message {
   id: string;
@@ -34,31 +29,42 @@ interface Message {
       url: string;
     };
   };
+  senderPage: {
+    id: string;
+    name: string;
+    avatar: {
+      url: string;
+    };
+  }
   conversation: {
     id: string;
   };
 }
-
 interface MessagesResponse {
   items: Message[];
   nextCursor: string | null;
 }
 
-const ConversationCurrentHeader = ({ conversation, isPageView }: { conversation: Conversation, isPageView: boolean }) => {
+const ConversationCurrentHeader = ({ conversation }: { conversation: Conversation }) => {
   const { user } = useAuth();
-
+  const { pageId } = useParams();
   let name: string | undefined;
   let avatar: string | undefined;
+  let isPage: boolean = false;
 
   if (!conversation.isGroup) {
     const participant = conversation.participants.find(
       (p: any) => {
-        if (isPageView) {
+        if (pageId) {
           return p.user;
         }
-        return p.user.id !== user?.id;
+        return p.user?.id !== user?.id;
       }
     );
+
+    if (participant?.page) {
+      isPage = true;
+    }
 
     name = participant?.page?.name || participant?.user?.fullName || "Unknown";
     avatar = participant?.page?.avatar?.url || participant?.user?.avatar?.url || "";
@@ -91,11 +97,17 @@ const ConversationCurrentHeader = ({ conversation, isPageView }: { conversation:
             </span>
           </div>
         )}
+        {isPage && (
+          <span className="text-xs text-gray-500">
+            {`Công ty`}
+          </span>
+        )}
       </div>
     </div>
   );
 };
 const ConversationCurrentMain = (props: any) => {
+  const { pageId } = useParams();
   const { user } = useAuth();
   const { messages, scrollContainerRef, handleScroll, isFetchingNextPage } = props;
   return (
@@ -108,8 +120,8 @@ const ConversationCurrentMain = (props: any) => {
             <div className="text-center text-gray-500">Đang tải thêm...</div>
           )}
           {messages?.map((message: Message, index: number) => {
-            const fullName = message.senderUser?.firstName + " " + message.senderUser?.lastName;
-            const isSentByMe = message.senderUser?.id === user?.id
+            const fullName = message.senderPage ? message.senderPage.name : message.senderUser?.firstName + " " + message.senderUser?.lastName;
+            const isSentByMe = message.senderPage ? !!pageId : message.senderUser?.id === user?.id
             return (
               <motion.div
                 key={message.id || index}
@@ -135,7 +147,7 @@ const ConversationCurrentMain = (props: any) => {
                   <Avatar className="h-9 w-9 mt-5">
                     <AvatarImage
                       className="object-cover"
-                      src={message.senderUser.avatar?.url || ""}
+                      src={message.senderPage ? message.senderPage.avatar?.url : message.senderUser.avatar?.url || ""}
                     />
                     <AvatarFallback className="bg-gray-500 text-white">
                       {fullName.charAt(0).toUpperCase()}
@@ -271,14 +283,11 @@ const ConversationCurrentBottom = (props: any) => {
     </div>
   );
 };
-export default function ConversationCurrent({
-  pageId,
-  isPageView
-}: Props) {
+export default function ConversationCurrent() {
   const router = useRouter();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { id: conversationId } = useParams();
+  const { id: conversationId, pageId } = useParams();
   const { socket, sendMessage, onNewMessage, joinConversation } = useChat();
 
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
@@ -291,7 +300,8 @@ export default function ConversationCurrent({
     queryKey: ["conversation", conversationId],
     queryFn: async () => {
       try {
-        const res = await axiosInstance.get<Conversation>(`api/chats/conversations/${conversationId}`);
+        const url = pageId ? `/api/chats/page/${pageId}/conversations/${conversationId}` : `/api/chats/conversations/${conversationId}`;
+        const res = await axiosInstance.get<Conversation>(url);
         return res.data;
       } catch (e: any) {
         if (e.response.status === 404) {
@@ -313,7 +323,8 @@ export default function ConversationCurrent({
             params: {
               conversationId,
               limit: 20,
-              cursor: pageParam
+              cursor: pageParam,
+              pageId: pageId
             }
           }
         );
@@ -335,7 +346,7 @@ export default function ConversationCurrent({
     const trimmedInput = input.trim();
     if (!trimmedInput) return;
 
-    sendMessage({ conversationId: conversationId as string, content: trimmedInput, pageId });
+    sendMessage({ conversationId: conversationId as string, content: trimmedInput, pageId: pageId as string });
     setShouldScrollToBottom(true);
   }, [conversationId, pageId, sendMessage]);
 
@@ -438,7 +449,6 @@ export default function ConversationCurrent({
     <div className="flex flex-col h-full border-l w-full">
       <ConversationCurrentHeader
         conversation={conversation}
-        isPageView={isPageView}
       />
       <ConversationCurrentMain
         messages={messages}

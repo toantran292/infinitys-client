@@ -28,6 +28,8 @@ export interface JobPost {
   createdAt: string;
   active: boolean;
   pageUser: PageUser;
+  page: Page;
+  author: User;
 }
 export interface Page {
   id: string;
@@ -40,6 +42,7 @@ export interface Page {
   createdAt: string;
   updatedAt: string;
   avatar?: Avatar;
+  pageRole: string;
 }
 
 export interface PageUser {
@@ -84,6 +87,7 @@ export interface Profile {
   avatar: Avatar;
   connections?: number;
   totalConnections?: number;
+  aboutMe?: string;
 }
 
 export interface ApiResponse<T> {

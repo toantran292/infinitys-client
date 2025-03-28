@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { MapPin, Mail, Pencil, UserX } from "lucide-react";
-import Image from "next/image";
+import { Mail, Pencil, UserX } from "lucide-react";
 import { UserUploadType, useUserUpload } from "../hooks/use-user-upload";
 import { ProfileAvatarComponent } from "./profile-avatar";
 import { toast } from "sonner";
@@ -19,16 +18,23 @@ import {
 import useFriend from "@/hooks/use-friend";
 import { motion } from "framer-motion";
 import { FriendStatus } from "@/types/friend";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { useCompanyWorkingById } from "@/views/jobs-id/hooks/use-company-working";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useMutation } from "@tanstack/react-query";
+import axiosInstance from "@/lib/axios";
 interface ArtDecordProfileCardProps {
   data: Profile;
   isEditable?: boolean;
+  onUpdateProfile?: (updatedData: Partial<Profile>) => void;
 }
 
 export const ArtDecordProfileCard = ({
   data,
-  isEditable = false
+  isEditable = false,
+  onUpdateProfile
 }: ArtDecordProfileCardProps) => {
+  const { id } = useParams();
   const router = useRouter();
   const [profile, setProfile] = useState<Profile>(data);
   const { refetchUser, user } = useAuth();
@@ -36,6 +42,8 @@ export const ArtDecordProfileCard = ({
   const [isEditing, setIsEditing] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { sendFriendRequest, cancelFriendRequest, acceptFriendRequest } = useFriend();
+
+  const { companyWorking } = useCompanyWorkingById(id as string);
 
   const { action: uploadAvatar } = useUserUpload({
     userId: data?.id || "",
@@ -60,9 +68,24 @@ export const ArtDecordProfileCard = ({
     }
   };
 
+  const { mutate: updateProfile } = useMutation({
+    mutationFn: async (updatedData: Partial<Profile>) => {
+      return axiosInstance.patch(`/api/users/${profile.id}`, updatedData).then((res) => res.data);
+    },
+    onSuccess: (updatedData: Partial<Profile>) => {
+      toast.success("Cập nhật thông tin thành công");
+      setProfile({ ...profile, ...updatedData });
+      refetchUser();
+      onUpdateProfile?.(updatedData);
+    },
+    onError: (error) =>
+      toast.error("Lỗi khi cập nhật thông tin", {
+        description: error.message
+      })
+  });
+
   const handleProfileUpdate = (updatedData: Partial<Profile>) => {
-    // Xử lý cập nhật thông tin profile
-    console.log("Updated data:", updatedData);
+    updateProfile(updatedData);
     setIsEditing(false);
   };
 
@@ -173,10 +196,10 @@ export const ArtDecordProfileCard = ({
               </p>
 
               <div className="flex items-center gap-4 text-sm text-gray-500">
-                <div className="flex items-center gap-1">
-                  <MapPin className="h-4 w-4" />
-                  <span>Cần Thơ, Việt Nam</span>
-                </div>
+                {/* <div className="flex items-center gap-1">
+                  {/* <MapPin className="h-4 w-4" /> */}
+                {/* <span>Cần Thơ, Việt Nam</span> */}
+                {/* </div> */}
                 <div className="flex items-center gap-1">
                   <Mail className="h-4 w-4" />
                   <a
@@ -198,20 +221,19 @@ export const ArtDecordProfileCard = ({
             {/* Company/School Section */}
             <div className="mt-4 flex flex-col gap-2">
               {/* Company */}
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
-                  <Image
-                    src="/boom-logo.png"
-                    alt="Boom"
-                    width={32}
-                    height={32}
-                    className="object-contain"
-                  />
+              {companyWorking?.[0] && (
+                <div className="flex items-center gap-2">
+                  <Avatar className="w-8 h-8 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
+                    <AvatarImage className="object-cover" src={companyWorking?.[0]?.avatar?.url || ""} />
+                    <AvatarFallback className="text-xl bg-gray-500 text-white">
+                      {companyWorking?.[0]?.name?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium text-gray-600 whitespace-nowrap hover:text-blue-600 cursor-pointer" onClick={() => router.push(`/page/${companyWorking?.[0]?.id}`)}>
+                    {companyWorking?.[0]?.name || ""}
+                  </span>
                 </div>
-                <span className="text-sm font-medium text-gray-600 whitespace-nowrap">
-                  Boom
-                </span>
-              </div>
+              )}
             </div>
           </div>
 
@@ -242,7 +264,7 @@ export const ArtDecordProfileCard = ({
             </div>
           )}
         </div>
-      </div>
+      </div >
 
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent className="sm:max-w-[425px] bg-white rounded-lg shadow-lg overflow-hidden">

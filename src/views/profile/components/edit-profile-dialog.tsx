@@ -8,18 +8,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X } from "lucide-react";
-import { Profile } from "../profile";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Profile } from "@/types/job";
 
 interface FormValues {
   firstName: string;
   lastName: string;
-  otherName?: string;
-  position: string;
-  currentPosition: boolean;
-  jobTitle?: string;
-  company?: string;
+  aboutMe: string;
+  desiredJobPosition: string;
 }
 
 interface EditProfileDialogProps {
@@ -35,23 +31,23 @@ export const EditProfileDialog = ({
   data,
   onSubmit
 }: EditProfileDialogProps) => {
-  const { register, handleSubmit, watch } = useForm<FormValues>({
+  const { register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
       firstName: data.firstName,
       lastName: data.lastName,
-      position: data.desiredJobPosition,
-      currentPosition: false
+      desiredJobPosition: data.desiredJobPosition,
+      aboutMe: data.aboutMe
     }
   });
 
-  const isCurrentPosition = watch("currentPosition");
+  // const isCurrentPosition = watch("currentPosition");
 
   const onSubmitForm = (formData: FormValues) => {
     onSubmit({
       firstName: formData.firstName,
       lastName: formData.lastName,
-      desiredJobPosition: formData.position
-      // Thêm các trường khác nếu cần
+      desiredJobPosition: formData.desiredJobPosition,
+      aboutMe: formData.aboutMe
     });
   };
 
@@ -96,7 +92,7 @@ export const EditProfileDialog = ({
               </div>
 
               {/* Tên khác */}
-              <div>
+              {/* <div>
                 <Label htmlFor="otherName" className="block text-sm mb-1.5">
                   Tên khác
                 </Label>
@@ -105,21 +101,32 @@ export const EditProfileDialog = ({
                   placeholder="Ví dụ: Tên thời con gái, biệt danh, v.v."
                   className="w-full bg-white border-[1.5px] border-gray-300 focus:border-blue-600"
                 />
-              </div>
+              </div> */}
 
               {/* Tiêu đề */}
               <div>
-                <Label htmlFor="position" className="block text-sm mb-1.5">
-                  Tiêu đề*
+                <Label htmlFor="desiredJobPosition" className="block text-sm mb-1.5">
+                  Vị trí mong muốn*
                 </Label>
                 <Input
-                  {...register("position", { required: true })}
+                  {...register("desiredJobPosition", { required: true })}
+                  className="w-full bg-white border-[1.5px] border-gray-300 focus:border-blue-600"
+                />
+              </div>
+
+              {/* Họ */}
+              <div>
+                <Label htmlFor="aboutMe" className="block text-sm mb-1.5">
+                  Giới thiệu*
+                </Label>
+                <Input
+                  {...register("aboutMe", { required: true })}
                   className="w-full bg-white border-[1.5px] border-gray-300 focus:border-blue-600"
                 />
               </div>
 
               {/* Vị trí hiện tại */}
-              <div>
+              {/* <div>
                 <Label className="block text-base font-semibold mb-2">
                   Vị trí hiện tại
                 </Label>
@@ -153,7 +160,7 @@ export const EditProfileDialog = ({
                     </div>
                   )}
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 

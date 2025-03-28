@@ -17,12 +17,15 @@ import {
   PeopleTab as NewPeopleTab
 } from "./components/tabs";
 import { useAuth } from "@/providers/auth-provider";
+import { useCreateConversation } from "@/hooks/conversations";
 
 export default function PagesIdComponent() {
   const { user } = useAuth();
   const { id } = useParams();
   const [currentTab, setCurrentTab] = useState<TabKey>("home");
   const router = useRouter();
+
+  const { createUserPage } = useCreateConversation();
 
   const { data: page, isLoading } = useQuery({
     queryKey: ["page", id],
@@ -56,16 +59,30 @@ export default function PagesIdComponent() {
     }
   };
 
+  const handleMessagePage = () => {
+    createUserPage.mutate({ pageId: page.id }, {
+      onSuccess: (data) => {
+        router.push(`/chat/${data.id}`);
+      }
+    });
+  };
+
   return (
     <ProtectedRouteLayout sectionClassName="bg-[#f4f2ee] min-h-screen w-full py-8">
       <div className="max-w-5xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-        <PageHeader page={page}>
-          {!isAdmin && (
+        <PageHeader page={page} isAdmin={isAdmin}>
+          {!isAdmin ? (
             <div className="flex gap-2 mt-4">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                 + Theo dõi
               </Button>
-              <Button variant="outline">Nhắn tin</Button>
+              <Button variant="outline" onClick={handleMessagePage}>Nhắn tin</Button>
+            </div>
+          ) : (
+            <div className="flex gap-2 mt-4">
+              <Button variant="outline" onClick={() => router.push(`/chat/page/${page.id}`)}>
+                Tin nhắn
+              </Button>
             </div>
           )}
         </PageHeader>

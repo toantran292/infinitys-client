@@ -15,27 +15,25 @@ import { useDebounce } from "@/hooks/useDebounce";
 
 export const useConversations = ({
   pageId,
-  isPageView,
   limit = 10
 }: {
   pageId?: string;
-  isPageView?: boolean;
   limit?: number;
 }) => {
   return useInfiniteQuery({
-    queryKey: ["conversations", pageId, isPageView],
+    queryKey: ["conversations", pageId],
     queryFn: async ({ pageParam = null }) => {
       const params: any = {
         limit,
         cursor: pageParam
       };
 
-      if (isPageView) {
+      if (pageId) {
         params.pageId = pageId;
       }
 
       const res = await axiosInstance.get(
-        `api/chats/${isPageView ? "page-conversations" : "conversations"}`,
+        `api/chats/${pageId ? "page-conversations" : "conversations"}`,
         { params }
       );
       return res.data;
@@ -62,13 +60,12 @@ const useSearch = (query: string) => {
 };
 
 type Props = {
-  isPageView?: boolean;
-  pageId?: string;
   activeConversationId?: string;
   onSelect: (conversation: Conversation) => void;
 };
 
 const ConversationListHeader = ({ onSearch }: { onSearch: (value: string) => void }) => {
+  const { pageId } = useParams();
   const router = useRouter();
   const [input, setInput] = useState("");
   const debouncedSearch = useDebounce(input, 300);
@@ -80,7 +77,7 @@ const ConversationListHeader = ({ onSearch }: { onSearch: (value: string) => voi
   return (
     <div className="flex flex-col border-b">
       <div className="flex justify-between p-4 items-center">
-        <h1 className="text-xl font-semibold">Tin nhắn</h1>
+        <h1 className="text-xl font-semibold">Tin nhắn {pageId ? "trang" : "người dùng"}</h1>
         <Button
           variant="ghost"
           size="icon"
@@ -113,7 +110,7 @@ const ConversationListBody = (props: any) => {
     handleSelectConversation,
     isFetchingNextPage
   } = props;
-  const { id: conversationId } = useParams();
+  const { id: conversationId, pageId } = useParams();
   const { user } = useAuth();
   const renderConversationItem = useCallback(
     (conversation: Conversation) => {
@@ -132,8 +129,9 @@ const ConversationListBody = (props: any) => {
         }
       } else {
         const participant = conversation.participants.find(
-          (p: any) => !p.user || p.user.id !== user?.id
+          (p: any) => pageId ? p.user : (!p.user || p.user.id !== user?.id)
         );
+        console.log({ participant, participants: conversation.participants });
         name = participant?.page?.name || participant?.user?.fullName || "Unknown";
         avatar = participant?.page?.avatar?.url || participant?.user?.avatar?.url || "";
       }
@@ -194,14 +192,12 @@ const ConversationListBody = (props: any) => {
 };
 
 export default function ConversationList({
-  isPageView,
-  pageId,
   onSelect
 }: Props) {
-  const { id: conversationId } = useParams();
+  const { id: conversationId, pageId } = useParams();
   const queryClient = useQueryClient();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useConversations({ isPageView, pageId });
+    useConversations({ pageId: pageId as string });
 
   const [searchQuery, setSearchQuery] = useState("");
   const { data: searchResults, isLoading: isSearching } = useSearch(searchQuery);
@@ -224,13 +220,16 @@ export default function ConversationList({
       conversationId: string;
       lastMessage: any;
       updatedAt: string;
+      pageChatId: string;
     }) => {
       if (!isSubscribed) return;
 
       queryClient.setQueryData(
-        ["conversations", pageId, isPageView],
+        ["conversations", pageId],
         (old: any) => {
           if (!old?.pages) return old;
+          console.log({ pageId, updated });
+          if (pageId && updated.pageChatId !== pageId) return old;
 
           // Tìm và xóa conversation cũ khỏi tất cả các pages
           let foundConversation: any = null;
@@ -287,7 +286,6 @@ export default function ConversationList({
     onConversationUpdate,
     queryClient,
     pageId,
-    isPageView,
     conversationId
   ]);
 
@@ -309,7 +307,7 @@ export default function ConversationList({
     (conversation: Conversation) => {
       // Update conversation unread status in cache
       queryClient.setQueryData(
-        ["conversations", pageId, isPageView],
+        ["conversations", pageId],
         (old: any) => {
           if (!old?.pages) return old;
 
@@ -329,7 +327,7 @@ export default function ConversationList({
 
       onSelect(conversation);
     },
-    [onSelect, queryClient, pageId, isPageView]
+    [onSelect, queryClient, pageId]
   );
 
   return (

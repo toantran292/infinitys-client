@@ -1,12 +1,15 @@
 import { Building2 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { PageSearchResult } from "../types";
+import { useRouter } from "next/navigation";
 
 interface PageCardProps {
     page: PageSearchResult;
 }
 
 export const PageCard = ({ page }: PageCardProps) => {
+    const router = useRouter();
+
     return (
         <div className="p-4 hover:bg-[#f9fafb]">
             <div className="flex gap-4">
@@ -23,7 +26,9 @@ export const PageCard = ({ page }: PageCardProps) => {
                     </Avatar>
                 </div>
                 <div>
-                    <h3 className="text-[#191919] font-medium hover:text-[#0a66c2] hover:underline">
+                    <h3 className="text-[#191919] font-medium hover:text-[#0a66c2] hover:underline cursor-pointer"
+                        onClick={() => router.push(`/page/${page.id}`)}
+                    >
                         {page.name}
                     </h3>
                     <p className="text-[#666666] text-sm mt-1">
@@ -40,7 +45,7 @@ export const PageCard = ({ page }: PageCardProps) => {
                         rel="noopener noreferrer"
                         className="inline-flex items-center mt-3 text-sm text-[#0a66c2] font-medium hover:underline"
                     >
-                        Truy cập trang
+                        Truy cập trang của công ty
                         <Building2 className="ml-1 w-4 h-4" />
                     </a>
                 </div>

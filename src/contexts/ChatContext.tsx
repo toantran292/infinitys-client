@@ -26,6 +26,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   const connect = (userId: string, token: string) => {
+    if (socket) return;
     const s = io(SOCKET_URL, {
       auth: {
         userId,

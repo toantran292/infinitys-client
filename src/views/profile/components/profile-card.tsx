@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Pencil, MessageCircleCode, UserRoundPlus } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useCreateGroupChat } from "@/views/chat-id/hooks";
 import { useAuth } from "@/providers/auth-provider";
 import axiosInstance from "@/lib/axios";
 import { ProfileAvatarComponent } from "./profile-avatar";
@@ -11,12 +10,17 @@ import { ProfileForm } from "./profile-form";
 import type { ProfileFormData } from "./profile-form";
 import { UserUploadType, useUserUpload } from "../hooks/use-user-upload";
 import { toast } from "sonner";
+import { useCreateConversation } from "@/hooks/conversations";
+import useFriend from "@/hooks/use-friend";
 
 export default function ProfileCard({ data }: { data: Profile | null }) {
   const { user, refetchUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const queryClient = useQueryClient();
-  const { createGroupChat, isPending } = useCreateGroupChat();
+  const { createUserUser } = useCreateConversation();
+  const { sendFriendRequest } = useFriend();
+
+
   const { action: uploadAvatar } = useUserUpload({
     userId: data?.id || "",
     type: UserUploadType.AVATAR,
@@ -95,15 +99,15 @@ export default function ProfileCard({ data }: { data: Profile | null }) {
           {data.id !== user?.id && (
             <div className="flex gap-2 items-center">
               <Button
-                disabled={isPending}
-                onClick={() => createGroupChat([data.id])}
+                disabled={createUserUser.isPending}
+                onClick={() => createUserUser.mutate({ userId: data.id })}
                 className="bg-neutral-500 text-white"
               >
                 <MessageCircleCode /> Nhắn tin
               </Button>
               <Button
-                disabled={isPending}
-                onClick={() => createGroupChat([data.id])}
+                disabled={sendFriendRequest.isPending}
+                onClick={() => sendFriendRequest.mutate({ userId: data.id })}
               >
                 <UserRoundPlus /> Kết bạn
               </Button>

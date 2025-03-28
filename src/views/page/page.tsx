@@ -15,10 +15,6 @@ export default function PagesComponent() {
 
   const { data, isLoading } = usePages(params);
 
-  const handleReapply = () => {
-    console.log("hihi");
-  };
-
   return (
     <ProtectedRouteLayout sectionClassName="bg-[#f4f2ee] min-h-screen w-full py-8">
       <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 px-4">
@@ -35,7 +31,6 @@ export default function PagesComponent() {
           <PageList
             isLoading={isLoading}
             pages={data?.items || []}
-            onReapply={handleReapply}
           />
         </div>
 

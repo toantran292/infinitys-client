@@ -1,11 +1,9 @@
 "use client";
 
 import {
-  BookOpen,
   Mail,
   MapPin,
   GraduationCap,
-  BriefcaseIcon
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 

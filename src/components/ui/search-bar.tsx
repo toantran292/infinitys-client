@@ -93,7 +93,7 @@ export const SearchBar = () => {
     if (item.type === SearchResultType.USER) {
       router.push(`/profile/${item.id}`);
     } else {
-      router.push(`/pages/${item.id}`);
+      router.push(`/page/${item.id}`);
     }
     setIsOpen(false);
     setSearchValue("");

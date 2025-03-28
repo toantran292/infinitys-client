@@ -3,7 +3,9 @@
 import {
   FriendRequestToast,
   ReactToast,
-  CommentToast
+  CommentToast,
+  PageRejectedToast,
+  PageApprovedToast
 } from "@/components/notification/NotificationToast";
 import axiosInstance from "@/lib/axios";
 import { useAuth } from "@/providers/auth-provider";
@@ -116,6 +118,12 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         break;
       case "comment:created":
         toast.custom((t) => <CommentToast {...newNotification.meta} t={t} />);
+        break;
+      case "page:rejected":
+        toast.custom((t) => <PageRejectedToast {...newNotification.meta} t={t} />);
+        break;
+      case "page:approved":
+        toast.custom((t) => <PageApprovedToast {...newNotification.meta} t={t} />);
         break;
     }
   };

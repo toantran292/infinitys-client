@@ -1,5 +1,5 @@
 import { ProtectedRouteLayout } from "@/components/layouts";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader } from "@/components/ui/Loader";
 import axiosInstance from "@/lib/axios";
 import { PostList } from "@/views/profile/components/post-list";
@@ -16,13 +16,14 @@ const getProfile = async (userId: string): Promise<Profile> => {
 };
 
 export const ProfileComponent = ({ userId }: ProfilePageProps) => {
+  const queryClient = useQueryClient();
   const {
     data: profile,
     isLoading,
     error
   } = useQuery({
     queryKey: ["PROFILE", userId],
-    queryFn: () => getProfile(userId)
+    queryFn: () => getProfile(userId),
   });
 
   if (isLoading || !profile)
@@ -32,6 +33,13 @@ export const ProfileComponent = ({ userId }: ProfilePageProps) => {
       </div>
     );
 
+  const onUpdateProfile = (updatedData: Partial<Profile>) => {
+    queryClient.setQueryData(["PROFILE", userId], (oldData: Profile) => {
+      return { ...oldData, ...updatedData };
+    });
+  };
+
+  console.log(profile);
   return (
     <ProtectedRouteLayout>
       <div className="px-6 py-4">
@@ -43,24 +51,15 @@ export const ProfileComponent = ({ userId }: ProfilePageProps) => {
           {/* Cột trái - Thông tin chính */}
           <div className="space-y-6">
             {/* Card thông tin cá nhân */}
-            <ArtDecordProfileCard data={profile} isEditable={true} />
+            <ArtDecordProfileCard data={profile} isEditable={true} onUpdateProfile={onUpdateProfile} />
 
             {/* Giới thiệu */}
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">Giới thiệu</h2>
-                <button className="p-2 hover:bg-gray-100 rounded-full">
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M21.13 2.86a3 3 0 00-4.17 0l-13 13L2 22l6.19-2L21.13 7a3 3 0 000-4.16zM6.77 19.14l-2.52.83.83-2.52 10.05-10.05 1.68 1.69L6.77 19.14z" />
-                  </svg>
-                </button>
               </div>
               <p className="text-gray-600">
-                {profile.desiredJobPosition || "Software Engineer"}
+                {profile.aboutMe || "Software Engineer"}
               </p>
             </div>
 
@@ -76,7 +75,7 @@ export const ProfileComponent = ({ userId }: ProfilePageProps) => {
           {/* Cột phải - Thông tin bổ sung */}
           <div className="space-y-6">
             {/* Ngôn ngữ hồ sơ */}
-            <div className="bg-white rounded-lg shadow p-6">
+            {/* <div className="bg-white rounded-lg shadow p-6">
               <div className="flex justify-between items-center">
                 <div>
                   <h2 className="text-lg font-semibold">Ngôn ngữ hồ sơ</h2>
@@ -92,7 +91,7 @@ export const ProfileComponent = ({ userId }: ProfilePageProps) => {
                   </svg>
                 </button>
               </div>
-            </div>
+            </div> */}
 
             {/* Hồ sơ công khai và URL */}
             <div className="bg-white rounded-lg shadow p-6">
@@ -102,10 +101,10 @@ export const ProfileComponent = ({ userId }: ProfilePageProps) => {
                     Hồ sơ công khai và URL
                   </h2>
                   <p className="text-gray-600 break-all">
-                    www.linkedin.com/in/{profile.id}
+                    https://www.infinitys.vn/profile/{profile.id}
                   </p>
                 </div>
-                <button className="p-2 hover:bg-gray-100 rounded-full">
+                {/* <button className="p-2 hover:bg-gray-100 rounded-full">
                   <svg
                     className="w-5 h-5"
                     fill="currentColor"
@@ -113,7 +112,7 @@ export const ProfileComponent = ({ userId }: ProfilePageProps) => {
                   >
                     <path d="M21.13 2.86a3 3 0 00-4.17 0l-13 13L2 22l6.19-2L21.13 7a3 3 0 000-4.16zM6.77 19.14l-2.52.83.83-2.52 10.05-10.05 1.68 1.69L6.77 19.14z" />
                   </svg>
-                </button>
+                </button> */}
               </div>
             </div>
           </div>

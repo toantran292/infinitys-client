@@ -28,7 +28,9 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import axiosInstance from "@/lib/axios";
-export default function JobsPageUI() {
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+export default function JobsComponent() {
   const { user } = useAuth();
   const { data: profile, isLoading } = useProfile(user?.id);
   const [page, setPage] = useState(1);
@@ -49,10 +51,10 @@ export default function JobsPageUI() {
 
   const pageQueries = useQueries({
     queries: jobs.map((job) => ({
-      queryKey: ["page", job.pageUser.page.id],
+      queryKey: ["page", job.page.id],
       queryFn: () =>
         axiosInstance
-          .get(`/api/pages/${job.pageUser.page.id}`)
+          .get(`/api/pages/${job.page.id}`)
           .then((res) => res.data),
       staleTime: 5 * 60 * 1000 // Cache for 5 minutes
     }))
@@ -249,16 +251,12 @@ export default function JobsPageUI() {
                         return (
                           <Link href={`/jobs/${job.id}`} key={job.id}>
                             <div className="p-4 hover:bg-accent cursor-pointer flex gap-4">
-                              <div className="h-12 w-12 relative rounded-lg bg-muted flex items-center justify-center overflow-hidden">
-                                <img
-                                  src={
-                                    page?.avatar?.url ||
-                                    "https://github.com/shadcn.png"
-                                  }
-                                  alt={page?.name || "Company"}
-                                  className="object-cover"
-                                />
-                              </div>
+                              <Avatar className="h-12 w-12 relative rounded-lg bg-muted flex items-center justify-center overflow-hidden">
+                                <AvatarImage className="object-cover" src={page?.avatar?.url} />
+                                <AvatarFallback className="text-xl bg-gray-500 text-white">
+                                  {page?.name?.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
                               <div className="flex-1">
                                 <h3 className="font-medium text-primary">
                                   {job.title}
@@ -333,7 +331,7 @@ export default function JobsPageUI() {
                                 }
                                 size="sm"
                                 onClick={() => setPage(pageNumber as number)}
-                                className="min-w-[32px]"
+                                className="min-w-[32px] text-white"
                               >
                                 {pageNumber}
                               </Button>
